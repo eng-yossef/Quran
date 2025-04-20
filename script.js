@@ -3,6 +3,15 @@ let currentPage = 1;
 const totalPages = 604; // Total pages in standard Quran mushaf
 let pagesData = {}; // Will store organized verses by page
 let surahData = []; // Will store surah information
+let currentAudio = null;
+let currentPlayingSurah = null;
+let isPlayingEntireSurah = false;
+let currentVerseHighlight = null;
+let audioPaused = false;
+let currentVerseSequence = [];
+let currentVerseIndex = 0;
+let currentPageNumber = 1; // Track current page number
+
 
 // DOM elements
 const quranPageEl = document.getElementById('quranPage');
@@ -89,10 +98,21 @@ function organizeVersesByPage(surahs) {
     return pages;
 }
 
-// Render page
-let currentAudio = null;
+
+// Add stop button container to HTML body
+const stopBtnContainer = document.createElement('div');
+stopBtnContainer.className = 'stop-btn-container';
+stopBtnContainer.innerHTML = `
+    <button class="stop-audio-btn" style="display: none;">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>
+    </button>
+`;
+document.body.appendChild(stopBtnContainer);
 
 function renderPage(pageNumber) {
+    currentPageNumber = pageNumber; // Update current page
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
@@ -104,12 +124,14 @@ function renderPage(pageNumber) {
             if (verse.numberInSurah === 1) {
                 html += `
                     <div class="surah-info">
-                        <h2>${verse.surahName}</h2>
+                        <h2 class="surah-name" data-surah="${verse.surahNumber}">
+                            ${verse.surahName}
+                        </h2>
                         <p>${verse.englishName} - ${verse.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</p>
                     </div>
                 `;
 
-                if (pageNumber != 1&& pageNumber != 187) {
+                if (pageNumber != 1 && pageNumber != 187) {
                     html += `
                         <div class="bismillah-container">
                             <div class="bismillah-decoration left"></div>
@@ -124,7 +146,7 @@ function renderPage(pageNumber) {
 
         html += `
             <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}">
-            <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
+                <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
                 <span class="verse-number">${verse.numberInSurah}</span>
             </div>
         `;
@@ -133,9 +155,17 @@ function renderPage(pageNumber) {
     quranPageEl.innerHTML = html;
     pageIndicatorEl.textContent = `الصفحة ${pageNumber}`;
 
-    // Click event only on verse text
+    // Add click event to surah names
+    document.querySelectorAll('.surah-name').forEach(surahName => {
+        surahName.addEventListener('click', function() {
+            const surahNumber = this.getAttribute('data-surah');
+            playEntireSurah(surahNumber, pageNumber);
+        });
+    });
+
+    // Click event on verse text
     document.querySelectorAll('.verse-text').forEach(span => {
-        span.addEventListener('click', function (e) {
+        span.addEventListener('click', function(e) {
             const container = this.closest('.verse-container');
             const surah = container.getAttribute('data-surah');
             const ayah = container.getAttribute('data-ayah');
@@ -147,7 +177,8 @@ function renderPage(pageNumber) {
             container.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
 
             // Play verse
-            playVerseAudio(surah, ayah);
+            playVerseAudio(surah, ayah, false);
+            
         });
     });
 
@@ -160,8 +191,81 @@ function renderPage(pageNumber) {
     matchSidebarHeight();
 }
 
-function playVerseAudio(surah, ayah) {
-    if (currentAudio) {
+function playEntireSurah(surahNumber, currentPage) {
+    stopAudio();
+    
+    const verses = [];
+    let startPlaying = false;
+    let currentPageVerses = [];
+    
+    // First collect all verses from current page onwards
+    for (let page = currentPage; page <= totalPages; page++) {
+        pagesData[page].forEach(verse => {
+            if (verse.surahNumber == surahNumber) {
+                verses.push(verse);
+                if (page == currentPage) {
+                    currentPageVerses.push(verse);
+                }
+            }
+        });
+        // If we found any verses and moved to next page, break if surah changes
+        if (verses.length > 0 && page > currentPage) {
+            if (pagesData[page][0].surahNumber !== surahNumber) break;
+        }
+    }
+    
+    if (verses.length === 0) return;
+    
+    isPlayingEntireSurah = true;
+    currentPlayingSurah = surahNumber;
+    currentVerseSequence = verses;
+    currentVerseIndex = currentPageVerses.findIndex(v => v.numberInSurah === verses[0].numberInSurah);
+    if (currentVerseIndex < 0) currentVerseIndex = 0;
+    
+    // Show stop button
+    document.querySelector('.stop-audio-btn').style.display = 'block';
+    
+    playNextVerseInSequence();
+}
+
+function playNextVerseInSequence() {
+    if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
+        stopAudio();
+        return;
+    }
+    
+    const verse = currentVerseSequence[currentVerseIndex];
+    const verseElement = document.querySelector(`.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`);
+    
+    // Check if we need to change page
+    const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
+    if (versePage !== currentPageNumber) {
+        renderPage(versePage);
+    }
+    
+    if (verseElement) {
+        // Highlight and scroll to verse
+        document.querySelectorAll('.verse-container').forEach(v => {
+            v.style.backgroundColor = '';
+        });
+        verseElement.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
+        verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    playVerseAudio(verse.surahNumber, verse.numberInSurah, true);
+}
+
+function findPageForVerse(surahNumber, ayahNumber) {
+    for (let page in pagesData) {
+        if (pagesData[page].some(v => v.surahNumber == surahNumber && v.numberInSurah == ayahNumber)) {
+            return parseInt(page);
+        }
+    }
+    return currentPageNumber;
+}
+
+function playVerseAudio(surah, ayah, isSequence = false) {
+    if (currentAudio && !audioPaused) {
         currentAudio.pause();
         currentAudio = null;
     }
@@ -171,20 +275,114 @@ function playVerseAudio(surah, ayah) {
         .then(data => {
             if (data.code === 200 && data.data.audio) {
                 currentAudio = new Audio(data.data.audio);
+                
+                if (audioPaused) {
+                    audioPaused = false;
+                    document.querySelector('.stop-audio-btn').innerHTML = `
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    `;
+                }
+                
                 currentAudio.play();
 
                 currentAudio.addEventListener('ended', () => {
-                    document.querySelectorAll('.verse-container').forEach(v => {
-                        v.style.backgroundColor = '';
-                    });
+                    if (isSequence) {
+                        currentVerseIndex++;
+                        if (currentVerseIndex < currentVerseSequence.length) {
+                            playNextVerseInSequence();
+                        } else {
+                            stopAudio();
+                        }
+                    } else {
+                        document.querySelectorAll('.verse-container').forEach(v => {
+                            v.style.backgroundColor = '';
+                        });
+                    }
                 });
             }
         })
         .catch(error => {
             console.error('Error fetching audio:', error);
+            if (isSequence) {
+                currentVerseIndex++;
+                playNextVerseInSequence();
+            }
         });
 }
 
+function toggleAudioPlayback() {
+    const stopBtn = document.querySelector('.stop-audio-btn');
+    
+    if (currentAudio) {
+        if (audioPaused) {
+            // Resume playback
+            currentAudio.play();
+            audioPaused = false;
+            stopBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                </svg>
+            `;
+            
+            if (isPlayingEntireSurah) {
+                playNextVerseInSequence();
+            }
+        } else {
+            // Pause playback
+            currentAudio.pause();
+            audioPaused = true;
+            stopBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                </svg>
+            `;
+        }
+    }
+}
+
+function stopAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    isPlayingEntireSurah = false;
+    audioPaused = false;
+    document.querySelectorAll('.verse-container').forEach(v => {
+        v.style.backgroundColor = '';
+    });
+    document.querySelector('.stop-audio-btn').style.display = 'none';
+}
+
+// Add event listener to stop button
+document.querySelector('.stop-audio-btn').addEventListener('click', function() {
+    toggleAudioPlayback();
+});
+
+// Minimal CSS for stop button (won't affect existing styles)
+const style = document.createElement('style');
+style.textContent = `
+    .stop-btn-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    .stop-audio-btn {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+`;
+document.head.appendChild(style);
 
 // Populate surah list in sidebar
 function populateSurahList(surahs) {

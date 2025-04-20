@@ -155,32 +155,32 @@ function renderPage(pageNumber) {
     quranPageEl.innerHTML = html;
     pageIndicatorEl.textContent = `الصفحة ${pageNumber}`;
 
-    // Add click event to surah names
-    document.querySelectorAll('.surah-name').forEach(surahName => {
-        surahName.addEventListener('click', function() {
-            const surahNumber = this.getAttribute('data-surah');
-            playEntireSurah(surahNumber, pageNumber);
-        });
+  // Add click event to surah names
+document.querySelectorAll('.surah-name').forEach(surahName => {
+    surahName.addEventListener('click', function() {
+        const surahNumber = parseInt(this.getAttribute('data-surah'));
+        playEntireSurah(surahNumber, {page: pageNumber});
     });
+});
 
-    // Click event on verse text
-    document.querySelectorAll('.verse-text').forEach(span => {
-        span.addEventListener('click', function(e) {
-            const container = this.closest('.verse-container');
-            const surah = container.getAttribute('data-surah');
-            const ayah = container.getAttribute('data-ayah');
+// Click event on verse text
+document.querySelectorAll('.verse-text').forEach(span => {
+    span.addEventListener('click', function(e) {
+        const container = this.closest('.verse-container');
+        const surah = parseInt(container.getAttribute('data-surah'));
+        const ayah = parseInt(container.getAttribute('data-ayah'));
 
-            // Highlight the clicked verse
-            document.querySelectorAll('.verse-container').forEach(v => {
-                v.style.backgroundColor = '';
-            });
-            container.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
-
-            // Play verse
-            playVerseAudio(surah, ayah, false);
-            
+        // Highlight the clicked verse
+        document.querySelectorAll('.verse-container').forEach(v => {
+            v.style.backgroundColor = '';
         });
+        container.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
+
+        // Play from this verse through the rest of the surah
+        playEntireSurah(surah, {verseNumber: ayah});
+        
     });
+});
 
     // Disable/enable navigation buttons
     prevPageBtn.disabled = pageNumber <= 1;
@@ -191,23 +191,43 @@ function renderPage(pageNumber) {
     matchSidebarHeight();
 }
 
-function playEntireSurah(surahNumber, currentPage) {
+function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
     stopAudio();
     
     const verses = [];
     let startPlaying = false;
     let currentPageVerses = [];
     
-    // First collect all verses from current page onwards
+    // Determine the starting page if only verseNumber is provided
+    let currentPage = startFrom.page;
+    if (!currentPage && startFrom.verseNumber) {
+        // Find the page containing the starting verse
+        for (let page = 1; page <= totalPages; page++) {
+            const verseInPage = pagesData[page].find(v => 
+                v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
+            );
+            if (verseInPage) {
+                currentPage = page;
+                break;
+            }
+        }
+        if (!currentPage) return; // Verse not found
+    }
+    
+    // Collect all verses from current page onwards
     for (let page = currentPage; page <= totalPages; page++) {
         pagesData[page].forEach(verse => {
             if (verse.surahNumber == surahNumber) {
-                verses.push(verse);
+                // Only start collecting from the starting verse if specified
+                if (!startFrom.verseNumber || verse.numberInSurah >= startFrom.verseNumber) {
+                    verses.push(verse);
+                }
                 if (page == currentPage) {
                     currentPageVerses.push(verse);
                 }
             }
         });
+        
         // If we found any verses and moved to next page, break if surah changes
         if (verses.length > 0 && page > currentPage) {
             if (pagesData[page][0].surahNumber !== surahNumber) break;
@@ -219,8 +239,16 @@ function playEntireSurah(surahNumber, currentPage) {
     isPlayingEntireSurah = true;
     currentPlayingSurah = surahNumber;
     currentVerseSequence = verses;
-    currentVerseIndex = currentPageVerses.findIndex(v => v.numberInSurah === verses[0].numberInSurah);
-    if (currentVerseIndex < 0) currentVerseIndex = 0;
+    
+    // Find the index of the starting verse
+    currentVerseIndex = 0;
+    if (startFrom.verseNumber) {
+        currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
+        if (currentVerseIndex < 0) currentVerseIndex = 0;
+    } else {
+        currentVerseIndex = currentPageVerses.findIndex(v => v.numberInSurah === verses[0].numberInSurah);
+        if (currentVerseIndex < 0) currentVerseIndex = 0;
+    }
     
     // Show stop button
     document.querySelector('.stop-audio-btn').style.display = 'block';
@@ -360,29 +388,7 @@ document.querySelector('.stop-audio-btn').addEventListener('click', function() {
     toggleAudioPlayback();
 });
 
-// Minimal CSS for stop button (won't affect existing styles)
-const style = document.createElement('style');
-style.textContent = `
-    .stop-btn-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1000;
-    }
-    .stop-audio-btn {
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-`;
-document.head.appendChild(style);
+
 
 // Populate surah list in sidebar
 function populateSurahList(surahs) {

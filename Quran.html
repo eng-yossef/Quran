@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> المصحف الشريف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <!-- add Icon  -->
+    <link rel="icon" href="quran (1).png" type="image/png" sizes="16x16">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">سور القرآن الكريم</h3>
+                <button class="close-sidebar" id="closeSidebar">&times;</button>
+            </div>
+            <ul class="surah-list" id="surahList">
+                <!-- Surah list will be populated here -->
+            </ul>
+        </div>
+        
+        <!-- Main Content  -->
+        <div class="main-content">
+            <div class="header">
+                <button class="menu-button" id="menuButton">☰</button>
+                <h1 class="header-title">المصحف الشريف</h1>
+                <div style="width: 40px;"></div> <!-- Spacer for alignment -->
+            </div>
+            
+            <div class="quran-page" id="quranPage">
+                <!-- Quran content will be loaded here -->
+            </div>
+            
+            <div class="navigation">
+                <button class="nav-button" id="prevPage">السابق</button>
+                <span class="page-indicator" id="pageIndicator">الصفحة 1</span>
+                <button class="nav-button" id="nextPage">التالي</button>
+            </div>
+        </div>
+    </div>    
+    <script src="script.js"></script>
+</body>
+</html>

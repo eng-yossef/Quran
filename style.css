@@ -139,14 +139,59 @@ z-index: 10;
 }
 
 .verse-text {
-    display: inline;
-    padding: 0 0.2rem;
+    transition: all 0.3s ease;
+    padding: 2px 4px;
     border-radius: 3px;
-    transition: background-color 0.2s;
 }
 
+/* Light Mode Hover */
 .verse-text:hover {
-    background-color: var(--light-green);
+    background-color: rgba(46, 139, 87, 0.1);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Night Mode Verse Hover Effect */
+.night-mode .verse-text:hover {
+    position: relative;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(179, 229, 252, 0.7);
+    transition: all 0.3s ease;
+}
+
+/* Create a subtle glow effect */
+.night-mode .verse-text:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 4px;
+    background: rgba(179, 229, 252, 0.1);
+    box-shadow: 0 0 12px rgba(179, 229, 252, 0.3);
+    z-index: -1;
+    animation: gentle-pulse 2s infinite alternate;
+}
+
+
+
+@keyframes gentle-pulse {
+    0% {
+        opacity: 0.3;
+        box-shadow: 0 0 8px rgba(179, 229, 252, 0.2);
+    }
+    100% {
+        opacity: 0.5;
+        box-shadow: 0 0 15px rgba(179, 229, 252, 0.4);
+    }
+}
+
+/* Light Mode Hover (for comparison) */
+.verse-text:hover {
+    background-color: rgba(46, 139, 87, 0.08);
+    color: #1B5E20;
+    transition: all 0.2s ease;
 }
 
 /* Verse number styling */
@@ -180,6 +225,64 @@ z-index: 10;
     padding-bottom: 5px;
     line-height: 1.8;
 }
+
+/* Verse Container Hover Effect */
+.verse:hover {
+    transform: translateX(3px);
+    transition: transform 0.3s ease;
+}
+
+/* Night Mode Verse Container Hover */
+.night-mode .verse:hover {
+    background-color: rgba(30, 30, 30, 0.7);
+    border-left: 2px solid #4FC3F7;
+    transform: translateX(3px);
+
+}
+
+.night-mode .verse:hover .verse-text {
+    color: #E1F5FE;
+    text-shadow: 0 0 10px rgba(187, 222, 251, 0.6);
+}
+
+
+.night-mode .verse:hover .verse-number {
+    background-color: #0288D1 !important;
+    box-shadow: 0 0 0 2px #4FC3F7;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
+
+/* Subtle Background Glow */
+.night-mode .verse:hover::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -5px;
+    right: -5px;
+    bottom: -2px;
+    background: linear-gradient(
+        90deg,
+        rgba(2, 136, 209, 0.1) 0%,
+        rgba(66, 165, 245, 0.05) 50%,
+        rgba(2, 136, 209, 0.1) 100%
+    );
+    border-radius: 6px;
+    z-index: -1;
+    animation: gentle-glow 2s ease infinite alternate;
+}
+
+@keyframes gentle-glow {
+    from {
+        opacity: 0.4;
+    }
+    to {
+        opacity: 0.7;
+    }
+}
+
+
 
 .navigation {
     display: flex;
@@ -613,6 +716,8 @@ z-index: 10;
 .night-mode .verse {
     background-color: #1e1e1e !important;
     color: #e0e0e0 !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
 }
 
 .night-mode ,
@@ -639,4 +744,56 @@ h1.header-title{
     cursor: pointer;
     margin-left: 10px;
     padding: 5px;
+}
+
+
+/* Current Playing Verse Styles */
+.current-playing-verse {
+    position: relative;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+/* Light Mode */
+.current-playing-verse {
+    background-color: rgba(46, 139, 87, 0.08) !important;
+    border-left: 3px solid #2E8B57;
+    padding-left: 8px;
+}
+
+.current-playing-verse .verse-number {
+    background-color: #2E8B57 !important;
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Night Mode */
+.night-mode .current-playing-verse {
+    background-color: rgba(66, 165, 245, 0.1) !important;
+    border-left: 3px solid #4FC3F7;
+}
+
+.night-mode .current-playing-verse .verse-number {
+    background-color: #0288D1 !important;
+    color: #E1F5FE !important;
+    box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+}
+
+/* Animation */
+@keyframes verse-pulse {
+    0% { box-shadow: inset 0 0 0 rgba(46, 139, 87, 0); }
+    50% { box-shadow: inset 0 0 10px rgba(46, 139, 87, 0.1); }
+    100% { box-shadow: inset 0 0 0 rgba(46, 139, 87, 0); }
+}
+
+.night-mode .current-playing-verse {
+    animation: night-pulse 3s ease infinite;
+}
+
+@keyframes night-pulse {
+    0% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
+    50% { box-shadow: inset 0 0 15px rgba(66, 165, 245, 0.15); }
+    100% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
 }

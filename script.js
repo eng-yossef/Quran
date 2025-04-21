@@ -243,10 +243,10 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
   }
   
   function hideTafsir(verseElement) {
-    const tooltip = verseElement.querySelector('.verse-tafsir');
-    if (tooltip) {
-      tooltip.style.display = 'none';
-    }
+    document.querySelectorAll('.verse-tafsir').forEach(t => {
+        t.style.display = 'none';
+    });
+    verseElement.querySelector('.verse-tafsir').style.display = 'none';
   }
 
 
@@ -366,6 +366,9 @@ function toArabicNumber(num) {
 function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
     stopAudio();
     
+    // Clear any existing highlights
+    clearVerseHighlights();
+    
     const verses = [];
     let startPlaying = false;
     let currentPageVerses = [];
@@ -428,6 +431,30 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
     playNextVerseInSequence();
 }
 
+// Add these helper functions:
+
+function highlightCurrentVerse(verseElement) {
+    if (!verseElement) return;
+    
+    verseElement.classList.add('current-playing-verse');
+    
+    // Scroll to the verse if it's not fully visible
+    verseElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+}
+
+function clearVerseHighlights() {
+    document.querySelectorAll('.current-playing-verse').forEach(el => {
+        el.classList.remove('current-playing-verse');
+    });
+}
+
+// Add this to your playNextVerseInSequence function:
+// After creating/loading the verse element, call:
+// highlightCurrentVerse(verseElement);
+
 function playNextVerseInSequence() {
     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
         stopAudio();
@@ -437,24 +464,54 @@ function playNextVerseInSequence() {
     const verse = currentVerseSequence[currentVerseIndex];
     const verseElement = document.querySelector(`.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`);
     
+    // Clear previous highlights
+    document.querySelectorAll('.current-playing-verse').forEach(el => {
+        el.classList.remove('current-playing-verse');
+    });
+    
     // Check if we need to change page
     const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
     if (versePage !== currentPageNumber) {
-        renderPage(versePage);
+        renderPage(versePage).then(() => {
+            // After page renders, find the verse element again
+            const newVerseElement = document.querySelector(`.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`);
+            highlightCurrentVerse(newVerseElement);
+            playVerseAudio(verse.surahNumber, verse.numberInSurah, true);
+        });
+        return;
     }
     
     if (verseElement) {
-        // Highlight and scroll to verse
-        document.querySelectorAll('.verse-container').forEach(v => {
-            v.style.backgroundColor = '';
-        });
-        verseElement.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
-        verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        highlightCurrentVerse(verseElement);
     }
     
     playVerseAudio(verse.surahNumber, verse.numberInSurah, true);
 }
 
+function highlightCurrentVerse(verseElement) {
+    if (!verseElement) return;
+    
+    verseElement.classList.add('current-playing-verse');
+    
+    // Scroll to the verse with smooth behavior
+    setTimeout(() => {
+        verseElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'start'
+        });
+    }, 100);
+    
+    // Add visual pulse effect
+    verseElement.style.animation = 'verse-pulse 2s infinite';
+}
+
+function clearVerseHighlights() {
+    document.querySelectorAll('.current-playing-verse').forEach(el => {
+        el.classList.remove('current-playing-verse');
+        el.style.animation = '';
+    });
+}
 function findPageForVerse(surahNumber, ayahNumber) {
     for (let page in pagesData) {
         if (pagesData[page].some(v => v.surahNumber == surahNumber && v.numberInSurah == ayahNumber)) {
@@ -669,6 +726,8 @@ async function initApp() {
         }
         
     });
+    setupVerseHoverEffects();
+
 
     
 }
@@ -696,6 +755,8 @@ function applyNightMode() {
     document.body.classList.toggle('night-mode', isNightMode);
     nightModeToggle.textContent = isNightMode ? '☀️' : '🌙';
     updateVerseNumbers();
+    setupVerseHoverEffects();
+
 }
 
 // Initialize
@@ -715,7 +776,21 @@ function onVersesLoaded() {
 
 
 
-
+function setupVerseHoverEffects() {
+    const verses = document.querySelectorAll('.verse');
+    
+    verses.forEach(verse => {
+        verse.addEventListener('mouseenter', function() {
+            if (document.body.classList.contains('night-mode')) {
+                this.style.setProperty('--glow-intensity', '0.6');
+            }
+        });
+        
+        verse.addEventListener('mouseleave', function() {
+            this.style.setProperty('--glow-intensity', '0');
+        });
+    });
+}
 
 
 // Start the application

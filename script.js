@@ -673,6 +673,50 @@ async function initApp() {
     
 }
 
+// Night Mode Toggle with better verse number handling
+const nightModeToggle = document.getElementById('nightModeToggle');
+let isNightMode = localStorage.getItem('nightMode') === 'true';
+
+function updateVerseNumbers() {
+    const verseNumbers = document.querySelectorAll('.verse-number');
+    verseNumbers.forEach(num => {
+        if (isNightMode) {
+            num.style.backgroundColor = '#01579b';
+            num.style.color = '#b3e5fc';
+            num.style.boxShadow = '0 0 0 1px #0288d1';
+        } else {
+            num.style.backgroundColor = '#e0f7fa';
+            num.style.color = '#006064';
+            num.style.boxShadow = 'none';
+        }
+    });
+}
+
+function applyNightMode() {
+    document.body.classList.toggle('night-mode', isNightMode);
+    nightModeToggle.textContent = isNightMode ? '☀️' : '🌙';
+    updateVerseNumbers();
+}
+
+// Initialize
+applyNightMode();
+
+// Toggle handler
+nightModeToggle.addEventListener('click', () => {
+    isNightMode = !isNightMode;
+    localStorage.setItem('nightMode', isNightMode);
+    applyNightMode();
+});
+
+// Call this after loading new verses
+function onVersesLoaded() {
+    updateVerseNumbers();
+}
+
+
+
+
+
 
 // Start the application
 initApp();

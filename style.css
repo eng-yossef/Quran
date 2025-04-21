@@ -149,17 +149,36 @@ z-index: 10;
     background-color: var(--light-green);
 }
 
+/* Verse number styling */
 .verse-number {
     display: inline-flex;
-    justify-content: center;
     align-items: center;
-    width: 1.8rem;
-    height: 1.8rem;
-    background-color: var(--primary-green);
-    color: white;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    font-size: 0.9rem;
-    margin-left: 0.2rem;
+    background-color: #e0f7fa; /* Light blue circle for light mode */
+    color: #006064; /* Dark text for contrast */
+    font-weight: bold;
+    font-size: 0.8em;
+    margin: 0 5px;
+    text-align: center;
+    line-height: 1;
+    padding: 2px;
+}
+
+/* Night mode adjustments */
+.night-mode .verse-number {
+    background-color: #01579b !important; /* Darker blue circle */
+    color: #b3e5fc !important; /* Light text for contrast */
+    box-shadow: 0 0 0 1px #0288d1;
+}
+
+/* Adjust verse spacing */
+.verse {
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    line-height: 1.8;
 }
 
 .navigation {
@@ -197,22 +216,121 @@ z-index: 10;
     border-radius: 20px;
 }
 
+/* Surah Info - Light Mode */
 .surah-info {
-    
-    background-color: var(--light-green);
-    /* padding: 0.6rem 1rem; */
-    border-radius: 4px;
-    /* margin-bottom: 1rem; */
-    border-right: 4px solid var(--primary-green);
+    background-color: #E8F5E9; /* Light green background */
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    border-right: 4px solid #2E8B57; /* Primary green border */
     text-align: center;
     font-size: 1.4rem;
-    color: var(--dark-green);
+    color: #1B5E20; /* Dark green text */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.surah-info h2,p{
-    margin: 0;
+.surah-info h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2E8B57;
+    position: relative;
+    display: inline-block;
 }
 
+.surah-info h2::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(to right, #D4AF37, #2E8B57, #D4AF37);
+}
+
+.surah-info p {
+    margin: 0.5rem 0 0 0;
+    font-size: 1.2rem;
+    color: #388E3C;
+    font-style: italic;
+}
+
+/* Decorative corner elements */
+.surah-info::before,
+.surah-info::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(46, 139, 87, 0.1);
+    border-radius: 50%;
+}
+
+.surah-info::before {
+    top: -15px;
+    left: -15px;
+}
+
+.surah-info::after {
+    bottom: -15px;
+    right: -15px;
+}
+
+/* Night Mode Styles */
+.night-mode .surah-info {
+    background-color: #263238; /* Dark slate background */
+    border-right-color: #81C784; /* Light green border */
+    color: #E8F5E9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.night-mode .surah-info h2 {
+    color: #81C784;
+}
+
+.night-mode .surah-info h2::after {
+    background: linear-gradient(to right, #FFD54F, #81C784, #FFD54F);
+}
+
+.night-mode .surah-info p {
+    color: #A5D6A7;
+}
+
+.night-mode .surah-info::before,
+.night-mode .surah-info::after {
+    background-color: rgba(129, 199, 132, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .surah-info {
+        padding: 0.8rem;
+        font-size: 1.2rem;
+        margin: 1rem 0;
+    }
+    
+    .surah-info h2 {
+        font-size: 1.5rem;
+    }
+    
+    .surah-info p {
+        font-size: 1rem;
+    }
+}
+
+/* Animation for Visual Interest */
+@keyframes surah-info-glow {
+    0% { box-shadow: 0 0 0 rgba(46, 139, 87, 0); }
+    100% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3); }
+}
+
+.surah-info:hover {
+    animation: surah-info-glow 0.5s forwards;
+}
 
 
 
@@ -266,98 +384,124 @@ z-index: 10;
 }
 
 
+/* Bismillah Container - Light Mode */
 .bismillah-container {
-display: flex;
-justify-content: center;
-align-items: center;
-position: relative;
-}
-
-.bismillah-text {
-font-family: 'Amiri', serif;
-font-size: 2.5rem;
-color: #2E8B57;
-text-align: center;
-padding: 0 2rem;
-position: relative;
-text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-background: linear-gradient(to right, #F5F5F0, #E8F5E9, #F5F5F0);
-border-radius: 8px;
-box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-border: 1px solid rgba(46, 139, 87, 0.3);
-}
-
-.bismillah-decoration {
-flex: 1;
-height: 2px;
-background: linear-gradient(90deg, #D4AF37, #2E8B57, #D4AF37);
-position: relative;
-}
-
-.bismillah-decoration.left {
-margin-right: 1rem;
-}
-
-.bismillah-decoration.right {
-margin-left: 1rem;
-}
-
-.bismillah-decoration::before,
-.bismillah-decoration::after {
-content: "";
-position: absolute;
-width: 12px;
-height: 12px;
-background-color: #D4AF37;
-border-radius: 50%;
-top: 50%;
-transform: translateY(-50%);
-}
-
-.bismillah-decoration.left::before {
-left: 0;
-}
-
-.bismillah-decoration.left::after {
-left: 20px;
-background-color: #2E8B57;
-}
-
-.bismillah-decoration.right::before {
-right: 0;
-}
-
-.bismillah-decoration.right::after {
-right: 20px;
-background-color: #2E8B57;
-}
-
-@media (max-width: 768px) {
-.bismillah-text {
-    font-size: 2rem;
-    padding: 0 1.5rem;
-}
-
-.bismillah-decoration::before,
-.bismillah-decoration::after {
-    width: 10px;
-    height: 10px;
-}
-}
-
-@media (max-width: 480px) {
-.bismillah-text {
-    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0;
     padding: 0 1rem;
 }
 
+.bismillah-text {
+    font-family: 'Amiri', serif;
+    font-size: 2.5rem;
+    color: #2E8B57;
+    text-align: center;
+    padding: 1rem 2rem;
+    position: relative;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    background: linear-gradient(to right, #F5F5F0, #E8F5E9, #F5F5F0);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border: 1px solid rgba(46, 139, 87, 0.3);
+    transition: all 0.3s ease;
+}
+
+.bismillah-decoration {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, #D4AF37, #2E8B57, #D4AF37);
+    position: relative;
+    opacity: 0.8;
+}
+
 .bismillah-decoration.left {
-    margin-right: 0.5rem;
+    margin-right: 1rem;
 }
 
 .bismillah-decoration.right {
-    margin-left: 0.5rem;
+    margin-left: 1rem;
 }
+
+.bismillah-decoration::before,
+.bismillah-decoration::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #D4AF37;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.3s ease;
+}
+
+.bismillah-decoration.left::before {
+    left: 0;
+}
+
+.bismillah-decoration.left::after {
+    left: 20px;
+    background-color: #2E8B57;
+}
+
+.bismillah-decoration.right::before {
+    right: 0;
+}
+
+.bismillah-decoration.right::after {
+    right: 20px;
+    background-color: #2E8B57;
+}
+
+/* Night Mode Styles */
+.night-mode .bismillah-text {
+    color: #81C784;
+    background: linear-gradient(to right, #263238, #37474F, #263238);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    border-color: rgba(129, 199, 132, 0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.night-mode .bismillah-decoration {
+    background: linear-gradient(90deg, #FFD54F, #81C784, #FFD54F);
+}
+
+.night-mode .bismillah-decoration::before {
+    background-color: #FFD54F;
+}
+
+.night-mode .bismillah-decoration.left::after,
+.night-mode .bismillah-decoration.right::after {
+    background-color: #81C784;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .bismillah-text {
+        font-size: 2rem;
+        padding: 0.8rem 1.5rem;
+    }
+    
+    .bismillah-decoration.left {
+        margin-right: 0.5rem;
+    }
+    
+    .bismillah-decoration.right {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Animation for Emphasis */
+@keyframes bismillah-glow {
+    0% { box-shadow: 0 0 5px rgba(46, 139, 87, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(46, 139, 87, 0.5); }
+    100% { box-shadow: 0 0 5px rgba(46, 139, 87, 0.3); }
+}
+
+.bismillah-text:hover {
+    animation: bismillah-glow 2s infinite;
 }
 
 .stop-btn-container {
@@ -436,4 +580,63 @@ background-color: #2E8B57;
 
 
 
-  
+  /* Night Mode Styles */
+.night-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .main-content {
+    background-color: #1e1e1e !important;
+}
+
+.night-mode .sidebar {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .surah-list li {
+    color: #e0e0e0 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+.night-mode .surah-list li:hover {
+    background-color: #333 !important;
+}
+
+.night-mode .quran-page,
+.night-mode .quran-page * {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .verse {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode ,
+.night-mode ,
+.night-mode  {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #444 !important;
+}
+
+.night-mode .header-title {
+    color: #e0e0e0 !important;
+   
+}
+h1.header-title{
+    width: -1;
+    margin-left: 15%;
+}
+
+.night-mode-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 5px;
+}

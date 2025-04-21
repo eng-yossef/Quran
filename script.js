@@ -182,6 +182,9 @@ function renderPage(pageNumber) {
         
         // Hover events for tafsir
         verseContainer.addEventListener('mouseenter', function() {
+            document.querySelectorAll( '.verse-tafsir').forEach(t => {  
+                t.style.display = 'none';
+            }   );
             showTafsir(this, surah, ayah);
         });
         
@@ -513,8 +516,8 @@ function toggleAudioPlayback() {
     const stopBtn = document.querySelector('.stop-audio-btn');
     
     if (currentAudio) {
-        if (audioPaused) {
-            // Resume playback
+        if (currentAudio.paused) {
+            // Resume playback from where it was paused
             currentAudio.play();
             audioPaused = false;
             stopBtn.innerHTML = `
@@ -523,11 +526,12 @@ function toggleAudioPlayback() {
                 </svg>
             `;
             
-            if (isPlayingEntireSurah) {
+            // Only play next verse if we're in sequence mode AND we reached the end
+            if (isPlayingEntireSurah && currentAudio.ended) {
                 playNextVerseInSequence();
             }
         } else {
-            // Pause playback
+            // Pause playback (without resetting position)
             currentAudio.pause();
             audioPaused = true;
             stopBtn.innerHTML = `
@@ -660,11 +664,13 @@ async function initApp() {
             window.scrollTo(0, 0);
         }
         else if (e.code === 'Space' || e.key === ' ') {
-            e.preventDefault(); // Prevent scrolling when space is pressed
+            e.preventDefault();
             toggleAudioPlayback();
         }
         
     });
+
+    
 }
 
 

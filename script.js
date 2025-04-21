@@ -180,17 +180,38 @@ function renderPage(pageNumber) {
             playEntireSurah(surah, {verseNumber: ayah});
         });
         
-        // Hover events for tafsir
         verseContainer.addEventListener('mouseenter', function() {
-            document.querySelectorAll( '.verse-tafsir').forEach(t => {  
-                t.style.display = 'none';
-            }   );
-            showTafsir(this, surah, ayah);
+            const verse = this;
+            
+            // Set timer to show tafsir after 2 seconds
+            verse._tafsirTimer = setTimeout(() => {
+                // Hide all other tafsirs first
+                document.querySelectorAll('.verse-tafsir').forEach(t => {
+                    t.classList.remove('show');
+                });
+                
+                // Show current verse tafsir
+                showTafsir(verse, surah, ayah);
+                verse._tafsirTimer = null;
+            }, 1000);
         });
         
+        
         verseContainer.addEventListener('mouseleave', function() {
+            // Clear the tafsir timer if it exists
+            if (this._tafsirTimer) {
+                clearTimeout(this._tafsirTimer);
+                this._tafsirTimer = null;
+            }
+            
+            // Hide tafsir on mouse leave
             hideTafsir(this);
         });
+
+
+
+
+        
     });
 
     // Disable/enable navigation buttons

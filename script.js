@@ -386,18 +386,13 @@ function toArabicNumber(num) {
 
 function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
     stopAudio();
-    
-    // Clear any existing highlights
     clearVerseHighlights();
     
     const verses = [];
-    let startPlaying = false;
-    let currentPageVerses = [];
-    
-    // Determine the starting page if only verseNumber is provided
     let currentPage = startFrom.page;
+    
+    // Find starting page if only verseNumber is provided
     if (!currentPage && startFrom.verseNumber) {
-        // Find the page containing the starting verse
         for (let page = 1; page <= totalPages; page++) {
             const verseInPage = pagesData[page].find(v => 
                 v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
@@ -407,26 +402,42 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
                 break;
             }
         }
-        if (!currentPage) return; // Verse not found
+        if (!currentPage) return;
     }
     
-    // Collect all verses from current page onwards
+    // If no starting point specified, find first page of surah
+    if (!currentPage) {
+        for (let page = 1; page <= totalPages; page++) {
+            if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
+                currentPage = page;
+                break;
+            }
+        }
+        if (!currentPage) return;
+    }
+    
+    // Collect all verses from current page to end of surah
+    let foundStartingVerse = !startFrom.verseNumber; // true if no specific verse to start from
     for (let page = currentPage; page <= totalPages; page++) {
-        pagesData[page].forEach(verse => {
-            if (verse.surahNumber == surahNumber) {
-                // Only start collecting from the starting verse if specified
-                if (!startFrom.verseNumber || verse.numberInSurah >= startFrom.verseNumber) {
+        const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
+        
+        if (pageVerses.length === 0) break; // No more verses in this surah
+        
+        for (const verse of pageVerses) {
+            if (!foundStartingVerse) {
+                if (verse.numberInSurah === startFrom.verseNumber) {
+                    foundStartingVerse = true;
                     verses.push(verse);
                 }
-                if (page == currentPage) {
-                    currentPageVerses.push(verse);
-                }
+            } else {
+                verses.push(verse);
             }
-        });
+        }
         
-        // If we found any verses and moved to next page, break if surah changes
-        if (verses.length > 0 && page > currentPage) {
-            if (pagesData[page][0].surahNumber !== surahNumber) break;
+        // Check if next page starts a new surah
+        if (page < totalPages && pagesData[page+1].length > 0 && 
+            pagesData[page+1][0].surahNumber !== surahNumber) {
+            break;
         }
     }
     
@@ -436,35 +447,30 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
     currentPlayingSurah = surahNumber;
     currentVerseSequence = verses;
     
-    // Find the index of the starting verse
+    // Find starting index
     currentVerseIndex = 0;
     if (startFrom.verseNumber) {
         currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
         if (currentVerseIndex < 0) currentVerseIndex = 0;
-    } else {
-        currentVerseIndex = currentPageVerses.findIndex(v => v.numberInSurah === verses[0].numberInSurah);
-        if (currentVerseIndex < 0) currentVerseIndex = 0;
     }
     
-    // Show stop button
     document.querySelector('.stop-audio-btn').style.display = 'block';
-    
     playNextVerseInSequence();
 }
 
 // Add these helper functions:
 
-function highlightCurrentVerse(verseElement) {
-    if (!verseElement) return;
+// function highlightCurrentVerse(verseElement) {
+//     if (!verseElement) return;
     
-    verseElement.classList.add('current-playing-verse');
+//     verseElement.classList.add('current-playing-verse');
     
-    // Scroll to the verse if it's not fully visible
-    verseElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-}
+//     // Scroll to the verse if it's not fully visible
+//     verseElement.scrollIntoView({
+//         behavior: 'smooth',
+//         block: 'center'
+//     });
+// }
 
 function clearVerseHighlights() {
     document.querySelectorAll('.current-playing-verse').forEach(el => {
@@ -476,14 +482,13 @@ function clearVerseHighlights() {
 // After creating/loading the verse element, call:
 // highlightCurrentVerse(verseElement);
 
-function playNextVerseInSequence() {
+async function playNextVerseInSequence() {
     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
         stopAudio();
         return;
     }
     
     const verse = currentVerseSequence[currentVerseIndex];
-    const verseElement = document.querySelector(`.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`);
     
     // Clear previous highlights
     document.querySelectorAll('.current-playing-verse').forEach(el => {
@@ -493,20 +498,57 @@ function playNextVerseInSequence() {
     // Check if we need to change page
     const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
     if (versePage !== currentPageNumber) {
-        renderPage(versePage).then(() => {
-            // After page renders, find the verse element again
-            const newVerseElement = document.querySelector(`.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`);
-            highlightCurrentVerse(newVerseElement);
-            playVerseAudio(verse.surahNumber, verse.numberInSurah, true);
-        });
+        try {
+            await renderPage(versePage);
+            
+            // Find the verse element after page render
+            const verseElement = document.querySelector(
+                `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
+            );
+            
+            if (verseElement) {
+                highlightCurrentVerse(verseElement);
+                
+                // Play audio after highlighting
+                playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
+                    // Move to next verse only after audio completes
+                    currentVerseIndex++;
+                    if (currentVerseIndex < currentVerseSequence.length) {
+                        playNextVerseInSequence();
+                    } else {
+                        stopAudio();
+                    }
+                });
+            } else {
+                // If verse element not found, move to next verse
+                currentVerseIndex++;
+                playNextVerseInSequence();
+            }
+        } catch (error) {
+            console.error("Error rendering page:", error);
+            stopAudio();
+        }
         return;
     }
+    
+    // For same-page verses
+    const verseElement = document.querySelector(
+        `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
+    );
     
     if (verseElement) {
         highlightCurrentVerse(verseElement);
     }
     
-    playVerseAudio(verse.surahNumber, verse.numberInSurah, true);
+    playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
+        // Move to next verse only after audio completes
+        currentVerseIndex++;
+        if (currentVerseIndex < currentVerseSequence.length) {
+            playNextVerseInSequence();
+        } else {
+            stopAudio();
+        }
+    });
 }
 
 function highlightCurrentVerse(verseElement) {

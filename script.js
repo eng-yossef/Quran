@@ -267,7 +267,6 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
     document.querySelectorAll('.verse-tafsir').forEach(t => {
         t.style.display = 'none';
     });
-    verseElement.querySelector('.verse-tafsir').style.display = 'none';
   }
 
 

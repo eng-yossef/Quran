@@ -386,7 +386,6 @@ function toArabicNumber(num) {
 function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
     stopAudio();
     clearVerseHighlights();
-    
     const verses = [];
     let currentPage = startFrom.page;
     
@@ -454,22 +453,16 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
     }
     
     document.querySelector('.stop-audio-btn').style.display = 'block';
+    document.querySelector('.stop-audio-btn').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>`
+    
+
     playNextVerseInSequence();
+
 }
 
-// Add these helper functions:
 
-// function highlightCurrentVerse(verseElement) {
-//     if (!verseElement) return;
-    
-//     verseElement.classList.add('current-playing-verse');
-    
-//     // Scroll to the verse if it's not fully visible
-//     verseElement.scrollIntoView({
-//         behavior: 'smooth',
-//         block: 'center'
-//     });
-// }
 
 function clearVerseHighlights() {
     document.querySelectorAll('.current-playing-verse').forEach(el => {
@@ -477,9 +470,7 @@ function clearVerseHighlights() {
     });
 }
 
-// Add this to your playNextVerseInSequence function:
-// After creating/loading the verse element, call:
-// highlightCurrentVerse(verseElement);
+
 
 async function playNextVerseInSequence() {
     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {

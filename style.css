@@ -378,3 +378,62 @@ background-color: #2E8B57;
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
+
+/* Tafsir Tooltip Styles */
+.verse-tafsir {
+    position: fixed;
+    z-index: 1000;
+    max-width: 400px;
+    min-width: 300px;
+    background: #f8f5e6;
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    color: #333;
+    font-family: 'Traditional Arabic', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: right;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .verse-tafsir::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: var(--arrow-left, -10px);
+    border: var(--arrow-border, 10px solid transparent 10px solid #d4af37 10px solid transparent);
+    width: 0;
+    height: 0;
+  }
+  
+  .verse-tafsir::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: var(--arrow-after-left, -9px);
+    border: var(--arrow-after-border, 9px solid transparent 9px solid #f8f5e6 9px solid transparent);
+    width: 0;
+    height: 0;
+  }
+  
+  .verse-tafsir-header {
+    font-weight: bold;
+    color: #8b4513;
+    border-bottom: 1px solid #d4af37;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+
+
+  

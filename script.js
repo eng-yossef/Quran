@@ -112,7 +112,7 @@ stopBtnContainer.innerHTML = `
 document.body.appendChild(stopBtnContainer);
 
 function renderPage(pageNumber) {
-    currentPageNumber = pageNumber; // Update current page
+    currentPageNumber = pageNumber;
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
@@ -147,7 +147,7 @@ function renderPage(pageNumber) {
         html += `
             <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}">
                 <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
-                <span class="verse-number">${ toArabicNumber( verse.numberInSurah)}</span>
+                <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
             </div>
         `;
     });
@@ -155,35 +155,40 @@ function renderPage(pageNumber) {
     quranPageEl.innerHTML = html;
     pageIndicatorEl.textContent = `الصفحة ${pageNumber}`;
 
- 
-    
-
-  // Add click event to surah names
-document.querySelectorAll('.surah-name').forEach(surahName => {
-    surahName.addEventListener('click', function() {
-        const surahNumber = parseInt(this.getAttribute('data-surah'));
-        playEntireSurah(surahNumber, {page: pageNumber});
-    });
-});
-
-// Click event on verse text
-document.querySelectorAll('.verse-text').forEach(span => {
-    span.addEventListener('click', function(e) {
-        const container = this.closest('.verse-container');
-        const surah = parseInt(container.getAttribute('data-surah'));
-        const ayah = parseInt(container.getAttribute('data-ayah'));
-
-        // Highlight the clicked verse
-        document.querySelectorAll('.verse-container').forEach(v => {
-            v.style.backgroundColor = '';
+    // Add click event to surah names
+    document.querySelectorAll('.surah-name').forEach(surahName => {
+        surahName.addEventListener('click', function() {
+            const surahNumber = parseInt(this.getAttribute('data-surah'));
+            playEntireSurah(surahNumber, {page: pageNumber});
         });
-        container.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
-
-        // Play from this verse through the rest of the surah
-        playEntireSurah(surah, {verseNumber: ayah});
-        
     });
-});
+
+    // Add click and hover events to verses
+    document.querySelectorAll('.verse-container').forEach(verseContainer => {
+        const surah = parseInt(verseContainer.getAttribute('data-surah'));
+        const ayah = parseInt(verseContainer.getAttribute('data-ayah'));
+        
+        // Click event
+        verseContainer.addEventListener('click', function(e) {
+            // Highlight the clicked verse
+            document.querySelectorAll('.verse-container').forEach(v => {
+                v.style.backgroundColor = '';
+            });
+            this.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
+            
+            // Play from this verse through the rest of the surah
+            playEntireSurah(surah, {verseNumber: ayah});
+        });
+        
+        // Hover events for tafsir
+        verseContainer.addEventListener('mouseenter', function() {
+            showTafsir(this, surah, ayah);
+        });
+        
+        verseContainer.addEventListener('mouseleave', function() {
+            hideTafsir(this);
+        });
+    });
 
     // Disable/enable navigation buttons
     prevPageBtn.disabled = pageNumber <= 1;
@@ -193,6 +198,158 @@ document.querySelectorAll('.verse-text').forEach(span => {
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
     matchSidebarHeight();
 }
+
+
+// Add this function to fetch and display tafsir
+// Update the showTafsir function with better positioning
+async function showTafsir(verseElement, surahNumber, verseNumber) {
+    // Create tooltip if it doesn't exist
+    let tooltip = verseElement.querySelector('.verse-tafsir');
+    
+    if (!tooltip) {
+      tooltip = document.createElement('div');
+      tooltip.className = 'verse-tafsir';
+      verseElement.appendChild(tooltip);
+      
+      // Add loading state
+      tooltip.innerHTML = `
+        <div class="verse-tafsir-header">تفسير المیسر</div>
+        <div class="tafsir-content">جاري التحميل...</div>
+      `;
+      
+      try {
+        // Fetch tafsir from API
+        const response = await fetch(`https://raw.githubusercontent.com/spa5k/tafsir_api/main/tafsir/ar-tafsir-muyassar/${surahNumber}/${verseNumber}.json`);
+        const tafsirData = await response.json();
+        
+        // Display tafsir
+        tooltip.innerHTML = `
+          <div class="verse-tafsir-header">تفسير المیسر (${surahNumber}:${verseNumber})</div>
+          <div class="tafsir-content">${tafsirData.text}</div>
+        `;
+      } catch (error) {
+        tooltip.innerHTML = `
+          <div class="verse-tafsir-header">تفسير المیسر</div>
+          <div class="tafsir-content">لا يتوفر تفسير لهذه الآية حالياً</div>
+        `;
+      }
+    }
+    
+    // Position the tooltip smartly
+    positionTafsirTooltip(verseElement, tooltip);
+  }
+  
+  function hideTafsir(verseElement) {
+    const tooltip = verseElement.querySelector('.verse-tafsir');
+    if (tooltip) {
+      tooltip.style.display = 'none';
+    }
+  }
+
+
+  function positionTafsirTooltip(verseElement, tooltip) {
+    const verseRect = verseElement.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Show tooltip to calculate dimensions
+    tooltip.style.display = 'block';
+    const tooltipWidth = tooltip.offsetWidth;
+    const tooltipHeight = tooltip.offsetHeight;
+
+    // ===== RESPONSIVE ADJUSTMENTS ===== //
+    // Default values (mobile first)
+    let horizontalOffset = 15;
+    let maxTooltipWidth = Math.min(300, viewportWidth - 40);
+    let verticalOffset = 0;
+    const minMargin = 10;
+
+    // Tablet adjustments (768px to 1023px)
+    if (viewportWidth >= 768 && viewportWidth < 1024) {
+        maxTooltipWidth = 200;
+        horizontalOffset = 20;
+    }
+    // Phone adjustments (< 768px)
+    else if (viewportWidth < 768) {
+        maxTooltipWidth = viewportWidth - 50;
+        horizontalOffset = 10;
+    }
+    // Desktop adjustments (≥ 1024px - preserved from original)
+    else if (viewportWidth >= 1024) {
+        maxTooltipWidth = 400;
+        horizontalOffset = 25;
+    }
+
+    tooltip.style.maxWidth = `${maxTooltipWidth}px`;
+    tooltip.style.width = 'auto';
+    const effectiveTooltipWidth = Math.min(tooltipWidth, maxTooltipWidth);
+
+    // ===== POSITIONING LOGIC ===== //
+    // Calculate both possible positions
+    const rightPosition = verseRect.right + horizontalOffset;
+    const leftPosition = verseRect.left - horizontalOffset - effectiveTooltipWidth;
+
+    // Check available space
+    const spaceRight = viewportWidth - verseRect.right - horizontalOffset;
+    const spaceLeft = verseRect.left - horizontalOffset;
+    
+    // Determine position - modified for mobile/tablet
+    let useRightSide;
+    
+    // Desktop logic (preserved)
+    if (viewportWidth >= 1024) {
+        useRightSide = spaceRight >= effectiveTooltipWidth || 
+                      (spaceRight >= spaceLeft && spaceRight >= minMargin);
+    } 
+    // Mobile/tablet logic
+    else {
+        // For mobile/tablet, prioritize left side for right-edge verses
+        const isRightEdgeVerse = verseRect.right > viewportWidth * 0.7;
+        useRightSide = !isRightEdgeVerse && spaceRight >= effectiveTooltipWidth;
+    }
+
+    // Edge case handling (applies to all devices)
+    if (useRightSide && (rightPosition + effectiveTooltipWidth > viewportWidth - minMargin)) {
+        useRightSide = (leftPosition >= minMargin);
+    }
+
+    // Apply position
+    if (useRightSide) {
+        tooltip.style.left = `${Math.min(rightPosition, viewportWidth - effectiveTooltipWidth - minMargin)-150}px`;
+        tooltip.style.right = 'auto';
+    } else {
+        tooltip.style.left = `${Math.max(leftPosition, minMargin)-11}px`;
+        tooltip.style.right = 'auto';
+    }
+
+    // ===== VERTICAL POSITIONING (unchanged) ===== //
+    verticalOffset = (verseRect.height - tooltipHeight) / 2;
+    
+    if (verseRect.top + verticalOffset < minMargin) {
+        verticalOffset = -verseRect.top + minMargin;
+    }
+    if (verseRect.bottom + verticalOffset + tooltipHeight > viewportHeight - minMargin) {
+        verticalOffset = viewportHeight - verseRect.bottom - tooltipHeight - minMargin;
+    }
+
+    tooltip.style.top = `${verseRect.top + verticalOffset}px`;
+
+    // ===== ARROW POSITIONING (unchanged) ===== //
+    if (useRightSide) {
+        tooltip.style.setProperty('--arrow-left', '-10px');
+        tooltip.style.setProperty('--arrow-border', 
+            '10px solid transparent 10px solid #d4af37 10px solid transparent');
+    } else {
+        tooltip.style.setProperty('--arrow-left', 'calc(100% - 1px)');
+        tooltip.style.setProperty('--arrow-border', 
+            '10px solid #d4af37 10px solid transparent 10px solid transparent');
+    }
+}
+
+
+
+
+
 
 function toArabicNumber(num) {
     const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];

@@ -147,13 +147,16 @@ function renderPage(pageNumber) {
         html += `
             <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}">
                 <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
-                <span class="verse-number">${verse.numberInSurah}</span>
+                <span class="verse-number">${ toArabicNumber( verse.numberInSurah)}</span>
             </div>
         `;
     });
 
     quranPageEl.innerHTML = html;
     pageIndicatorEl.textContent = `الصفحة ${pageNumber}`;
+
+ 
+    
 
   // Add click event to surah names
 document.querySelectorAll('.surah-name').forEach(surahName => {
@@ -189,6 +192,15 @@ document.querySelectorAll('.verse-text').forEach(span => {
     // Update browser history
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
     matchSidebarHeight();
+}
+
+function toArabicNumber(num) {
+    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    return num
+        .toString()
+        .split('')
+        .map(digit => /\d/.test(digit) ? arabicDigits[+digit] : digit)
+        .join('');
 }
 
 function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
@@ -394,7 +406,7 @@ document.querySelector('.stop-audio-btn').addEventListener('click', function() {
 function populateSurahList(surahs) {
     surahListEl.innerHTML = surahs.map(surah => `
         <li class="surah-item" data-surah="${surah.number}">
-            <span class="surah-number">${surah.number}</span>
+            <span class="surah-number">${toArabicNumber(surah.number)}</span>
             ${surah.name} (${surah.englishName})
         </li>
     `).join('');
@@ -490,6 +502,11 @@ async function initApp() {
             renderPage(currentPage);
             window.scrollTo(0, 0);
         }
+        else if (e.code === 'Space' || e.key === ' ') {
+            e.preventDefault(); // Prevent scrolling when space is pressed
+            toggleAudioPlayback();
+        }
+        
     });
 }
 

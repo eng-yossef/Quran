@@ -145,7 +145,7 @@ function renderPage(pageNumber) {
         }
 
         html += `
-            <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}">
+            <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah} " data-surah-name="${verse.surahName}">
                 <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
                 <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
             </div>
@@ -193,7 +193,7 @@ function renderPage(pageNumber) {
                 // Show current verse tafsir
                 showTafsir(verse, surah, ayah);
                 verse._tafsirTimer = null;
-            }, 1000);
+            }, 2000);
         });
         
         
@@ -776,6 +776,15 @@ async function initApp() {
         else if (e.code === 'Space' || e.key === ' ') {
             e.preventDefault();
             toggleAudioPlayback();
+        }else if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            const selection = window.getSelection();
+            if (selection && selection.toString().trim() !== '') {
+                // Check if selection is within Quran content
+                if (document.getElementById('quranPage').contains(selection.anchorNode)) {
+                    saveVerseAsImage(selection);
+                }
+            }
         }
         
     });
@@ -784,6 +793,139 @@ async function initApp() {
 
     
 }
+
+
+
+async function saveVerseAsImage(selection) {    
+    try {
+        const range = selection.getRangeAt(0);
+        // Get the parent element that contains the selected text
+        let container = range.startContainer;
+        if (container.nodeType === Node.TEXT_NODE) {
+            container = container.parentNode;
+        }
+        
+        // Find the nearest verse container
+        const verseContainer = findParentWithClass(container, 'verse-container');
+        if (!verseContainer) {
+            console.warn('No verse container found for selection');
+            return;
+        }
+
+        // Create a decorated container
+        const decoratedVerse = createDecoratedVerse(verseContainer, selection.toString());
+        
+        // Use html2canvas to convert to image
+        const html2canvas = await loadHtml2Canvas();
+        
+        html2canvas(decoratedVerse, {
+            backgroundColor: null,
+            scale: 2,
+            logging: false,
+            allowTaint: true,
+            useCORS: true
+        }).then(canvas => {
+            // Trigger download
+            const link = document.createElement('a');
+            link.download = `quran-verse-${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // Clean up
+            document.body.removeChild(decoratedVerse);
+        });
+    } catch (error) {
+        console.error('Error saving verse as image:', error);
+    }
+}
+
+
+function createDecoratedVerse(verseContainer, selectedText) {
+    const verseNumber = verseContainer.querySelector('.verse-number')?.textContent;
+    const surahName = verseContainer.dataset.surahName || 'السورة';
+    
+    const decorated = document.createElement('div');
+    decorated.className = 'qv-premium-container';
+    decorated.innerHTML = `
+        <div class="qv-premium-gold-accent"></div>
+        <div class="qv-premium-pattern"></div>
+        <div class="qv-premium-corner qv-premium-corner-tl"></div>
+        <div class="qv-premium-corner qv-premium-corner-tr"></div>
+        <div class="qv-premium-corner qv-premium-corner-bl"></div>
+        <div class="qv-premium-corner qv-premium-corner-br"></div>
+        
+        <div class="qv-premium-header">
+            <div class="qv-premium-meta">
+                <div class="qv-premium-surah">${surahName}</div>
+                <span class="qv-premium-number">آية  ${verseNumber}</span>
+            </div>
+        </div>
+        
+        <div class="qv-premium-text">${selectedText}</div>
+        
+        <div class="qv-premium-footer">
+            <div class="qv-premium-decoration"></div>
+            <div class="qv-premium-watermark">${new Date().toLocaleDateString('ar-EG')}</div>
+        </div>
+    `;
+    
+    document.body.appendChild(decorated);
+    return decorated;
+}
+
+
+
+function loadHtml2Canvas() {
+    return new Promise((resolve) => {
+        if (window.html2canvas) {
+            showSaveNotification();
+
+            return resolve(window.html2canvas);
+        }
+        const script = document.createElement('script');
+        script.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
+        script.onload = () => resolve(window.html2canvas);
+        document.head.appendChild(script);
+    });
+}
+
+// Helper function to find parent with specific class
+function findParentWithClass(element, className, maxDepth = 5) {
+    let current = element;
+    let depth = 0;
+    
+    while (current && depth < maxDepth) {
+        if (current.classList && current.classList.contains(className)) {
+            return current;
+        }
+        current = current.parentNode;
+        depth++;
+    }
+    return null;
+}
+
+
+function showSaveNotification() {
+    const notification = document.createElement('div');
+    notification.textContent = 'Preparing verse image...';
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.padding = '10px 20px';
+    notification.style.background = '#2E8B57';
+    notification.style.color = 'white';
+    notification.style.borderRadius = '4px';
+    notification.style.zIndex = '1000';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+
+
+
 
 // Night Mode Toggle with better verse number handling
 const nightModeToggle = document.getElementById('nightModeToggle');

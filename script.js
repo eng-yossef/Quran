@@ -145,11 +145,11 @@ function renderPage(pageNumber) {
         }
 
         html += `
-            <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah} " data-surah-name="${verse.surahName}">
-                <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
-                <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
-            </div>
-        `;
+        <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}" data-surah-name="${verse.surahName}">
+            <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
+            <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
+        </div>
+    `;
     });
 
     quranPageEl.innerHTML = html;
@@ -464,11 +464,11 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
 
 
 
-function clearVerseHighlights() {
-    document.querySelectorAll('.current-playing-verse').forEach(el => {
-        el.classList.remove('current-playing-verse');
-    });
-}
+// function clearVerseHighlights() {
+//     document.querySelectorAll('.current-playing-verse').forEach(el => {
+//         el.classList.remove('current-playing-verse');
+//     });
+// }
 
 
 
@@ -776,7 +776,7 @@ async function initApp() {
         else if (e.code === 'Space' || e.key === ' ') {
             e.preventDefault();
             toggleAudioPlayback();
-        }else if (e.ctrlKey && e.key === 's') {
+        }else if (e.ctrlKey && e.key === 's' ) {
             e.preventDefault();
             const selection = window.getSelection();
             if (selection && selection.toString().trim() !== '') {
@@ -843,6 +843,7 @@ async function saveVerseAsImage(selection) {
 function createDecoratedVerse(verseContainer, selectedText) {
     const verseNumber = verseContainer.querySelector('.verse-number')?.textContent;
     const surahName = verseContainer.dataset.surahName || 'السورة';
+    
     
     const decorated = document.createElement('div');
     decorated.className = 'qv-premium-container';

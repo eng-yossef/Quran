@@ -781,8 +781,11 @@ async function initApp() {
                 currentPage--;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo(0, 0);
-            }
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  });
+                              }
         });
         
         nextPageBtn.addEventListener('click', () => {
@@ -790,8 +793,11 @@ async function initApp() {
                 currentPage++;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo(0, 0);
-            }
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  });
+                              }
         });
         
         // Sidebar controls
@@ -800,19 +806,27 @@ async function initApp() {
         
         // Keyboard navigation (fixed arrow directions)
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' && currentPage < totalPages) {
+            if (e.key === 'ArrowLeft' && currentPage >1) {
                 e.preventDefault();
                 currentPage++;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo(0, 0);
-            } else if (e.key === 'ArrowLeft' && currentPage > 1) {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  });
+
+                } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
                 e.preventDefault();
                 currentPage--;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo(0, 0);
-            } else if (e.code === 'Space' || e.key === ' ') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  });
+
+                } else if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
                 toggleAudioPlayback();
             } else if (e.ctrlKey && e.key === 's') {

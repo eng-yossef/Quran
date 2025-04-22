@@ -11,6 +11,10 @@ let audioPaused = false;
 let currentVerseSequence = [];
 let currentVerseIndex = 0;
 let currentPageNumber = 1; // Track current page number
+let lastScrollPosition = window.pageYOffset;
+let scrollTimeout = null;
+
+
 
 
 // DOM elements
@@ -56,6 +60,27 @@ window.addEventListener('resize', function() {
 matchSidebarHeight();
 });
 
+
+function setupTafsirHideOnScroll() {
+    // Use passive: true for better scroll performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+  }
+  
+  function handleScroll() {
+    // Clear any pending hide operations
+    if (scrollTimeout) {
+      clearTimeout(scrollTimeout);
+    }
+  
+    // Only hide if scroll is significant (more than 5 pixels)
+    if (Math.abs(window.pageYOffset - lastScrollPosition) > 5) {
+      scrollTimeout = setTimeout(() => {
+        hideTafsir();
+      }, 100); // Small delay to avoid hiding during momentum scrolling
+    }
+  
+    lastScrollPosition = window.pageYOffset;
+  }
 
 
 // Fetch Quran data
@@ -164,56 +189,7 @@ function renderPage(pageNumber) {
         });
     });
 
-    // Add click and hover events to verses
-    document.querySelectorAll('.verse-container').forEach(verseContainer => {
-        const surah = parseInt(verseContainer.getAttribute('data-surah'));
-        const ayah = parseInt(verseContainer.getAttribute('data-ayah'));
-        
-        // Click event
-        verseContainer.addEventListener('click', function(e) {
-            // Highlight the clicked verse
-            document.querySelectorAll('.verse-container').forEach(v => {
-                v.style.backgroundColor = '';
-            });
-            this.style.backgroundColor = 'rgba(46, 139, 87, 0.1)';
-            
-            // Play from this verse through the rest of the surah
-            playEntireSurah(surah, {verseNumber: ayah});
-        });
-        
-        verseContainer.addEventListener('mouseenter', function() {
-            const verse = this;
-            
-            // Set timer to show tafsir after 2 seconds
-            verse._tafsirTimer = setTimeout(() => {
-                // Hide all other tafsirs first
-                document.querySelectorAll('.verse-tafsir').forEach(t => {
-                    t.classList.remove('show');
-                });
-                
-                // Show current verse tafsir
-                showTafsir(verse, surah, ayah);
-                verse._tafsirTimer = null;
-            }, 1500);
-        });
-        
-        
-        verseContainer.addEventListener('mouseleave', function() {
-            // Clear the tafsir timer if it exists
-            if (this._tafsirTimer) {
-                clearTimeout(this._tafsirTimer);
-                this._tafsirTimer = null;
-            }
-            
-            // Hide tafsir on mouse leave
-            hideTafsir(this);
-        });
-
-
-
-
-        
-    });
+   
 
     // Disable/enable navigation buttons
     prevPageBtn.disabled = pageNumber <= 1;
@@ -226,44 +202,210 @@ function renderPage(pageNumber) {
 }
 
 
+function setupVerseInteractions() {
+    const isTouchDevice = ('ontouchstart' in window) || 
+                         (navigator.maxTouchPoints > 0) || 
+                         (navigator.msMaxTouchPoints > 0);
+
+    document.querySelectorAll('.verse-container').forEach(verseContainer => {
+        verseContainer.classList.add('no-text-select');
+        
+        const surahNumber = parseInt(verseContainer.getAttribute('data-surah'));
+        const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
+        let tafsirTimer = null;
+        let touchStartTime = 0;
+        let touchStartY = 0;
+        let isPotentialScroll = false;
+
+        const highlightVerse = () => {
+            document.querySelectorAll('.verse-container').forEach(v => {
+                v.classList.remove('active-verse');
+            });
+            verseContainer.classList.add('active-verse');
+        };
+
+        if (isTouchDevice) {
+            /* ===== MOBILE/TOUCH HANDLING ===== */
+            verseContainer.addEventListener('touchstart', handleTouchStart, {passive: true});
+            verseContainer.addEventListener('touchmove', handleTouchMove, {passive: true});
+            verseContainer.addEventListener('touchend', handleTouchEnd);
+            verseContainer.addEventListener('touchcancel', handleTouchCancel);
+        } else {
+            /* ===== DESKTOP HANDLING ===== */
+            verseContainer.addEventListener('click', handleDesktopClick);
+            verseContainer.addEventListener('mouseenter', handleMouseEnter);
+            verseContainer.addEventListener('mouseleave', handleMouseLeave);
+        }
+
+        function handleTouchStart(e) {
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+            isPotentialScroll = false;
+            
+            // Start timer for long press
+            tafsirTimer = setTimeout(() => {
+                if (!isPotentialScroll) {
+                    clearSelection();
+                    showTafsir(verseContainer, surahNumber, verseNumber);
+                }
+            }, 800);
+        }
+
+        function handleTouchMove(e) {
+            const yDiff = Math.abs(e.touches[0].clientY - touchStartY);
+            
+            // If movement is significant, cancel tafsir and allow scroll
+            if (yDiff > 10) {
+                isPotentialScroll = true;
+                if (tafsirTimer) {
+                    clearTimeout(tafsirTimer);
+                    tafsirTimer = null;
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                if (touchDuration < 800 && !isPotentialScroll) {
+                    highlightVerse();
+                    playEntireSurah(surahNumber, {verseNumber: verseNumber});
+                }
+            } else if (!isPotentialScroll) {
+                hideTafsir(verseContainer);
+            }
+        }
+
+        function handleTouchCancel() {
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
+        }
+
+        // Desktop handlers remain unchanged
+        function handleDesktopClick() {
+            // highlightVerse();
+            playEntireSurah(surahNumber, {verseNumber: verseNumber});
+            clearSelection();
+        }
+
+        async function handleMouseEnter() {
+            tafsirTimer = setTimeout(async () => {
+                await showTafsir(verseContainer, surahNumber, verseNumber);
+                tafsirTimer = null;
+            }, 1500);
+        }
+
+        function handleMouseLeave() {
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
+            hideTafsir(verseContainer);
+        }
+    });
+
+    function clearSelection() {
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+            document.selection.empty();
+        }
+    }
+}
+
+
+
+
+
+// Add this in your initialization code
+function setupTafsirCloseHandlers() {
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('close-tafsir-btn')) {
+            e.stopImmediatePropagation(); // Completely stops event bubbling
+            e.preventDefault();
+            
+            const tafsir = e.target.closest('.verse-tafsir');
+            if (tafsir) {
+                tafsir.style.display = 'none';
+            }
+        }
+    }, true); // Use capturing phase
+}
 // Add this function to fetch and display tafsir
 // Update the showTafsir function with better positioning
 async function showTafsir(verseElement, surahNumber, verseNumber) {
-    // Create tooltip if it doesn't exist
-    let tooltip = verseElement.querySelector('.verse-tafsir');
-    
-    if (!tooltip) {
-      tooltip = document.createElement('div');
-      tooltip.className = 'verse-tafsir';
-      verseElement.appendChild(tooltip);
-      
-      // Add loading state
-      tooltip.innerHTML = `
-        <div class="verse-tafsir-header">تفسير المیسر</div>
+    // Hide any existing tafsir first
+    hideTafsir(verseElement);
+
+    // Create tooltip container
+    const tooltip = document.createElement('div');
+    tooltip.className = 'verse-tafsir';
+    verseElement.appendChild(tooltip);
+
+    // Add initial content (with close button)
+    tooltip.innerHTML = `
+        <div class="verse-tafsir-header">
+            تفسير المیسر
+            <button class="close-tafsir-btn" aria-label="إغلاق التفسير">×</button>
+        </div>
         <div class="tafsir-content">جاري التحميل...</div>
-      `;
-      
-      try {
-        // Fetch tafsir from API
+    `;
+
+    // Attach close listener to current button
+    const closeButton = tooltip.querySelector('.close-tafsir-btn');
+    addCloseButtonListener(closeButton, verseElement);
+
+    try {
         const response = await fetch(`https://raw.githubusercontent.com/spa5k/tafsir_api/main/tafsir/ar-tafsir-muyassar/${surahNumber}/${verseNumber}.json`);
         const tafsirData = await response.json();
-        
-        // Display tafsir
+
+        // Update tooltip content
         tooltip.innerHTML = `
-          <div class="verse-tafsir-header">تفسير المیسر (${surahNumber}:${verseNumber})</div>
-          <div class="tafsir-content">${tafsirData.text}</div>
+            <div class="verse-tafsir-header">
+                تفسير المیسر (${surahNumber}:${verseNumber})
+                <button class="close-tafsir-btn" aria-label="إغلاق التفسير">×</button>
+            </div>
+            <div class="tafsir-content">${tafsirData.text}</div>
         `;
-      } catch (error) {
+
+        // Re-attach close button after DOM update
+        const newCloseButton = tooltip.querySelector('.close-tafsir-btn');
+        addCloseButtonListener(newCloseButton, verseElement);
+
+    } catch (error) {
         tooltip.innerHTML = `
-          <div class="verse-tafsir-header">تفسير المیسر</div>
-          <div class="tafsir-content">لا يتوفر تفسير لهذه الآية حالياً</div>
+            <div class="verse-tafsir-header">
+                تفسير المیسر
+                <button class="close-tafsir-btn" aria-label="إغلاق التفسير">×</button>
+            </div>
+            <div class="tafsir-content">لا يتوفر تفسير لهذه الآية حالياً</div>
         `;
-      }
+
+        // Re-attach close button on error
+        const newCloseButton = tooltip.querySelector('.close-tafsir-btn');
+        addCloseButtonListener(newCloseButton, verseElement);
     }
-    
-    // Position the tooltip smartly
+
+    // Show and position the tooltip
+    tooltip.style.display = 'block';
     positionTafsirTooltip(verseElement, tooltip);
-  }
+}
+function addCloseButtonListener(closeButton, verseElement) {
+    const handleCloseClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        hideTafsir(verseElement);
+    };
+
+    closeButton.addEventListener('click', handleCloseClick);
+    closeButton.addEventListener('touchstart', handleCloseClick);
+}
+
+
   
   function hideTafsir(verseElement) {
     document.querySelectorAll('.verse-tafsir').forEach(t => {
@@ -883,7 +1025,28 @@ async function initApp() {
             }
         });
         
+
+        document.addEventListener('click', function (e) {
+            const isInsideVerse = e.target.closest('.verse-container');
+            const isInsideTafsir = e.target.closest('.verse-tafsir');
+        
+            if (!isInsideVerse && !isInsideTafsir) {
+                // Hide all tafsir tooltips
+                document.querySelectorAll('.verse-tafsir').forEach(tooltip => {
+                    tooltip.remove();
+                });
+        
+                // Optionally remove active class
+                document.querySelectorAll('.verse-container').forEach(v => {
+                    v.classList.remove('active-verse');
+                });
+            }
+        });
+        
+        setupTafsirCloseHandlers();
+    setupVerseInteractions();
         setupVerseHoverEffects();
+        setupTafsirHideOnScroll();
         
     } catch (error) {
         console.error('App initialization failed:', error);

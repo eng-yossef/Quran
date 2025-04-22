@@ -13,6 +13,9 @@ let currentVerseIndex = 0;
 let currentPageNumber = 1; // Track current page number
 let lastScrollPosition = window.pageYOffset;
 let scrollTimeout = null;
+let touchStartX = 0;
+let touchEndX = 0;
+const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
 
 
 
@@ -81,6 +84,51 @@ function setupTafsirHideOnScroll() {
   
     lastScrollPosition = window.pageYOffset;
   }
+
+  function setupSwipeNavigation() {
+    const quranPage = document.getElementById('quranPage'); // Or your main container
+    
+    quranPage.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    quranPage.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    }, {passive: true});
+}
+
+function handleSwipe() {
+    const deltaX = touchEndX - touchStartX;
+
+    // Swipe right → Next page
+    if (deltaX > SWIPE_THRESHOLD && currentPage < totalPages) {
+        navigateToPage(currentPage + 1);
+    } 
+    // Swipe left → Previous page
+    else if (deltaX < -SWIPE_THRESHOLD && currentPage > 1) {
+        navigateToPage(currentPage - 1);
+    }
+}
+
+
+
+function navigateToPage(newPage) {
+    currentPage = newPage;
+    renderPage(currentPage);
+    saveCurrentPage(currentPage);
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+    highlightSurahForCurrentPage();
+    
+    // Add visual feedback (optional)
+    document.getElementById('quranPage').style.transform = `translateX(${newPage > currentPage ? 5 : -5}px)`;
+    setTimeout(() => {
+        document.getElementById('quranPage').style.transform = 'translateX(0)';
+    }, 300);
+}
 
 
 // Fetch Quran data
@@ -248,7 +296,7 @@ function setupVerseInteractions() {
                     clearSelection();
                     showTafsir(verseContainer, surahNumber, verseNumber);
                 }
-            }, 800);
+            }, 500);
         }
 
         function handleTouchMove(e) {
@@ -954,31 +1002,13 @@ async function initApp() {
         
         // Navigation event listeners
         prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderPage(currentPage);
-                saveCurrentPage(currentPage);
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                  });
-                  highlightSurahForCurrentPage();
+            if (currentPage > 1) navigateToPage(currentPage - 1);
 
-                              }
         });
         
         nextPageBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderPage(currentPage);
-                saveCurrentPage(currentPage);
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                  });
-                  highlightSurahForCurrentPage();
+            if (currentPage < totalPages) navigateToPage(currentPage + 1);
 
-                              }
         });
         
         // Sidebar controls
@@ -1047,6 +1077,8 @@ async function initApp() {
     setupVerseInteractions();
         setupVerseHoverEffects();
         setupTafsirHideOnScroll();
+        setupSwipeNavigation(); 
+
         
     } catch (error) {
         console.error('App initialization failed:', error);

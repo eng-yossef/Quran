@@ -113,6 +113,7 @@ document.body.appendChild(stopBtnContainer);
 
 function renderPage(pageNumber) {
     currentPageNumber = pageNumber;
+    saveCurrentPage(pageNumber)
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
@@ -193,7 +194,7 @@ function renderPage(pageNumber) {
                 // Show current verse tafsir
                 showTafsir(verse, surah, ayah);
                 verse._tafsirTimer = null;
-            }, 2000);
+            }, 1500);
         });
         
         
@@ -464,12 +465,6 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
 
 
 
-// function clearVerseHighlights() {
-//     document.querySelectorAll('.current-playing-verse').forEach(el => {
-//         el.classList.remove('current-playing-verse');
-//     });
-// }
-
 
 
 async function playNextVerseInSequence() {
@@ -721,79 +716,136 @@ function closeSidebar() {
 
 // Initialize app
 async function initApp() {
-    const surahs = await fetchQuranData();
-    if (!surahs) {
-        quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">تعذر تحميل القرآن الكريم. يرجى المحاولة لاحقاً.</p>';
-        return;
-    }
-    
-    surahData = surahs;
-    pagesData = organizeVersesByPage(surahs);
-    populateSurahList(surahs);
-    
-    // Check for page parameter in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const pageParam = urlParams.get('page');
-    if (pageParam && pageParam >= 1 && pageParam <= totalPages) {
-        currentPage = parseInt(pageParam);
-    }
-    
-    // Load current page
-    renderPage(currentPage);
-    
-    // Navigation event listeners
-    prevPageBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderPage(currentPage);
-            window.scrollTo(0, 0);
-        }
-    });
-    
-    nextPageBtn.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderPage(currentPage);
-            window.scrollTo(0, 0);
-        }
-    });
-    
-    // Sidebar controls
-    menuButtonEl.addEventListener('click', toggleSidebar);
-    closeSidebarEl.addEventListener('click', closeSidebar);
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft' && currentPage < totalPages) {
-            currentPage++;
-            renderPage(currentPage);
-            window.scrollTo(0, 0);
-        } else if (e.key === 'ArrowRight' && currentPage > 1) {
-            currentPage--;
-            renderPage(currentPage);
-            window.scrollTo(0, 0);
-        }
-        else if (e.code === 'Space' || e.key === ' ') {
-            e.preventDefault();
-            toggleAudioPlayback();
-        }else if (e.ctrlKey && e.key === 's' ) {
-            e.preventDefault();
-            const selection = window.getSelection();
-            if (selection && selection.toString().trim() !== '') {
-                // Check if selection is within Quran content
-                if (document.getElementById('quranPage').contains(selection.anchorNode)) {
-                    saveVerseAsImage(selection);
-                }
-            }
+    try {
+        // Load Quran data
+        const surahs = await fetchQuranData();
+        if (!surahs) {
+            quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">تعذر تحميل القرآن الكريم. يرجى المحاولة لاحقاً.</p>';
+            return;
         }
         
-    });
-    setupVerseHoverEffects();
+        surahData = surahs;
+        pagesData = organizeVersesByPage(surahs);
+        populateSurahList(surahs);
 
+        // Initialize current page with priority:
+        // 1. URL parameter
+        // 2. localStorage saved page
+        // 3. Default to page 1
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageParam = urlParams.get('page');
+        
+        currentPage = (function() {
+            try {
+                // 1. Check URL parameter first
+                if (pageParam && !isNaN(pageParam)) {
+                    const page = parseInt(pageParam);
+                    if (page >= 1 && page <= totalPages) {
+                        return page;
+                    }
+                }
+                
+                // 2. Check localStorage
+                const saved = localStorage.getItem('lastVisitedPage');
+                if (saved) {
+                    // Handle both JSON and number formats
+                    if (saved.startsWith('{')) {
+                        const data = JSON.parse(saved);
+                        // Check expiration (30 days)
+                        if (new Date().getTime() - data.timestamp < 30 * 24 * 60 * 60 * 1000) {
+                            return Math.max(1, Math.min(data.page, totalPages));
+                        }
+                    } else {
+                        const page = parseInt(saved);
+                        if (!isNaN(page)) {
+                            return Math.max(1, Math.min(page, totalPages));
+                        }
+                    }
+                }
+                
+                // 3. Default to page 1
+                return 1;
+            } catch (e) {
+                console.error('Error initializing page:', e);
+                return 1;
+            }
+        })();
 
-    
+        // Load current page
+        await renderPage(currentPage);
+        saveCurrentPage(currentPage); // Save initialized page
+        
+        // Navigation event listeners
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPage(currentPage);
+                saveCurrentPage(currentPage);
+                window.scrollTo(0, 0);
+            }
+        });
+        
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPage(currentPage);
+                saveCurrentPage(currentPage);
+                window.scrollTo(0, 0);
+            }
+        });
+        
+        // Sidebar controls
+        menuButtonEl.addEventListener('click', toggleSidebar);
+        closeSidebarEl.addEventListener('click', closeSidebar);
+        
+        // Keyboard navigation (fixed arrow directions)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && currentPage < totalPages) {
+                e.preventDefault();
+                currentPage++;
+                renderPage(currentPage);
+                saveCurrentPage(currentPage);
+                window.scrollTo(0, 0);
+            } else if (e.key === 'ArrowLeft' && currentPage > 1) {
+                e.preventDefault();
+                currentPage--;
+                renderPage(currentPage);
+                saveCurrentPage(currentPage);
+                window.scrollTo(0, 0);
+            } else if (e.code === 'Space' || e.key === ' ') {
+                e.preventDefault();
+                toggleAudioPlayback();
+            } else if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                const selection = window.getSelection();
+                if (selection && selection.toString().trim() !== '') {
+                    if (document.getElementById('quranPage').contains(selection.anchorNode)) {
+                        saveVerseAsImage(selection);
+                    }
+                }
+            }
+        });
+        
+        setupVerseHoverEffects();
+        
+    } catch (error) {
+        console.error('App initialization failed:', error);
+        quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">حدث خطأ أثناء تحميل التطبيق. يرجى تحديث الصفحة.</p>';
+    }
 }
 
+// Helper function to save current page
+function saveCurrentPage(page) {
+    try {
+        const data = {
+            page: page,
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem('lastVisitedPage', JSON.stringify(data));
+    } catch (error) {
+        console.error('Error saving page:', error);
+    }
+}
 
 
 async function saveVerseAsImage(selection) {    

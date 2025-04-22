@@ -221,6 +221,7 @@ function renderPage(pageNumber) {
 
     // Update browser history
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
+    highlightSurahForCurrentPage();
     matchSidebarHeight();
 }
 
@@ -673,7 +674,7 @@ function populateSurahList(surahs) {
     surahListEl.innerHTML = surahs.map(surah => `
         <li class="surah-item" data-surah="${surah.number}">
             <span class="surah-number">${toArabicNumber(surah.number)}</span>
-            ${surah.name} (${surah.englishName})
+            <span class="surah-name">${surah.name} (${surah.englishName})</span>
         </li>
     `).join('');
     
@@ -693,16 +694,50 @@ function goToSurah(surahNumber) {
     if (surah && surah.ayahs.length > 0) {
         currentPage = surah.ayahs[0].page;
         renderPage(currentPage);
+        highlightActiveSurah(surahNumber);
         window.scrollTo(0, 0);
+        // Update browser history
+        history.replaceState({ page: currentPage }, '', `?page=${currentPage}`);
     }
     //resize the page 
     matchSidebarHeight();
     // Close sidebar
     closeSidebar();
-    // Update browser history
-    history.replaceState({ page: currentPage }, '', `?page=${currentPage}`);
+}
 
 
+
+// After rendering a page, detect which surah is visible
+function highlightSurahForCurrentPage() {
+    if (!pagesData[currentPage] || pagesData[currentPage].length === 0) return;
+    
+    const firstVerse = pagesData[currentPage][0];
+    highlightActiveSurah(firstVerse.surahNumber);
+}
+
+// Call this after renderPage() completes
+
+
+
+
+// Highlight the active surah in sidebar
+function highlightActiveSurah(surahNumber) {
+    // Remove highlight from all surah items
+    document.querySelectorAll('.surah-item').forEach(item => {
+        item.classList.remove('active-surah');
+    });
+    
+    // Add highlight to current surah
+    const activeSurahItem = document.querySelector(`.surah-item[data-surah="${surahNumber}"]`);
+    if (activeSurahItem) {
+        activeSurahItem.classList.add('active-surah');
+        
+        // Scroll to the surah in sidebar if needed
+        activeSurahItem.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
 }
 
 // Toggle sidebar
@@ -785,6 +820,8 @@ async function initApp() {
                     top: 0,
                     behavior: 'smooth'
                   });
+                  highlightSurahForCurrentPage();
+
                               }
         });
         
@@ -797,6 +834,8 @@ async function initApp() {
                     top: 0,
                     behavior: 'smooth'
                   });
+                  highlightSurahForCurrentPage();
+
                               }
         });
         
@@ -806,7 +845,7 @@ async function initApp() {
         
         // Keyboard navigation (fixed arrow directions)
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' && currentPage >1) {
+            if (e.key === 'ArrowLeft' && currentPage < totalPages) {
                 e.preventDefault();
                 currentPage++;
                 renderPage(currentPage);
@@ -815,8 +854,10 @@ async function initApp() {
                     top: 0,
                     behavior: 'smooth'
                   });
+                  highlightSurahForCurrentPage();
 
-                } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
+
+                } else if (e.key === 'ArrowRight' && currentPage >1) {
                 e.preventDefault();
                 currentPage--;
                 renderPage(currentPage);
@@ -825,6 +866,8 @@ async function initApp() {
                     top: 0,
                     behavior: 'smooth'
                   });
+                  highlightSurahForCurrentPage();
+
 
                 } else if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();

@@ -98,7 +98,7 @@ z-index: 10;
 .header {
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
     color: white;
-    padding: 0.8rem 1rem;
+    padding: 0.1rem ;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -128,8 +128,8 @@ z-index: 10;
     box-shadow: 0 2px 15px rgba(0,0,0,0.08);
     border-radius: 4px;
     border: 1px solid #e0e0e0;
-    font-size: 1.7rem;
-    line-height: 2.8;
+    font-size: 1.5rem;
+    line-height: 2.5;
 }
 
 .verse-container {
@@ -289,7 +289,7 @@ z-index: 10;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.8rem 1.5rem;
+    padding: 0.3rem 1.5rem;
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
     color: white;
     border-top: 3px solid var(--gold-accent);
@@ -323,9 +323,9 @@ z-index: 10;
 /* Surah Info - Light Mode */
 .surah-info {
     background-color: #E8F5E9; /* Light green background */
-    padding: 1rem;
+    /* padding: 1rem; */
     border-radius: 8px;
-    margin: 1.5rem 0;
+    margin: .5rem 0;
     border-right: 4px solid #2E8B57; /* Primary green border */
     text-align: center;
     font-size: 1.4rem;
@@ -493,7 +493,7 @@ z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 1.5rem 0;
+    /* margin: 1.5rem 0; */
     padding: 0 1rem;
 }
 
@@ -1051,4 +1051,75 @@ h1.header-title{
 
 .night-mode .qv-premium-gold-accent {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="680" height="800" viewBox="0 0 680 800"><path fill="none" stroke="%23d4b770" stroke-width="1" stroke-opacity="0.1" d="M0,200 Q170,0 340,200 T680,200 M0,400 Q170,200 340,400 T680,400 M0,600 Q170,400 340,600 T680,600"/></svg>');
+}
+
+
+
+
+
+
+/* ===== Light Mode Styles ===== */
+.surah-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+.surah-item:hover {
+    background-color: rgba(34, 139, 34, 0.08); /* Forest green with 8% opacity */
+}
+
+.active-surah {
+    background-color: rgba(65, 105, 225, 0.1); /* Royal blue with 10% opacity */
+    border-right: 3px solid #2E8B57; /* Sea green border */
+    font-weight: 600;
+    position: relative;
+}
+
+.active-surah::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+}
+
+.active-surah .surah-name {
+    color: #2E8B57; /* Sea green text */
+}
+
+/* ===== Night Mode Styles ===== */
+.night-mode .surah-item:hover {
+    background-color: rgba(50, 205, 50, 0.1); /* Lime green with 10% opacity */
+}
+
+.night-mode .active-surah {
+    background-color: rgba(70, 130, 180, 0.15); /* Steel blue with 15% opacity */
+    border-right-color: #3CB371; /* Medium sea green */
+}
+
+.night-mode .active-surah::after {
+    
+}
+
+.night-mode .active-surah .surah-name {
+    color: #20B2AA; /* Light sea green */
+}
+
+/* ===== RTL Support ===== */
+[dir="rtl"] .active-surah {
+    border-right: none;
+    border-left: 3px solid #2E8B57; /* Sea green */
+}
+
+[dir="rtl"] .active-surah::after {
+    left: auto;
+    right: 0;
+}
+
+.night-mode[dir="rtl"] .active-surah {
+    border-left-color: #3CB371; /* Medium sea green */
 }

@@ -137,12 +137,6 @@ z-index: 10;
     align-items: center;
     margin: 0 0.1rem 0.3rem 0;
     position: relative;
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Standard */
     cursor: default;
 }
 
@@ -468,6 +462,12 @@ z-index: 10;
 @media (max-width: 768px) {
     .verse-container {
         margin-bottom: 0.2rem;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Standard */
     }
     
     .verse-number {
@@ -482,6 +482,14 @@ z-index: 10;
 }
 
 @media (max-width: 480px) {
+    .verse-container {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Standard */
+    }
     .quran-page {
         font-size: 1.3rem;
         line-height: 2.2;
@@ -653,9 +661,21 @@ z-index: 10;
     text-align: right;
     display: none;
     animation: fadeIn 0.3s ease;
-    user-select: text;
-    -webkit-user-select: text;
-  }
+    
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    
+    /* Allow selection only in content area when needed */
+    .tafsir-content {
+        user-select: text;
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+    }
+}
   
   .verse-tafsir::before {
     content: "";

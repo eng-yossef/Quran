@@ -346,10 +346,12 @@ function setupVerseInteractions() {
         }
 
         // Desktop handlers remain unchanged
-        function handleDesktopClick() {
-            // highlightVerse();
-            playEntireSurah(surahNumber, {verseNumber: verseNumber});
-            clearSelection();
+        function handleDesktopClick(e) {
+            // Only proceed if not clicking on tafsir (including close button)
+            if (!e.target.closest('.verse-tafsir')) {
+                playEntireSurah(surahNumber, {verseNumber: verseNumber});
+                clearSelection();
+            }
         }
 
         async function handleMouseEnter() {
@@ -951,6 +953,24 @@ function closeSidebar() {
     sidebarEl.classList.remove('open');
 }
 
+
+
+function setupTafsirClickHandlers() {
+    // Handle clicks on tafsir content (prevents bubbling to verse)
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.verse-tafsir')) {
+            e.stopImmediatePropagation();
+        }
+    }, true); // Use capturing phase
+
+
+    document.addEventListener('touchend', function(e) {
+        if (e.target.closest('.verse-tafsir')) {
+            e.stopImmediatePropagation();
+        }
+    }, true); // Use capturing phase
+}
+
 // Initialize app
 async function initApp() {
     try {
@@ -1086,10 +1106,11 @@ async function initApp() {
         });
         
         setupTafsirCloseHandlers();
-    setupVerseInteractions();
+          setupVerseInteractions();
         setupVerseHoverEffects();
         setupTafsirHideOnScroll();
         setupSwipeNavigation(); 
+        setupTafsirClickHandlers() 
 
         
     } catch (error) {

@@ -480,31 +480,24 @@ function addCloseButtonListener(closeButton, verseElement) {
     const verseRect = verseElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    
-    // Show tooltip to calculate dimensions
+
     tooltip.style.display = 'block';
     const tooltipWidth = tooltip.offsetWidth;
     const tooltipHeight = tooltip.offsetHeight;
 
     // ===== RESPONSIVE ADJUSTMENTS ===== //
-    // Default values (mobile first)
     let horizontalOffset = 15;
     let maxTooltipWidth = Math.min(300, viewportWidth - 40);
     let verticalOffset = 0;
     const minMargin = 10;
 
-    // Tablet adjustments (768px to 1023px)
     if (viewportWidth >= 768 && viewportWidth < 1024) {
         maxTooltipWidth = 200;
         horizontalOffset = 20;
-    }
-    // Phone adjustments (< 768px)
-    else if (viewportWidth < 768) {
+    } else if (viewportWidth < 768) {
         maxTooltipWidth = viewportWidth - 50;
         horizontalOffset = 10;
-    }
-    // Desktop adjustments (≥ 1024px - preserved from original)
-    else if (viewportWidth >= 1024) {
+    } else if (viewportWidth >= 1024) {
         maxTooltipWidth = 400;
         horizontalOffset = 25;
     }
@@ -514,46 +507,43 @@ function addCloseButtonListener(closeButton, verseElement) {
     const effectiveTooltipWidth = Math.min(tooltipWidth, maxTooltipWidth);
 
     // ===== POSITIONING LOGIC ===== //
-    // Calculate both possible positions
     const rightPosition = verseRect.right + horizontalOffset;
     const leftPosition = verseRect.left - horizontalOffset - effectiveTooltipWidth;
-
-    // Check available space
     const spaceRight = viewportWidth - verseRect.right - horizontalOffset;
     const spaceLeft = verseRect.left - horizontalOffset;
-    
-    // Determine position - modified for mobile/tablet
+
     let useRightSide;
-    
-    // Desktop logic (preserved)
+
     if (viewportWidth >= 1024) {
         useRightSide = spaceRight >= effectiveTooltipWidth || 
                       (spaceRight >= spaceLeft && spaceRight >= minMargin);
-    } 
-    // Mobile/tablet logic
-    else {
-        // For mobile/tablet, prioritize left side for right-edge verses
+    } else {
         const isRightEdgeVerse = verseRect.right > viewportWidth * 0.7;
         useRightSide = !isRightEdgeVerse && spaceRight >= effectiveTooltipWidth;
     }
 
-    // Edge case handling (applies to all devices)
     if (useRightSide && (rightPosition + effectiveTooltipWidth > viewportWidth - minMargin)) {
         useRightSide = (leftPosition >= minMargin);
     }
 
-    // Apply position
-    if (useRightSide) {
-        tooltip.style.left = `${Math.min(rightPosition, viewportWidth - effectiveTooltipWidth - minMargin)-150}px`;
+    // ===== FINAL POSITIONING ===== //
+    if (viewportWidth < 768) {
+        // Centered on mobile
+        tooltip.style.left = `${(viewportWidth - effectiveTooltipWidth) / 2}px`;
         tooltip.style.right = 'auto';
     } else {
-        tooltip.style.left = `${Math.max(leftPosition, minMargin)-11}px`;
-        tooltip.style.right = 'auto';
+        if (useRightSide) {
+            tooltip.style.left = `${Math.min(rightPosition, viewportWidth - effectiveTooltipWidth - minMargin) - 150}px`;
+            tooltip.style.right = 'auto';
+        } else {
+            tooltip.style.left = `${Math.max(leftPosition, minMargin) - 11}px`;
+            tooltip.style.right = 'auto';
+        }
     }
 
     // ===== VERTICAL POSITIONING (unchanged) ===== //
     verticalOffset = (verseRect.height - tooltipHeight) / 2;
-    
+
     if (verseRect.top + verticalOffset < minMargin) {
         verticalOffset = -verseRect.top + minMargin;
     }
@@ -563,8 +553,12 @@ function addCloseButtonListener(closeButton, verseElement) {
 
     tooltip.style.top = `${verseRect.top + verticalOffset}px`;
 
-    // ===== ARROW POSITIONING (unchanged) ===== //
-    if (useRightSide) {
+    // ===== ARROW POSITIONING ===== //
+    if (viewportWidth < 768) {
+        // Hide arrow or center it optionally for mobile
+        tooltip.style.setProperty('--arrow-left', '50%');
+        tooltip.style.setProperty('--arrow-border', '10px solid transparent 10px solid #d4af37 10px solid transparent');
+    } else if (useRightSide) {
         tooltip.style.setProperty('--arrow-left', '-10px');
         tooltip.style.setProperty('--arrow-border', 
             '10px solid transparent 10px solid #d4af37 10px solid transparent');
@@ -574,6 +568,7 @@ function addCloseButtonListener(closeButton, verseElement) {
             '10px solid #d4af37 10px solid transparent 10px solid transparent');
     }
 }
+
 
 
 

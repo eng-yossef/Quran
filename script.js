@@ -275,7 +275,9 @@ function setupVerseInteractions() {
         const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
         let tafsirTimer = null;
         let touchStartTime = 0;
+        let touchStartX = 0;
         let touchStartY = 0;
+        let touchMoved = false;
         let isPotentialScroll = false;
 
         const highlightVerse = () => {
@@ -287,8 +289,8 @@ function setupVerseInteractions() {
 
         if (isTouchDevice) {
             /* ===== MOBILE/TOUCH HANDLING ===== */
-            verseContainer.addEventListener('touchstart', handleTouchStart, {passive: true});
-            verseContainer.addEventListener('touchmove', handleTouchMove, {passive: true});
+            verseContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+            verseContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
             verseContainer.addEventListener('touchend', handleTouchEnd);
             verseContainer.addEventListener('touchcancel', handleTouchCancel);
         } else {
@@ -299,13 +301,15 @@ function setupVerseInteractions() {
         }
 
         function handleTouchStart(e) {
+            touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             touchStartTime = Date.now();
+            touchMoved = false;
             isPotentialScroll = false;
             
             // Start timer for long press
             tafsirTimer = setTimeout(() => {
-                if (!isPotentialScroll) {
+                if (!touchMoved && !isPotentialScroll) {
                     clearSelection();
                     showTafsir(verseContainer, surahNumber, verseNumber);
                 }
@@ -313,11 +317,17 @@ function setupVerseInteractions() {
         }
 
         function handleTouchMove(e) {
+            const xDiff = Math.abs(e.touches[0].clientX - touchStartX);
             const yDiff = Math.abs(e.touches[0].clientY - touchStartY);
             
-            // If movement is significant, cancel tafsir and allow scroll
-            if (yDiff > 10) {
-                isPotentialScroll = true;
+            // Consider it a move if exceeds 5px threshold (more sensitive than before)
+            if (xDiff > 5 || yDiff > 5) {
+                touchMoved = true;
+                // Only consider it a scroll if vertical movement dominates
+                if (yDiff > xDiff) {
+                    isPotentialScroll = true;
+                }
+                // Cancel any pending tafsir display
                 if (tafsirTimer) {
                     clearTimeout(tafsirTimer);
                     tafsirTimer = null;
@@ -327,16 +337,23 @@ function setupVerseInteractions() {
 
         function handleTouchEnd(e) {
             const touchDuration = Date.now() - touchStartTime;
+            const isTap = !touchMoved && touchDuration < 300;
             
+            // Clear any pending tafsir timer
             if (tafsirTimer) {
                 clearTimeout(tafsirTimer);
-                if (touchDuration < 800 && !isPotentialScroll) {
-                    highlightVerse();
-                    playEntireSurah(surahNumber, {verseNumber: verseNumber});
-                }
-            } else if (!isPotentialScroll) {
-                hideTafsir(verseContainer);
+                tafsirTimer = null;
             }
+            
+            // Handle tap (quick, no movement)
+            if (isTap) {
+                highlightVerse();
+                playEntireSurah(surahNumber, { verseNumber: verseNumber });
+            }
+            
+            // Reset touch state
+            touchMoved = false;
+            isPotentialScroll = false;
         }
 
         function handleTouchCancel() {
@@ -344,12 +361,11 @@ function setupVerseInteractions() {
                 clearTimeout(tafsirTimer);
                 tafsirTimer = null;
             }
+            touchMoved = false;
+            isPotentialScroll = false;
         }
 
-        // Desktop handlers remain unchanged
-        function handleDesktopClick(e) {
-            console.log("Clicked verse:", verseNumber);
-            
+        function handleDesktopClick(e) {            
             // Only proceed if not clicking on tafsir (including close button)
             if (!e.target.closest('.verse-tafsir')) {
                 const isCurrentVersePlaying = currentPlayingSurah === surahNumber && 
@@ -359,7 +375,7 @@ function setupVerseInteractions() {
                     toggleAudioPlayback(); // Pause if clicking same verse
                 } else {
                     highlightVerse();
-                    playEntireSurah(surahNumber, {verseNumber: verseNumber});
+                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
                     clearSelection();
                 }
             }

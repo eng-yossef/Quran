@@ -86,13 +86,25 @@ function setupTafsirHideOnScroll() {
   }
 
   function setupSwipeNavigation() {
-    const quranPage = document.getElementById('quranPage'); // Or your main container
+    const quranPage = document.getElementById('quranPage');
+    const SWIPE_IGNORE_RADIUS = 40; // Pixels around close button to ignore
     
     quranPage.addEventListener('touchstart', (e) => {
+        // Check if touch started on/near close button
+        const closeBtn = e.target.closest('.close-tafsir-btn');
+        if (closeBtn) {
+            e.stopPropagation(); // Prevent swipe handling
+            return;
+        }
+        
         touchStartX = e.changedTouches[0].screenX;
     }, {passive: true});
 
     quranPage.addEventListener('touchend', (e) => {
+        // Check if released on/near close button
+        const closeBtn = e.target.closest('.close-tafsir-btn');
+        if (closeBtn) return;
+        
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     }, {passive: true});

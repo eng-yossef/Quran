@@ -129,10 +129,10 @@ function navigateToPage(newPage) {
     currentPage = newPage;
     renderPage(currentPage);
     saveCurrentPage(currentPage);
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
+    // window.scrollTo({
+    //     top: 0,
+    //     behavior: 'smooth'
+    // });
     highlightSurahForCurrentPage();
     
     // Add visual feedback (optional)
@@ -1072,10 +1072,10 @@ async function initApp() {
                 currentPage++;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                  });
+                // window.scrollTo({
+                //     top: 0,
+                //     behavior: 'smooth'
+                //   });
                   highlightSurahForCurrentPage();
 
 
@@ -1084,10 +1084,10 @@ async function initApp() {
                 currentPage--;
                 renderPage(currentPage);
                 saveCurrentPage(currentPage);
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                  });
+                // window.scrollTo({
+                //     top: 0,
+                //     behavior: 'smooth'
+                //   });
                   highlightSurahForCurrentPage();
 
 

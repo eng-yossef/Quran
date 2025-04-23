@@ -540,7 +540,7 @@ function addCloseButtonListener(closeButton, verseElement) {
     // ===== FINAL POSITIONING ===== //
     if (viewportWidth < 768) {
         // Centered on mobile
-        tooltip.style.left = `${(viewportWidth - effectiveTooltipWidth) / 2}px`;
+        tooltip.style.left = `${(viewportWidth - effectiveTooltipWidth) / 5}px`;
         tooltip.style.right = 'auto';
     } else {
         if (useRightSide) {
@@ -818,8 +818,8 @@ function playVerseAudio(surah, ayah, isSequence = false) {
         .catch(error => {
             console.error('Error fetching audio:', error);
             if (isSequence) {
-                currentVerseIndex++;
-                playNextVerseInSequence();
+                // currentVerseIndex++;
+                // playNextVerseInSequence();
             }
         });
 }

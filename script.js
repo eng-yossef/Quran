@@ -257,6 +257,7 @@ function renderPage(pageNumber) {
 
     // Update browser history
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
+    setupVerseInteractions();
     highlightSurahForCurrentPage();
     matchSidebarHeight();
 }
@@ -347,10 +348,20 @@ function setupVerseInteractions() {
 
         // Desktop handlers remain unchanged
         function handleDesktopClick(e) {
+            console.log("Clicked verse:", verseNumber);
+            
             // Only proceed if not clicking on tafsir (including close button)
             if (!e.target.closest('.verse-tafsir')) {
-                playEntireSurah(surahNumber, {verseNumber: verseNumber});
-                clearSelection();
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber && 
+                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+                if (isCurrentVersePlaying && !audioPaused) {
+                    toggleAudioPlayback(); // Pause if clicking same verse
+                } else {
+                    highlightVerse();
+                    playEntireSurah(surahNumber, {verseNumber: verseNumber});
+                    clearSelection();
+                }
             }
         }
 
@@ -662,10 +673,6 @@ function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null
     playNextVerseInSequence();
 
 }
-
-
-
-
 
 async function playNextVerseInSequence() {
     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
@@ -1105,7 +1112,8 @@ async function initApp() {
         setupVerseHoverEffects();
         setupTafsirHideOnScroll();
         setupSwipeNavigation(); 
-        setupTafsirClickHandlers() 
+        setupTafsirClickHandlers() ;
+        
 
         
     } catch (error) {

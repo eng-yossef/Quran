@@ -144,9 +144,12 @@ function navigateToPage(newPage) {
 
 
 // Fetch Quran data
+// Fetch Quran data
 async function fetchQuranData() {
     try {
-        const response = await fetch('http://api.alquran.cloud/v1/quran/quran-uthmani');
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        const apiUrl = 'http://api.alquran.cloud/v1/quran/quran-uthmani';
+        const response = await fetch(proxyUrl + apiUrl);
         const data = await response.json();
         return data.data.surahs;
     } catch (error) {
@@ -154,6 +157,7 @@ async function fetchQuranData() {
         return null;
     }
 }
+
 
 // Organize verses by page
 function organizeVersesByPage(surahs) {
@@ -798,12 +802,15 @@ function playVerseAudio(surah, ayah, isSequence = false) {
         currentAudio = null;
     }
 
-    fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`)
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
+
+    fetch(proxyUrl + apiUrl)
         .then(response => response.json())
         .then(data => {
             if (data.code === 200 && data.data.audio) {
                 currentAudio = new Audio(data.data.audio);
-                
+
                 if (audioPaused) {
                     audioPaused = false;
                     document.querySelector('.stop-audio-btn').innerHTML = `
@@ -812,7 +819,7 @@ function playVerseAudio(surah, ayah, isSequence = false) {
                         </svg>
                     `;
                 }
-                
+
                 currentAudio.play();
 
                 currentAudio.addEventListener('ended', () => {
@@ -834,6 +841,7 @@ function playVerseAudio(surah, ayah, isSequence = false) {
         .catch(error => {
             console.error('Error fetching audio:', error);
             if (isSequence) {
+                // Optionally continue the sequence despite the error
                 // currentVerseIndex++;
                 // playNextVerseInSequence();
             }

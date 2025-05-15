@@ -16,6 +16,8 @@ let scrollTimeout = null;
 let touchStartX = 0;
 let touchEndX = 0;
 const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
+const QURAN_DATA_CACHE_KEY = 'quran-data-v1';
+
 
 
 
@@ -144,14 +146,35 @@ function navigateToPage(newPage) {
 
 
 // Fetch Quran data
-// Fetch Quran data
 async function fetchQuranData() {
     try {
-        //const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
         const apiUrl = 'http://api.alquran.cloud/v1/quran/quran-uthmani';
-        const response = await fetch( apiUrl);
+        
+        // First try to get from cache
+        const cache = await caches.open(QURAN_DATA_CACHE_KEY);
+        const cachedResponse = await cache.match(apiUrl);
+        
+        if (cachedResponse) {
+            const data = await cachedResponse.json();
+            return  data.data.surahs;
+            
+        }
+
+        // If not in cache, fetch fresh data
+        const response = await fetch(apiUrl);
+        
+        // Clone the response immediately for caching
+        const responseClone = response.clone();
+        
+        // Cache the response
+        cache.put(apiUrl, responseClone);
+        
+        // Process the original response
         const data = await response.json();
-        return data.data.surahs;
+        
+        return   data.data.surahs
+        
+        
     } catch (error) {
         console.error('Error fetching Quran data:', error);
         return null;

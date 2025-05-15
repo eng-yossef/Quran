@@ -17,6 +17,207 @@ let touchStartX = 0;
 let touchEndX = 0;
 const SWIPE_THRESHOLD = 50; // Minimum swipe distance in pixels
 const QURAN_DATA_CACHE_KEY = 'quran-data-v1';
+const tafsirCache = new Map();
+const MAX_CACHE_SIZE = 100; // Maximum size of the cache
+const MAX_PREFETCH_COUNT = 5; // 👈 You can change this number to prefetch more or fewer verses
+let audioQueue = [];
+
+
+// Main function to play a verse from the queue
+function playVerseAudioFromQueue(callback = null) {
+    if (currentAudio && !audioPaused) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+
+    if (audioQueue.length === 0) {
+        stopAudio();
+        return;
+    }
+
+    const { audio, verse } = audioQueue.shift();
+    currentAudio = audio;
+
+    if (audioPaused) {
+        audioPaused = false;
+        document.querySelector('.stop-audio-btn').innerHTML = `
+            <svg viewBox="0 0 24 24" width="18" height="18">
+                <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>`;
+    }
+
+    currentAudio.play();
+
+    currentAudio.addEventListener('ended', () => {
+        if (callback) callback();
+    });
+}
+
+
+
+
+
+async function prefetchVerses(startIndex, count) {
+    for (let i = startIndex; i < Math.min(startIndex + count, currentVerseSequence.length); i++) {
+        const verse = currentVerseSequence[i];
+        try {
+            const res = await fetch(`https://api.alquran.cloud/v1/ayah/${verse.surahNumber}:${verse.numberInSurah}/ar.alafasy`);
+            const data = await res.json();
+            if (data.code === 200 && data.data.audio) {
+                const audio = new Audio(data.data.audio);
+                audioQueue.push({ audio, verse });
+            }
+        } catch (err) {
+            console.error(`Error prefetching audio for ${verse.surahNumber}:${verse.numberInSurah}`, err);
+        }
+    }
+}
+
+// Play entire surah with prefetching
+async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumber: null }) {
+    stopAudio();
+    clearVerseHighlights();
+
+    const verses = [];
+    let currentPage = startFrom.page;
+
+    if (!currentPage && startFrom.verseNumber) {
+        for (let page = 1; page <= totalPages; page++) {
+            const verseInPage = pagesData[page].find(v =>
+                v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
+            );
+            if (verseInPage) {
+                currentPage = page;
+                break;
+            }
+        }
+        if (!currentPage) return;
+    }
+
+    if (!currentPage) {
+        for (let page = 1; page <= totalPages; page++) {
+            if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
+                currentPage = page;
+                break;
+            }
+        }
+        if (!currentPage) return;
+    }
+
+    let foundStartingVerse = !startFrom.verseNumber;
+    for (let page = currentPage; page <= totalPages; page++) {
+        const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
+        if (pageVerses.length === 0) break;
+
+        for (const verse of pageVerses) {
+            if (!foundStartingVerse) {
+                if (verse.numberInSurah === startFrom.verseNumber) {
+                    foundStartingVerse = true;
+                    verses.push(verse);
+                }
+            } else {
+                verses.push(verse);
+            }
+        }
+
+        if (page < totalPages && pagesData[page + 1][0]?.surahNumber !== surahNumber) {
+            break;
+        }
+    }
+
+    if (verses.length === 0) return;
+
+    isPlayingEntireSurah = true;
+    currentPlayingSurah = surahNumber;
+    currentVerseSequence = verses;
+    currentVerseIndex = 0;
+
+    if (startFrom.verseNumber) {
+        currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
+        if (currentVerseIndex < 0) currentVerseIndex = 0;
+    }
+
+    document.querySelector('.stop-audio-btn').style.display = 'block';
+    document.querySelector('.stop-audio-btn').innerHTML = `
+        <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+        </svg>`;
+
+    audioQueue = [];
+    await prefetchVerses(currentVerseIndex, MAX_PREFETCH_COUNT);
+    playNextVerseInSequence();
+}
+
+
+function stopAudio() {
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    audioQueue = [];
+    isPlayingEntireSurah = false;
+    document.querySelector('.stop-audio-btn').style.display = 'none';
+}
+
+function highlightCurrentVerse(element) {
+    element.classList.add('current-playing-verse');
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearVerseHighlights() {
+    document.querySelectorAll('.current-playing-verse').forEach(el => el.classList.remove('current-playing-verse'));
+}
+
+// Assume `pagesData`, `totalPages`, `renderPage`, and `findPageForVerse` are already defined elsewhere.
+
+// Sequentially play the next verse
+
+async function playNextVerseInSequence() {
+    if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
+        stopAudio();
+        return;
+    }
+
+    const verse = currentVerseSequence[currentVerseIndex];
+
+    document.querySelectorAll('.current-playing-verse').forEach(el => {
+        el.classList.remove('current-playing-verse');
+    });
+
+    const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
+    if (versePage !== currentPageNumber) {
+        try {
+            await renderPage(versePage);
+        } catch (error) {
+            console.error("Error rendering page:", error);
+            stopAudio();
+            return;
+        }
+    }
+
+    const verseElement = document.querySelector(
+        `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
+    );
+    if (verseElement) {
+        highlightCurrentVerse(verseElement);
+    }
+
+    playVerseAudioFromQueue(async () => {
+        currentVerseIndex++;
+
+        // Prefetch next verse if queue is getting short
+        if (audioQueue.length < MAX_PREFETCH_COUNT - 1) {
+            await prefetchVerses(currentVerseIndex + audioQueue.length, 1);
+        }
+
+        if (currentVerseIndex < currentVerseSequence.length) {
+            playNextVerseInSequence();
+        } else {
+            stopAudio();
+        }
+    });
+}
+
 
 
 
@@ -453,6 +654,17 @@ function setupTafsirCloseHandlers() {
 }
 // Add this function to fetch and display tafsir
 // Update the showTafsir function with better positioning
+// Global cache object
+
+// Add to cache with limit
+function addToCache(key, value) {
+    if (tafsirCache.size >= MAX_CACHE_SIZE) {
+        const oldestKey = tafsirCache.keys().next().value;
+        tafsirCache.delete(oldestKey);
+    }
+    tafsirCache.set(key, value);
+}
+
 async function showTafsir(verseElement, surahNumber, verseNumber) {
     // Hide any existing tafsir first
     hideTafsir(verseElement);
@@ -475,9 +687,20 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
     const closeButton = tooltip.querySelector('.close-tafsir-btn');
     addCloseButtonListener(closeButton, verseElement);
 
+    const cacheKey = `${surahNumber}:${verseNumber}`;
+
     try {
-        const response = await fetch(`https://raw.githubusercontent.com/spa5k/tafsir_api/main/tafsir/ar-tafsir-muyassar/${surahNumber}/${verseNumber}.json`);
-        const tafsirData = await response.json();
+        let tafsirData;
+
+        // Check cache first
+        if (tafsirCache.has(cacheKey)) {
+            tafsirData = tafsirCache.get(cacheKey);
+        } else {
+            // Fetch tafsir if not in cache
+            const response = await fetch(`https://raw.githubusercontent.com/spa5k/tafsir_api/main/tafsir/ar-tafsir-muyassar/${surahNumber}/${verseNumber}.json`);
+            tafsirData = await response.json();
+            addToCache(cacheKey, tafsirData);
+        }
 
         // Update tooltip content
         tooltip.innerHTML = `
@@ -501,7 +724,6 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
             <div class="tafsir-content">لا يتوفر تفسير لهذه الآية حالياً</div>
         `;
 
-        // Re-attach close button on error
         const newCloseButton = tooltip.querySelector('.close-tafsir-btn');
         addCloseButtonListener(newCloseButton, verseElement);
     }
@@ -510,6 +732,7 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
     tooltip.style.display = 'block';
     positionTafsirTooltip(verseElement, tooltip);
 }
+
 function addCloseButtonListener(closeButton, verseElement) {
     const handleCloseClick = (e) => {
         e.preventDefault();
@@ -638,153 +861,153 @@ function toArabicNumber(num) {
         .join('');
 }
 
-function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
-    stopAudio();
-    clearVerseHighlights();
-    const verses = [];
-    let currentPage = startFrom.page;
+// function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
+//     stopAudio();
+//     clearVerseHighlights();
+//     const verses = [];
+//     let currentPage = startFrom.page;
     
-    // Find starting page if only verseNumber is provided
-    if (!currentPage && startFrom.verseNumber) {
-        for (let page = 1; page <= totalPages; page++) {
-            const verseInPage = pagesData[page].find(v => 
-                v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
-            );
-            if (verseInPage) {
-                currentPage = page;
-                break;
-            }
-        }
-        if (!currentPage) return;
-    }
+//     // Find starting page if only verseNumber is provided
+//     if (!currentPage && startFrom.verseNumber) {
+//         for (let page = 1; page <= totalPages; page++) {
+//             const verseInPage = pagesData[page].find(v => 
+//                 v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
+//             );
+//             if (verseInPage) {
+//                 currentPage = page;
+//                 break;
+//             }
+//         }
+//         if (!currentPage) return;
+//     }
     
-    // If no starting point specified, find first page of surah
-    if (!currentPage) {
-        for (let page = 1; page <= totalPages; page++) {
-            if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
-                currentPage = page;
-                break;
-            }
-        }
-        if (!currentPage) return;
-    }
+//     // If no starting point specified, find first page of surah
+//     if (!currentPage) {
+//         for (let page = 1; page <= totalPages; page++) {
+//             if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
+//                 currentPage = page;
+//                 break;
+//             }
+//         }
+//         if (!currentPage) return;
+//     }
     
-    // Collect all verses from current page to end of surah
-    let foundStartingVerse = !startFrom.verseNumber; // true if no specific verse to start from
-    for (let page = currentPage; page <= totalPages; page++) {
-        const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
+//     // Collect all verses from current page to end of surah
+//     let foundStartingVerse = !startFrom.verseNumber; // true if no specific verse to start from
+//     for (let page = currentPage; page <= totalPages; page++) {
+//         const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
         
-        if (pageVerses.length === 0) break; // No more verses in this surah
+//         if (pageVerses.length === 0) break; // No more verses in this surah
         
-        for (const verse of pageVerses) {
-            if (!foundStartingVerse) {
-                if (verse.numberInSurah === startFrom.verseNumber) {
-                    foundStartingVerse = true;
-                    verses.push(verse);
-                }
-            } else {
-                verses.push(verse);
-            }
-        }
+//         for (const verse of pageVerses) {
+//             if (!foundStartingVerse) {
+//                 if (verse.numberInSurah === startFrom.verseNumber) {
+//                     foundStartingVerse = true;
+//                     verses.push(verse);
+//                 }
+//             } else {
+//                 verses.push(verse);
+//             }
+//         }
         
-        // Check if next page starts a new surah
-        if (page < totalPages && pagesData[page+1].length > 0 && 
-            pagesData[page+1][0].surahNumber !== surahNumber) {
-            break;
-        }
-    }
+//         // Check if next page starts a new surah
+//         if (page < totalPages && pagesData[page+1].length > 0 && 
+//             pagesData[page+1][0].surahNumber !== surahNumber) {
+//             break;
+//         }
+//     }
     
-    if (verses.length === 0) return;
+//     if (verses.length === 0) return;
     
-    isPlayingEntireSurah = true;
-    currentPlayingSurah = surahNumber;
-    currentVerseSequence = verses;
+//     isPlayingEntireSurah = true;
+//     currentPlayingSurah = surahNumber;
+//     currentVerseSequence = verses;
     
-    // Find starting index
-    currentVerseIndex = 0;
-    if (startFrom.verseNumber) {
-        currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
-        if (currentVerseIndex < 0) currentVerseIndex = 0;
-    }
+//     // Find starting index
+//     currentVerseIndex = 0;
+//     if (startFrom.verseNumber) {
+//         currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
+//         if (currentVerseIndex < 0) currentVerseIndex = 0;
+//     }
     
-    document.querySelector('.stop-audio-btn').style.display = 'block';
-    document.querySelector('.stop-audio-btn').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18">
-            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-        </svg>`
+//     document.querySelector('.stop-audio-btn').style.display = 'block';
+//     document.querySelector('.stop-audio-btn').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18">
+//             <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+//         </svg>`
     
 
-    playNextVerseInSequence();
+//     playNextVerseInSequence();
 
-}
+// }
 
-async function playNextVerseInSequence() {
-    if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
-        stopAudio();
-        return;
-    }
+// async function playNextVerseInSequence() {
+//     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
+//         stopAudio();
+//         return;
+//     }
     
-    const verse = currentVerseSequence[currentVerseIndex];
+//     const verse = currentVerseSequence[currentVerseIndex];
     
-    // Clear previous highlights
-    document.querySelectorAll('.current-playing-verse').forEach(el => {
-        el.classList.remove('current-playing-verse');
-    });
+//     // Clear previous highlights
+//     document.querySelectorAll('.current-playing-verse').forEach(el => {
+//         el.classList.remove('current-playing-verse');
+//     });
     
-    // Check if we need to change page
-    const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
-    if (versePage !== currentPageNumber) {
-        try {
-            await renderPage(versePage);
+//     // Check if we need to change page
+//     const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
+//     if (versePage !== currentPageNumber) {
+//         try {
+//             await renderPage(versePage);
             
-            // Find the verse element after page render
-            const verseElement = document.querySelector(
-                `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
-            );
+//             // Find the verse element after page render
+//             const verseElement = document.querySelector(
+//                 `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
+//             );
             
-            if (verseElement) {
-                highlightCurrentVerse(verseElement);
+//             if (verseElement) {
+//                 highlightCurrentVerse(verseElement);
                 
-                // Play audio after highlighting
-                playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
-                    // Move to next verse only after audio completes
-                    currentVerseIndex++;
-                    if (currentVerseIndex < currentVerseSequence.length) {
-                        playNextVerseInSequence();
-                    } else {
-                        stopAudio();
-                    }
-                });
-            } else {
-                // If verse element not found, move to next verse
-                currentVerseIndex++;
-                playNextVerseInSequence();
-            }
-        } catch (error) {
-            console.error("Error rendering page:", error);
-            stopAudio();
-        }
-        return;
-    }
+//                 // Play audio after highlighting
+//                 playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
+//                     // Move to next verse only after audio completes
+//                     currentVerseIndex++;
+//                     if (currentVerseIndex < currentVerseSequence.length) {
+//                         playNextVerseInSequence();
+//                     } else {
+//                         stopAudio();
+//                     }
+//                 });
+//             } else {
+//                 // If verse element not found, move to next verse
+//                 currentVerseIndex++;
+//                 playNextVerseInSequence();
+//             }
+//         } catch (error) {
+//             console.error("Error rendering page:", error);
+//             stopAudio();
+//         }
+//         return;
+//     }
     
-    // For same-page verses
-    const verseElement = document.querySelector(
-        `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
-    );
+//     // For same-page verses
+//     const verseElement = document.querySelector(
+//         `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
+//     );
     
-    if (verseElement) {
-        highlightCurrentVerse(verseElement);
-    }
+//     if (verseElement) {
+//         highlightCurrentVerse(verseElement);
+//     }
     
-    playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
-        // Move to next verse only after audio completes
-        currentVerseIndex++;
-        if (currentVerseIndex < currentVerseSequence.length) {
-            playNextVerseInSequence();
-        } else {
-            stopAudio();
-        }
-    });
-}
+//     playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
+//         // Move to next verse only after audio completes
+//         currentVerseIndex++;
+//         if (currentVerseIndex < currentVerseSequence.length) {
+//             playNextVerseInSequence();
+//         } else {
+//             stopAudio();
+//         }
+//     });
+// }
 
 function highlightCurrentVerse(verseElement) {
     if (!verseElement) return;
@@ -819,57 +1042,48 @@ function findPageForVerse(surahNumber, ayahNumber) {
     return currentPageNumber;
 }
 
-function playVerseAudio(surah, ayah, isSequence = false) {
+async function playVerseAudio(surah, ayah, isSequence = false, onEndedCallback) {
     if (currentAudio && !audioPaused) {
         currentAudio.pause();
         currentAudio = null;
     }
 
-   // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
 
-    fetch( apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.code === 200 && data.data.audio) {
-                currentAudio = new Audio(data.data.audio);
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-                if (audioPaused) {
-                    audioPaused = false;
-                    document.querySelector('.stop-audio-btn').innerHTML = `
-                        <svg viewBox="0 0 24 24" width="18" height="18">
-                            <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                        </svg>
-                    `;
+        if (data.code === 200 && data.data.audio) {
+            currentAudio = new Audio(data.data.audio);
+
+            if (audioPaused) {
+                audioPaused = false;
+                document.querySelector('.stop-audio-btn').innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                `;
+            }
+
+            currentAudio.addEventListener('ended', () => {
+                if (typeof onEndedCallback === "function") {
+                    onEndedCallback();
                 }
+            });
 
-                currentAudio.play();
+            try {
+                await currentAudio.play();
+            } catch (err) {
+                console.warn("Playback interrupted:", err);
+            }
 
-                currentAudio.addEventListener('ended', () => {
-                    if (isSequence) {
-                        currentVerseIndex++;
-                        if (currentVerseIndex < currentVerseSequence.length) {
-                            playNextVerseInSequence();
-                        } else {
-                            stopAudio();
-                        }
-                    } else {
-                        document.querySelectorAll('.verse-container').forEach(v => {
-                            v.style.backgroundColor = '';
-                        });
-                    }
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching audio:', error);
-            if (isSequence) {
-                // Optionally continue the sequence despite the error
-                // currentVerseIndex++;
-                // playNextVerseInSequence();
-            }
-        });
+        }
+    } catch (error) {
+        console.error(`Error fetching audio for ${surah}:${ayah}`, error);
+    }
 }
+
 
 function toggleAudioPlayback() {
     const stopBtn = document.querySelector('.stop-audio-btn');
@@ -902,18 +1116,18 @@ function toggleAudioPlayback() {
     }
 }
 
-function stopAudio() {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
-    isPlayingEntireSurah = false;
-    audioPaused = false;
-    document.querySelectorAll('.verse-container').forEach(v => {
-        v.style.backgroundColor = '';
-    });
-    document.querySelector('.stop-audio-btn').style.display = 'none';
-}
+// function stopAudio() {
+//     if (currentAudio) {
+//         currentAudio.pause();
+//         currentAudio = null;
+//     }
+//     isPlayingEntireSurah = false;
+//     audioPaused = false;
+//     document.querySelectorAll('.verse-container').forEach(v => {
+//         v.style.backgroundColor = '';
+//     });
+//     document.querySelector('.stop-audio-btn').style.display = 'none';
+// }
 
 // Add event listener to stop button
 document.querySelector('.stop-audio-btn').addEventListener('click', function() {

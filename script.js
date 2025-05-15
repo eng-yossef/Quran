@@ -22,6 +22,19 @@ const MAX_CACHE_SIZE = 100; // Maximum size of the cache
 const MAX_PREFETCH_COUNT = 5; // 👈 You can change this number to prefetch more or fewer verses
 let audioQueue = [];
 
+// Night Mode Toggle with better verse number handling
+const nightModeToggle = document.getElementById('nightModeToggle');
+let isNightMode = localStorage.getItem('nightMode') === 'true';
+
+// DOM elements
+const quranPageEl = document.getElementById('quranPage');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageIndicatorEl = document.getElementById('pageIndicator');
+const sidebarEl = document.getElementById('sidebar');
+const menuButtonEl = document.getElementById('menuButton');
+const closeSidebarEl = document.getElementById('closeSidebar');
+const surahListEl = document.getElementById('surahList');
 
 // Main function to play a verse from the queue
 function playVerseAudioFromQueue(callback = null) {
@@ -168,7 +181,6 @@ function clearVerseHighlights() {
     document.querySelectorAll('.current-playing-verse').forEach(el => el.classList.remove('current-playing-verse'));
 }
 
-// Assume `pagesData`, `totalPages`, `renderPage`, and `findPageForVerse` are already defined elsewhere.
 
 // Sequentially play the next verse
 
@@ -223,15 +235,7 @@ async function playNextVerseInSequence() {
 
 
 
-// DOM elements
-const quranPageEl = document.getElementById('quranPage');
-const prevPageBtn = document.getElementById('prevPage');
-const nextPageBtn = document.getElementById('nextPage');
-const pageIndicatorEl = document.getElementById('pageIndicator');
-const sidebarEl = document.getElementById('sidebar');
-const menuButtonEl = document.getElementById('menuButton');
-const closeSidebarEl = document.getElementById('closeSidebar');
-const surahListEl = document.getElementById('surahList');
+
 
 // Corrected implementation
 function matchSidebarHeight() {
@@ -861,153 +865,6 @@ function toArabicNumber(num) {
         .join('');
 }
 
-// function playEntireSurah(surahNumber, startFrom = {page: null, verseNumber: null}) {
-//     stopAudio();
-//     clearVerseHighlights();
-//     const verses = [];
-//     let currentPage = startFrom.page;
-    
-//     // Find starting page if only verseNumber is provided
-//     if (!currentPage && startFrom.verseNumber) {
-//         for (let page = 1; page <= totalPages; page++) {
-//             const verseInPage = pagesData[page].find(v => 
-//                 v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
-//             );
-//             if (verseInPage) {
-//                 currentPage = page;
-//                 break;
-//             }
-//         }
-//         if (!currentPage) return;
-//     }
-    
-//     // If no starting point specified, find first page of surah
-//     if (!currentPage) {
-//         for (let page = 1; page <= totalPages; page++) {
-//             if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
-//                 currentPage = page;
-//                 break;
-//             }
-//         }
-//         if (!currentPage) return;
-//     }
-    
-//     // Collect all verses from current page to end of surah
-//     let foundStartingVerse = !startFrom.verseNumber; // true if no specific verse to start from
-//     for (let page = currentPage; page <= totalPages; page++) {
-//         const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
-        
-//         if (pageVerses.length === 0) break; // No more verses in this surah
-        
-//         for (const verse of pageVerses) {
-//             if (!foundStartingVerse) {
-//                 if (verse.numberInSurah === startFrom.verseNumber) {
-//                     foundStartingVerse = true;
-//                     verses.push(verse);
-//                 }
-//             } else {
-//                 verses.push(verse);
-//             }
-//         }
-        
-//         // Check if next page starts a new surah
-//         if (page < totalPages && pagesData[page+1].length > 0 && 
-//             pagesData[page+1][0].surahNumber !== surahNumber) {
-//             break;
-//         }
-//     }
-    
-//     if (verses.length === 0) return;
-    
-//     isPlayingEntireSurah = true;
-//     currentPlayingSurah = surahNumber;
-//     currentVerseSequence = verses;
-    
-//     // Find starting index
-//     currentVerseIndex = 0;
-//     if (startFrom.verseNumber) {
-//         currentVerseIndex = verses.findIndex(v => v.numberInSurah === startFrom.verseNumber);
-//         if (currentVerseIndex < 0) currentVerseIndex = 0;
-//     }
-    
-//     document.querySelector('.stop-audio-btn').style.display = 'block';
-//     document.querySelector('.stop-audio-btn').innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18">
-//             <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-//         </svg>`
-    
-
-//     playNextVerseInSequence();
-
-// }
-
-// async function playNextVerseInSequence() {
-//     if (currentVerseIndex >= currentVerseSequence.length || !isPlayingEntireSurah) {
-//         stopAudio();
-//         return;
-//     }
-    
-//     const verse = currentVerseSequence[currentVerseIndex];
-    
-//     // Clear previous highlights
-//     document.querySelectorAll('.current-playing-verse').forEach(el => {
-//         el.classList.remove('current-playing-verse');
-//     });
-    
-//     // Check if we need to change page
-//     const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
-//     if (versePage !== currentPageNumber) {
-//         try {
-//             await renderPage(versePage);
-            
-//             // Find the verse element after page render
-//             const verseElement = document.querySelector(
-//                 `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
-//             );
-            
-//             if (verseElement) {
-//                 highlightCurrentVerse(verseElement);
-                
-//                 // Play audio after highlighting
-//                 playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
-//                     // Move to next verse only after audio completes
-//                     currentVerseIndex++;
-//                     if (currentVerseIndex < currentVerseSequence.length) {
-//                         playNextVerseInSequence();
-//                     } else {
-//                         stopAudio();
-//                     }
-//                 });
-//             } else {
-//                 // If verse element not found, move to next verse
-//                 currentVerseIndex++;
-//                 playNextVerseInSequence();
-//             }
-//         } catch (error) {
-//             console.error("Error rendering page:", error);
-//             stopAudio();
-//         }
-//         return;
-//     }
-    
-//     // For same-page verses
-//     const verseElement = document.querySelector(
-//         `.verse-container[data-surah="${verse.surahNumber}"][data-ayah="${verse.numberInSurah}"]`
-//     );
-    
-//     if (verseElement) {
-//         highlightCurrentVerse(verseElement);
-//     }
-    
-//     playVerseAudio(verse.surahNumber, verse.numberInSurah, true, () => {
-//         // Move to next verse only after audio completes
-//         currentVerseIndex++;
-//         if (currentVerseIndex < currentVerseSequence.length) {
-//             playNextVerseInSequence();
-//         } else {
-//             stopAudio();
-//         }
-//     });
-// }
 
 function highlightCurrentVerse(verseElement) {
     if (!verseElement) return;
@@ -1115,19 +972,6 @@ function toggleAudioPlayback() {
         }
     }
 }
-
-// function stopAudio() {
-//     if (currentAudio) {
-//         currentAudio.pause();
-//         currentAudio = null;
-//     }
-//     isPlayingEntireSurah = false;
-//     audioPaused = false;
-//     document.querySelectorAll('.verse-container').forEach(v => {
-//         v.style.backgroundColor = '';
-//     });
-//     document.querySelector('.stop-audio-btn').style.display = 'none';
-// }
 
 // Add event listener to stop button
 document.querySelector('.stop-audio-btn').addEventListener('click', function() {
@@ -1527,11 +1371,6 @@ function showSaveNotification() {
 
 
 
-
-
-// Night Mode Toggle with better verse number handling
-const nightModeToggle = document.getElementById('nightModeToggle');
-let isNightMode = localStorage.getItem('nightMode') === 'true';
 
 function updateVerseNumbers() {
     const verseNumbers = document.querySelectorAll('.verse-number');

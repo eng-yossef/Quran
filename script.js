@@ -37,12 +37,14 @@ const closeSidebarEl = document.getElementById('closeSidebar');
 const surahListEl = document.getElementById('surahList');
 
 // Main function to play a verse from the queue
-function playVerseAudioFromQueue(callback = null) {
+async function playVerseAudioFromQueue(callback = null) {
+    // Pause current audio if needed
     if (currentAudio && !audioPaused) {
         currentAudio.pause();
         currentAudio = null;
     }
 
+    // If no audio left in queue, stop
     if (audioQueue.length === 0) {
         stopAudio();
         return;
@@ -51,6 +53,7 @@ function playVerseAudioFromQueue(callback = null) {
     const { audio, verse } = audioQueue.shift();
     currentAudio = audio;
 
+    // Update UI play button if needed
     if (audioPaused) {
         audioPaused = false;
         document.querySelector('.stop-audio-btn').innerHTML = `
@@ -59,8 +62,19 @@ function playVerseAudioFromQueue(callback = null) {
             </svg>`;
     }
 
-    currentAudio.play();
+    // Try to play audio with error handling
+    try {
+        await currentAudio.play();
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            console.warn('Playback aborted due to pause or interruption.');
+        } else {
+            console.error('Audio playback failed:', error);
+        }
+        return; // Exit early on error
+    }
 
+    // Listen for audio ending
     currentAudio.addEventListener('ended', () => {
         if (callback) callback();
     });
@@ -897,47 +911,47 @@ function findPageForVerse(surahNumber, ayahNumber) {
     return currentPageNumber;
 }
 
-async function playVerseAudio(surah, ayah, isSequence = false, onEndedCallback) {
-    if (currentAudio && !audioPaused) {
-        currentAudio.pause();
-        currentAudio = null;
-    }
+// async function playVerseAudio(surah, ayah, isSequence = false, onEndedCallback) {
+//     if (currentAudio && !audioPaused) {
+//         currentAudio.pause();
+//         currentAudio = null;
+//     }
 
-    const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
+//     const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+//     try {
+//         const response = await fetch(apiUrl);
+//         const data = await response.json();
 
-        if (data.code === 200 && data.data.audio) {
-            currentAudio = new Audio(data.data.audio);
+//         if (data.code === 200 && data.data.audio) {
+//             currentAudio = new Audio(data.data.audio);
 
-            if (audioPaused) {
-                audioPaused = false;
-                document.querySelector('.stop-audio-btn').innerHTML = `
-                    <svg viewBox="0 0 24 24" width="18" height="18">
-                        <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                    </svg>
-                `;
-            }
+//             if (audioPaused) {
+//                 audioPaused = false;
+//                 document.querySelector('.stop-audio-btn').innerHTML = `
+//                     <svg viewBox="0 0 24 24" width="18" height="18">
+//                         <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+//                     </svg>
+//                 `;
+//             }
 
-            currentAudio.addEventListener('ended', () => {
-                if (typeof onEndedCallback === "function") {
-                    onEndedCallback();
-                }
-            });
+//             currentAudio.addEventListener('ended', () => {
+//                 if (typeof onEndedCallback === "function") {
+//                     onEndedCallback();
+//                 }
+//             });
 
-            try {
-                await currentAudio.play();
-            } catch (err) {
-                console.warn("Playback interrupted:", err);
-            }
+//             try {
+//                 await currentAudio.play();
+//             } catch (err) {
+//                 console.warn("Playback interrupted:", err);
+//             }
 
-        }
-    } catch (error) {
-        console.error(`Error fetching audio for ${surah}:${ayah}`, error);
-    }
-}
+//         }
+//     } catch (error) {
+//         console.error(`Error fetching audio for ${surah}:${ayah}`, error);
+//     }
+// }
 
 
 function toggleAudioPlayback() {

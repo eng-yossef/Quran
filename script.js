@@ -147,9 +147,9 @@ function navigateToPage(newPage) {
 // Fetch Quran data
 async function fetchQuranData() {
     try {
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        //const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
         const apiUrl = 'http://api.alquran.cloud/v1/quran/quran-uthmani';
-        const response = await fetch(proxyUrl + apiUrl);
+        const response = await fetch( apiUrl);
         const data = await response.json();
         return data.data.surahs;
     } catch (error) {
@@ -802,10 +802,10 @@ function playVerseAudio(surah, ayah, isSequence = false) {
         currentAudio = null;
     }
 
-    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+   // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
 
-    fetch(proxyUrl + apiUrl)
+    fetch( apiUrl)
         .then(response => response.json())
         .then(data => {
             if (data.code === 200 && data.data.audio) {

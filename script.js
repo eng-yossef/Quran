@@ -239,63 +239,63 @@ async function playNextVerseInSequence() {
 
 // Corrected implementation
 function matchSidebarHeight() {
-const quranPage = document.querySelector('.main-content');
-const sidebar = document.querySelector('.surah-list');
+    const quranPage = document.querySelector('.main-content');
+    const sidebar = document.querySelector('.surah-list');
 
-if (quranPage && sidebar) {
-// Get the computed height of the quran page
-const quranPageHeight = quranPage.offsetHeight;
+    if (quranPage && sidebar) {
+        // Get the computed height of the quran page
+        const quranPageHeight = quranPage.offsetHeight;
 
-// Set sidebar height to match
-sidebar.style.height = `${quranPageHeight-200}px`;
+        // Set sidebar height to match
+        sidebar.style.height = `${quranPageHeight - 200}px`;
 
 
-}
+    }
 }
 
 // Correct event listeners - use 'DOMContentLoaded' instead of 'load'
-document.addEventListener('DOMContentLoaded', function() {
-// Initial match
-matchSidebarHeight();
+document.addEventListener('DOMContentLoaded', function () {
+    // Initial match
+    matchSidebarHeight();
 
-// Also run after fonts and images are loaded
-window.addEventListener('load', matchSidebarHeight);
+    // Also run after fonts and images are loaded
+    window.addEventListener('load', matchSidebarHeight);
 });
 
 // Add debounce to resize event
 let resizeTimer;
-window.addEventListener('resize', function() {
-// clearTimeout(resizeTimer);
-// resizeTimer = setTimeout(matchSidebarHeight, 250);
-matchSidebarHeight();
+window.addEventListener('resize', function () {
+    // clearTimeout(resizeTimer);
+    // resizeTimer = setTimeout(matchSidebarHeight, 250);
+    matchSidebarHeight();
 });
 
 
 function setupTafsirHideOnScroll() {
     // Use passive: true for better scroll performance
     window.addEventListener('scroll', handleScroll, { passive: true });
-  }
-  
-  function handleScroll() {
+}
+
+function handleScroll() {
     // Clear any pending hide operations
     if (scrollTimeout) {
-      clearTimeout(scrollTimeout);
+        clearTimeout(scrollTimeout);
     }
-  
+
     // Only hide if scroll is significant (more than 5 pixels)
     if (Math.abs(window.pageYOffset - lastScrollPosition) > 5) {
-      scrollTimeout = setTimeout(() => {
-        hideTafsir();
-      }, 100); // Small delay to avoid hiding during momentum scrolling
+        scrollTimeout = setTimeout(() => {
+            hideTafsir();
+        }, 100); // Small delay to avoid hiding during momentum scrolling
     }
-  
-    lastScrollPosition = window.pageYOffset;
-  }
 
-  function setupSwipeNavigation() {
+    lastScrollPosition = window.pageYOffset;
+}
+
+function setupSwipeNavigation() {
     const quranPage = document.getElementById('quranPage');
     const SWIPE_IGNORE_RADIUS = 40; // Pixels around close button to ignore
-    
+
     quranPage.addEventListener('touchstart', (e) => {
         // Check if touch started on/near close button
         const closeBtn = e.target.closest('.close-tafsir-btn');
@@ -303,18 +303,18 @@ function setupTafsirHideOnScroll() {
             e.stopPropagation(); // Prevent swipe handling
             return;
         }
-        
+
         touchStartX = e.changedTouches[0].screenX;
-    }, {passive: true});
+    }, { passive: true });
 
     quranPage.addEventListener('touchend', (e) => {
         // Check if released on/near close button
         const closeBtn = e.target.closest('.close-tafsir-btn');
         if (closeBtn) return;
-        
+
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
-    }, {passive: true});
+    }, { passive: true });
 }
 
 function handleSwipe() {
@@ -323,7 +323,7 @@ function handleSwipe() {
     // Swipe right → Next page
     if (deltaX > SWIPE_THRESHOLD && currentPage < totalPages) {
         navigateToPage(currentPage + 1);
-    } 
+    }
     // Swipe left → Previous page
     else if (deltaX < -SWIPE_THRESHOLD && currentPage > 1) {
         navigateToPage(currentPage - 1);
@@ -341,7 +341,7 @@ function navigateToPage(newPage) {
     //     behavior: 'smooth'
     // });
     highlightSurahForCurrentPage();
-    
+
     // Add visual feedback (optional)
     document.getElementById('quranPage').style.transform = `translateX(${newPage > currentPage ? 5 : -5}px)`;
     setTimeout(() => {
@@ -354,32 +354,32 @@ function navigateToPage(newPage) {
 async function fetchQuranData() {
     try {
         const apiUrl = 'http://api.alquran.cloud/v1/quran/quran-uthmani';
-        
+
         // First try to get from cache
         const cache = await caches.open(QURAN_DATA_CACHE_KEY);
         const cachedResponse = await cache.match(apiUrl);
-        
+
         if (cachedResponse) {
             const data = await cachedResponse.json();
-            return  data.data.surahs;
-            
+            return data.data.surahs;
+
         }
 
         // If not in cache, fetch fresh data
         const response = await fetch(apiUrl);
-        
+
         // Clone the response immediately for caching
         const responseClone = response.clone();
-        
+
         // Cache the response
         cache.put(apiUrl, responseClone);
-        
+
         // Process the original response
         const data = await response.json();
-        
-        return   data.data.surahs
-        
-        
+
+        return data.data.surahs
+
+
     } catch (error) {
         console.error('Error fetching Quran data:', error);
         return null;
@@ -390,12 +390,12 @@ async function fetchQuranData() {
 // Organize verses by page
 function organizeVersesByPage(surahs) {
     const pages = {};
-    
+
     // Initialize pages object
     for (let i = 1; i <= totalPages; i++) {
         pages[i] = [];
     }
-    
+
     // Group verses by page
     surahs.forEach(surah => {
         surah.ayahs.forEach(ayah => {
@@ -411,7 +411,7 @@ function organizeVersesByPage(surahs) {
             });
         });
     });
-    
+
     return pages;
 }
 
@@ -475,13 +475,13 @@ function renderPage(pageNumber) {
 
     // Add click event to surah names
     document.querySelectorAll('.surah-name').forEach(surahName => {
-        surahName.addEventListener('click', function() {
+        surahName.addEventListener('click', function () {
             const surahNumber = parseInt(this.getAttribute('data-surah'));
-            playEntireSurah(surahNumber, {page: pageNumber});
+            playEntireSurah(surahNumber, { page: pageNumber });
         });
     });
 
-   
+
 
     // Disable/enable navigation buttons
     prevPageBtn.disabled = pageNumber <= 1;
@@ -496,13 +496,13 @@ function renderPage(pageNumber) {
 
 
 function setupVerseInteractions() {
-    const isTouchDevice = ('ontouchstart' in window) || 
-                         (navigator.maxTouchPoints > 0) || 
-                         (navigator.msMaxTouchPoints > 0);
+    const isTouchDevice = ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0);
 
     document.querySelectorAll('.verse-container').forEach(verseContainer => {
         verseContainer.classList.add('no-text-select');
-        
+
         const surahNumber = parseInt(verseContainer.getAttribute('data-surah'));
         const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
         let tafsirTimer = null;
@@ -538,7 +538,7 @@ function setupVerseInteractions() {
             touchStartTime = Date.now();
             touchMoved = false;
             isPotentialScroll = false;
-            
+
             // Start timer for long press
             tafsirTimer = setTimeout(() => {
                 if (!touchMoved && !isPotentialScroll) {
@@ -551,7 +551,7 @@ function setupVerseInteractions() {
         function handleTouchMove(e) {
             const xDiff = Math.abs(e.touches[0].clientX - touchStartX);
             const yDiff = Math.abs(e.touches[0].clientY - touchStartY);
-            
+
             // Consider it a move if exceeds 5px threshold (more sensitive than before)
             if (xDiff > 5 || yDiff > 5) {
                 touchMoved = true;
@@ -570,19 +570,19 @@ function setupVerseInteractions() {
         function handleTouchEnd(e) {
             const touchDuration = Date.now() - touchStartTime;
             const isTap = !touchMoved && touchDuration < 300;
-            
+
             // Clear any pending tafsir timer
             if (tafsirTimer) {
                 clearTimeout(tafsirTimer);
                 tafsirTimer = null;
             }
-            
+
             // Handle tap (quick, no movement)
             if (isTap) {
                 highlightVerse();
                 playEntireSurah(surahNumber, { verseNumber: verseNumber });
             }
-            
+
             // Reset touch state
             touchMoved = false;
             isPotentialScroll = false;
@@ -597,10 +597,10 @@ function setupVerseInteractions() {
             isPotentialScroll = false;
         }
 
-        function handleDesktopClick(e) {            
+        function handleDesktopClick(e) {
             // Only proceed if not clicking on tafsir (including close button)
             if (!e.target.closest('.verse-tafsir')) {
-                const isCurrentVersePlaying = currentPlayingSurah === surahNumber && 
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                     currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 
                 if (isCurrentVersePlaying && !audioPaused) {
@@ -648,7 +648,7 @@ function setupTafsirCloseHandlers() {
         if (e.target.classList.contains('close-tafsir-btn')) {
             e.stopImmediatePropagation(); // Completely stops event bubbling
             e.preventDefault();
-            
+
             const tafsir = e.target.closest('.verse-tafsir');
             if (tafsir) {
                 tafsir.style.display = 'none';
@@ -656,9 +656,7 @@ function setupTafsirCloseHandlers() {
         }
     }, true); // Use capturing phase
 }
-// Add this function to fetch and display tafsir
-// Update the showTafsir function with better positioning
-// Global cache object
+
 
 // Add to cache with limit
 function addToCache(key, value) {
@@ -749,15 +747,15 @@ function addCloseButtonListener(closeButton, verseElement) {
 }
 
 
-  
-  function hideTafsir(verseElement) {
+
+function hideTafsir(verseElement) {
     document.querySelectorAll('.verse-tafsir').forEach(t => {
         t.style.display = 'none';
     });
-  }
+}
 
 
-  function positionTafsirTooltip(verseElement, tooltip) {
+function positionTafsirTooltip(verseElement, tooltip) {
     const verseRect = verseElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -796,8 +794,8 @@ function addCloseButtonListener(closeButton, verseElement) {
     let useRightSide;
 
     if (viewportWidth >= 1024) {
-        useRightSide = spaceRight >= effectiveTooltipWidth || 
-                      (spaceRight >= spaceLeft && spaceRight >= minMargin);
+        useRightSide = spaceRight >= effectiveTooltipWidth ||
+            (spaceRight >= spaceLeft && spaceRight >= minMargin);
     } else {
         const isRightEdgeVerse = verseRect.right > viewportWidth * 0.7;
         useRightSide = !isRightEdgeVerse && spaceRight >= effectiveTooltipWidth;
@@ -841,11 +839,11 @@ function addCloseButtonListener(closeButton, verseElement) {
         tooltip.style.setProperty('--arrow-border', '10px solid transparent 10px solid #d4af37 10px solid transparent');
     } else if (useRightSide) {
         tooltip.style.setProperty('--arrow-left', '-10px');
-        tooltip.style.setProperty('--arrow-border', 
+        tooltip.style.setProperty('--arrow-border',
             '10px solid transparent 10px solid #d4af37 10px solid transparent');
     } else {
         tooltip.style.setProperty('--arrow-left', 'calc(100% - 1px)');
-        tooltip.style.setProperty('--arrow-border', 
+        tooltip.style.setProperty('--arrow-border',
             '10px solid #d4af37 10px solid transparent 10px solid transparent');
     }
 }
@@ -857,7 +855,7 @@ function addCloseButtonListener(closeButton, verseElement) {
 
 
 function toArabicNumber(num) {
-    const arabicDigits = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     return num
         .toString()
         .split('')
@@ -868,9 +866,9 @@ function toArabicNumber(num) {
 
 function highlightCurrentVerse(verseElement) {
     if (!verseElement) return;
-    
+
     verseElement.classList.add('current-playing-verse');
-    
+
     // Scroll to the verse with smooth behavior
     setTimeout(() => {
         verseElement.scrollIntoView({
@@ -879,7 +877,7 @@ function highlightCurrentVerse(verseElement) {
             inline: 'start'
         });
     }, 100);
-    
+
     // Add visual pulse effect
     verseElement.style.animation = 'verse-pulse 2s infinite';
 }
@@ -944,7 +942,7 @@ async function playVerseAudio(surah, ayah, isSequence = false, onEndedCallback) 
 
 function toggleAudioPlayback() {
     const stopBtn = document.querySelector('.stop-audio-btn');
-    
+
     if (currentAudio) {
         if (currentAudio.paused) {
             // Resume playback from where it was paused
@@ -955,7 +953,7 @@ function toggleAudioPlayback() {
                     <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                 </svg>
             `;
-            
+
             // Only play next verse if we're in sequence mode AND we reached the end
             if (isPlayingEntireSurah && currentAudio.ended) {
                 playNextVerseInSequence();
@@ -974,7 +972,7 @@ function toggleAudioPlayback() {
 }
 
 // Add event listener to stop button
-document.querySelector('.stop-audio-btn').addEventListener('click', function() {
+document.querySelector('.stop-audio-btn').addEventListener('click', function () {
     toggleAudioPlayback();
 });
 
@@ -988,7 +986,7 @@ function populateSurahList(surahs) {
             <span class="surah-name">${surah.name} (${surah.englishName})</span>
         </li>
     `).join('');
-    
+
     // Add click event listeners to surah items
     document.querySelectorAll('.surah-item').forEach(item => {
         item.addEventListener('click', () => {
@@ -1021,15 +1019,10 @@ function goToSurah(surahNumber) {
 // After rendering a page, detect which surah is visible
 function highlightSurahForCurrentPage() {
     if (!pagesData[currentPage] || pagesData[currentPage].length === 0) return;
-    
+
     const firstVerse = pagesData[currentPage][0];
     highlightActiveSurah(firstVerse.surahNumber);
 }
-
-// Call this after renderPage() completes
-
-
-
 
 // Highlight the active surah in sidebar
 function highlightActiveSurah(surahNumber) {
@@ -1037,12 +1030,12 @@ function highlightActiveSurah(surahNumber) {
     document.querySelectorAll('.surah-item').forEach(item => {
         item.classList.remove('active-surah');
     });
-    
+
     // Add highlight to current surah
     const activeSurahItem = document.querySelector(`.surah-item[data-surah="${surahNumber}"]`);
     if (activeSurahItem) {
         activeSurahItem.classList.add('active-surah');
-        
+
         // Scroll to the surah in sidebar if needed
         activeSurahItem.scrollIntoView({
             behavior: 'smooth',
@@ -1064,14 +1057,14 @@ function closeSidebar() {
 
 function setupTafsirClickHandlers() {
     // Handle clicks on tafsir content (prevents bubbling to verse)
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.closest('.verse-tafsir')) {
             e.stopImmediatePropagation();
         }
     }, true); // Use capturing phase
 
 
-    document.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function (e) {
         if (e.target.closest('.verse-tafsir')) {
             e.stopImmediatePropagation();
         }
@@ -1087,7 +1080,7 @@ async function initApp() {
             quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">تعذر تحميل القرآن الكريم. يرجى المحاولة لاحقاً.</p>';
             return;
         }
-        
+
         surahData = surahs;
         pagesData = organizeVersesByPage(surahs);
         populateSurahList(surahs);
@@ -1098,8 +1091,8 @@ async function initApp() {
         // 3. Default to page 1
         const urlParams = new URLSearchParams(window.location.search);
         const pageParam = urlParams.get('page');
-        
-        currentPage = (function() {
+
+        currentPage = (function () {
             try {
                 // 1. Check URL parameter first
                 if (pageParam && !isNaN(pageParam)) {
@@ -1108,7 +1101,7 @@ async function initApp() {
                         return page;
                     }
                 }
-                
+
                 // 2. Check localStorage
                 const saved = localStorage.getItem('lastVisitedPage');
                 if (saved) {
@@ -1126,7 +1119,7 @@ async function initApp() {
                         }
                     }
                 }
-                
+
                 // 3. Default to page 1
                 return 1;
             } catch (e) {
@@ -1138,22 +1131,22 @@ async function initApp() {
         // Load current page
         await renderPage(currentPage);
         saveCurrentPage(currentPage); // Save initialized page
-        
+
         // Navigation event listeners
         prevPageBtn.addEventListener('click', () => {
             if (currentPage > 1) navigateToPage(currentPage - 1);
 
         });
-        
+
         nextPageBtn.addEventListener('click', () => {
             if (currentPage < totalPages) navigateToPage(currentPage + 1);
 
         });
-        
+
         // Sidebar controls
         menuButtonEl.addEventListener('click', toggleSidebar);
         closeSidebarEl.addEventListener('click', closeSidebar);
-        
+
         // Keyboard navigation (fixed arrow directions)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' && currentPage < totalPages) {
@@ -1165,10 +1158,10 @@ async function initApp() {
                 //     top: 0,
                 //     behavior: 'smooth'
                 //   });
-                  highlightSurahForCurrentPage();
+                highlightSurahForCurrentPage();
 
 
-                } else if (e.key === 'ArrowRight' && currentPage >1) {
+            } else if (e.key === 'ArrowRight' && currentPage > 1) {
                 e.preventDefault();
                 currentPage--;
                 renderPage(currentPage);
@@ -1177,10 +1170,10 @@ async function initApp() {
                 //     top: 0,
                 //     behavior: 'smooth'
                 //   });
-                  highlightSurahForCurrentPage();
+                highlightSurahForCurrentPage();
 
 
-                } else if (e.code === 'Space' || e.key === ' ') {
+            } else if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
                 toggleAudioPlayback();
             } else if (e.ctrlKey && e.key === 's') {
@@ -1193,34 +1186,34 @@ async function initApp() {
                 }
             }
         });
-        
+
 
         document.addEventListener('click', function (e) {
             const isInsideVerse = e.target.closest('.verse-container');
             const isInsideTafsir = e.target.closest('.verse-tafsir');
-        
+
             if (!isInsideVerse && !isInsideTafsir) {
                 // Hide all tafsir tooltips
                 document.querySelectorAll('.verse-tafsir').forEach(tooltip => {
                     tooltip.remove();
                 });
-        
+
                 // Optionally remove active class
                 document.querySelectorAll('.verse-container').forEach(v => {
                     v.classList.remove('active-verse');
                 });
             }
         });
-        
+
         setupTafsirCloseHandlers();
-          setupVerseInteractions();
+        setupVerseInteractions();
         setupVerseHoverEffects();
         setupTafsirHideOnScroll();
-        setupSwipeNavigation(); 
-        setupTafsirClickHandlers() ;
-        
+        setupSwipeNavigation();
+        setupTafsirClickHandlers();
 
-        
+
+
     } catch (error) {
         console.error('App initialization failed:', error);
         quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">حدث خطأ أثناء تحميل التطبيق. يرجى تحديث الصفحة.</p>';
@@ -1241,7 +1234,7 @@ function saveCurrentPage(page) {
 }
 
 
-async function saveVerseAsImage(selection) {    
+async function saveVerseAsImage(selection) {
     try {
         const range = selection.getRangeAt(0);
         // Get the parent element that contains the selected text
@@ -1249,7 +1242,7 @@ async function saveVerseAsImage(selection) {
         if (container.nodeType === Node.TEXT_NODE) {
             container = container.parentNode;
         }
-        
+
         // Find the nearest verse container
         const verseContainer = findParentWithClass(container, 'verse-container');
         if (!verseContainer) {
@@ -1259,10 +1252,10 @@ async function saveVerseAsImage(selection) {
 
         // Create a decorated container
         const decoratedVerse = createDecoratedVerse(verseContainer, selection.toString());
-        
+
         // Use html2canvas to convert to image
         const html2canvas = await loadHtml2Canvas();
-        
+
         html2canvas(decoratedVerse, {
             backgroundColor: null,
             scale: 2,
@@ -1275,7 +1268,7 @@ async function saveVerseAsImage(selection) {
             link.download = `quran-verse-${new Date().getTime()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            
+
             // Clean up
             document.body.removeChild(decoratedVerse);
         });
@@ -1288,8 +1281,8 @@ async function saveVerseAsImage(selection) {
 function createDecoratedVerse(verseContainer, selectedText) {
     const verseNumber = verseContainer.querySelector('.verse-number')?.textContent;
     const surahName = verseContainer.dataset.surahName || 'السورة';
-    
-    
+
+
     const decorated = document.createElement('div');
     decorated.className = 'qv-premium-container';
     decorated.innerHTML = `
@@ -1314,7 +1307,7 @@ function createDecoratedVerse(verseContainer, selectedText) {
             <div class="qv-premium-watermark">${new Date().toLocaleDateString('ar-EG')}</div>
         </div>
     `;
-    
+
     document.body.appendChild(decorated);
     return decorated;
 }
@@ -1339,7 +1332,7 @@ function loadHtml2Canvas() {
 function findParentWithClass(element, className, maxDepth = 5) {
     let current = element;
     let depth = 0;
-    
+
     while (current && depth < maxDepth) {
         if (current.classList && current.classList.contains(className)) {
             return current;
@@ -1363,14 +1356,11 @@ function showSaveNotification() {
     notification.style.borderRadius = '4px';
     notification.style.zIndex = '1000';
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.remove();
     }, 3000);
 }
-
-
-
 
 function updateVerseNumbers() {
     const verseNumbers = document.querySelectorAll('.verse-number');
@@ -1414,15 +1404,15 @@ function onVersesLoaded() {
 
 function setupVerseHoverEffects() {
     const verses = document.querySelectorAll('.verse');
-    
+
     verses.forEach(verse => {
-        verse.addEventListener('mouseenter', function() {
+        verse.addEventListener('mouseenter', function () {
             if (document.body.classList.contains('night-mode')) {
                 this.style.setProperty('--glow-intensity', '0.6');
             }
         });
-        
-        verse.addEventListener('mouseleave', function() {
+
+        verse.addEventListener('mouseleave', function () {
             this.style.setProperty('--glow-intensity', '0');
         });
     });

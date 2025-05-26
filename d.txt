@@ -1,0 +1,3 @@
+db.collectionName.deleteMany({});
+db.employees.find({ scores: { $elemMatch: { $gt: 26 } } });
+db.employees.find({ "scores.2": { $gt: 26 } });

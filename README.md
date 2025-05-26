@@ -40,7 +40,7 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 ### Installation
 1. Clone the repository:
 ```powershell
-git clone <repository-url>
+git clone https://github.com/eng-yossef/Quran
 cd Quran
 ```
 

@@ -41,6 +41,7 @@ async function playVerseAudioFromQueue(callback = null) {
     // Pause current audio if needed
     if (currentAudio && !audioPaused) {
         currentAudio.pause();
+        currentAudio.removeEventListener('ended', currentAudio._endedHandler); // Clean up previous listener
         currentAudio = null;
     }
 
@@ -62,9 +63,37 @@ async function playVerseAudioFromQueue(callback = null) {
             </svg>`;
     }
 
+    // Clean up any previous ended listeners
+    if (audio._endedHandler) {
+        audio.removeEventListener('ended', audio._endedHandler);
+    }
+
+    // Create and store the ended handler
+    audio._endedHandler = () => {
+        audio.removeEventListener('ended', audio._endedHandler);
+        delete audio._endedHandler;
+        if (callback) callback();
+    };
+
+    // Add the new ended listener
+    currentAudio.addEventListener('ended', currentAudio._endedHandler);
+
     // Try to play audio with error handling
     try {
         await currentAudio.play();
+        
+        // Update current verse index and prefetch next verses
+        if (isPlayingEntireSurah && currentVerseSequence) {
+            currentVerseIndex = currentVerseSequence.findIndex(v => 
+                v.surahNumber === verse.surahNumber && 
+                v.numberInSurah === verse.numberInSurah
+            );
+            
+            // Prefetch next verses if we're running low
+            if (audioQueue.length < 2 && currentVerseIndex < currentVerseSequence.length - 1) {
+                prefetchVerses(currentVerseIndex + 1, MAX_PREFETCH_COUNT);
+            }
+        }
     } catch (error) {
         if (error.name === 'AbortError') {
             console.warn('Playback aborted due to pause or interruption.');
@@ -73,11 +102,6 @@ async function playVerseAudioFromQueue(callback = null) {
         }
         return; // Exit early on error
     }
-
-    // Listen for audio ending
-    currentAudio.addEventListener('ended', () => {
-        if (callback) callback();
-    });
 }
 
 
@@ -174,6 +198,7 @@ async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumbe
     await prefetchVerses(currentVerseIndex, MAX_PREFETCH_COUNT);
     playNextVerseInSequence();
 }
+
 
 
 function stopAudio() {

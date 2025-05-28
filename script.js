@@ -660,26 +660,35 @@ function setupVerseInteractions() {
             }
         }
 
-        function handleTouchEnd(e) {
-            const touchDuration = Date.now() - touchStartTime;
-            const isTap = !touchMoved && touchDuration < 300;
+     function handleTouchEnd(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-            // Clear any pending tafsir timer
-            if (tafsirTimer) {
-                clearTimeout(tafsirTimer);
-                tafsirTimer = null;
-            }
+    const touchDuration = Date.now() - touchStartTime;
+    const isTap = !touchMoved && touchDuration < 300;
 
-            // Handle tap (quick, no movement)
-            if (isTap) {
-                highlightVerse();
-                playEntireSurah(surahNumber, { verseNumber: verseNumber });
-            }
+    if (tafsirTimer) {
+        clearTimeout(tafsirTimer);
+        tafsirTimer = null;
+    }
 
-            // Reset touch state
-            touchMoved = false;
-            isPotentialScroll = false;
+    if (isTap) {
+        const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+            currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+        if (isCurrentVersePlaying && !audioPaused) {
+            toggleAudioPlayback();
+        } else {
+            highlightVerse();
+            playEntireSurah(surahNumber, { verseNumber: verseNumber });
+            clearSelection();
         }
+    }
+
+    touchMoved = false;
+    isPotentialScroll = false;
+}
+
 
         function handleTouchCancel() {
             if (tafsirTimer) {

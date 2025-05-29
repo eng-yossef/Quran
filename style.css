@@ -1192,3 +1192,16 @@ h1.header-title{
 .night-mode[dir="rtl"] .active-surah {
     border-left-color: #3CB371; /* Medium sea green */
 }
+
+
+
+.go-btn {
+    background-color: var(--gold-accent);
+    color: var(--dark-green);
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}

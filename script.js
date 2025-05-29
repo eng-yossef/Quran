@@ -568,7 +568,7 @@ function renderPage(pageNumber) {
     pageIndicatorEl.innerHTML = `
         الصفحة ${pageNumber}
         <input type="number" id="pageInput"  min="1" max="${totalPages}" value="${pageNumber}" style="width: 60px; margin-right: 8px;">
-        <button id="goToPageBtn" class="nav-button">اذهب</button>
+        <button id="goToPageBtn" class="go-btn">اذهب</button>
     `;
 
     // Set up button and input events

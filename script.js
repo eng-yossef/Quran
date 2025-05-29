@@ -523,7 +523,7 @@ document.body.appendChild(stopBtnContainer);
 
 function renderPage(pageNumber) {
     currentPageNumber = pageNumber;
-    saveCurrentPage(pageNumber)
+    saveCurrentPage(pageNumber);
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
@@ -541,7 +541,6 @@ function renderPage(pageNumber) {
                         <p>${verse.englishName} - ${verse.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</p>
                     </div>
                 `;
-
                 if (pageNumber != 1 && pageNumber != 187) {
                     html += `
                         <div class="bismillah-container">
@@ -564,9 +563,33 @@ function renderPage(pageNumber) {
     });
 
     quranPageEl.innerHTML = html;
-    pageIndicatorEl.textContent = `الصفحة ${pageNumber}`;
 
-    // Add click event to surah names
+    // =============== Inject Input + Button Next to Page Number ===============
+    pageIndicatorEl.innerHTML = `
+        الصفحة ${pageNumber}
+        <input type="number" id="pageInput"  min="1" max="${totalPages}" value="${pageNumber}" style="width: 60px; margin-right: 8px;">
+        <button id="goToPageBtn" class="nav-button">اذهب</button>
+    `;
+
+    // Set up button and input events
+    const input = document.getElementById('pageInput');
+    const button = document.getElementById('goToPageBtn');
+
+    button.addEventListener('click', () => {
+        const val = parseInt(input.value);
+        if (!isNaN(val) && val >= 1 && val <= totalPages) {
+            renderPage(val);
+        } else {
+            alert(`أدخل رقم صفحة من 1 إلى ${totalPages}`);
+        }
+    });
+
+    input.addEventListener('keypress', e => {
+        if (e.key === 'Enter') button.click();
+    });
+    // ==========================================================================
+
+    // Surah click event
     document.querySelectorAll('.surah-name').forEach(surahName => {
         surahName.addEventListener('click', function () {
             const surahNumber = parseInt(this.getAttribute('data-surah'));
@@ -574,18 +597,15 @@ function renderPage(pageNumber) {
         });
     });
 
-
-
-    // Disable/enable navigation buttons
     prevPageBtn.disabled = pageNumber <= 1;
     nextPageBtn.disabled = pageNumber >= totalPages;
 
-    // Update browser history
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
     setupVerseInteractions();
     highlightSurahForCurrentPage();
     matchSidebarHeight();
 }
+
 
 
 function setupVerseInteractions() {

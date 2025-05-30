@@ -679,19 +679,28 @@ function setupVerseInteractions() {
             }
         }
 
-     function handleTouchEnd(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
+function handleTouchEnd(e) {
     const touchDuration = Date.now() - touchStartTime;
     const isTap = !touchMoved && touchDuration < 300;
 
+    // If user swiped horizontally (e.g., to scroll pages), skip preventing default
+    const deltaX = Math.abs(touchEndX - touchStartX || 0); // horizontal movement
+    const deltaY = Math.abs(touchEndY - touchStartY || 0); // vertical movement
+
+    const isHorizontalSwipe = deltaX > deltaY && deltaX > 30; // significant horizontal scroll
+    if (!isHorizontalSwipe) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // Clear any pending tafsir timer
     if (tafsirTimer) {
         clearTimeout(tafsirTimer);
         tafsirTimer = null;
     }
 
-    if (isTap) {
+    // Only process tap (not scroll)
+    if (isTap && !isHorizontalSwipe) {
         const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
             currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 

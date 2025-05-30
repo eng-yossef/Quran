@@ -617,10 +617,13 @@ function setupVerseInteractions() {
 
         const surahNumber = parseInt(verseContainer.getAttribute('data-surah'));
         const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
+
         let tafsirTimer = null;
         let touchStartTime = 0;
         let touchStartX = 0;
         let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
         let touchMoved = false;
         let isPotentialScroll = false;
 
@@ -647,11 +650,12 @@ function setupVerseInteractions() {
         function handleTouchStart(e) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
+            touchEndX = touchStartX;
+            touchEndY = touchStartY;
             touchStartTime = Date.now();
             touchMoved = false;
             isPotentialScroll = false;
 
-            // Start timer for long press
             tafsirTimer = setTimeout(() => {
                 if (!touchMoved && !isPotentialScroll) {
                     clearSelection();
@@ -661,17 +665,22 @@ function setupVerseInteractions() {
         }
 
         function handleTouchMove(e) {
-            const xDiff = Math.abs(e.touches[0].clientX - touchStartX);
-            const yDiff = Math.abs(e.touches[0].clientY - touchStartY);
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
 
-            // Consider it a move if exceeds 5px threshold (more sensitive than before)
+            touchEndX = currentX;
+            touchEndY = currentY;
+
+            const xDiff = Math.abs(currentX - touchStartX);
+            const yDiff = Math.abs(currentY - touchStartY);
+
             if (xDiff > 5 || yDiff > 5) {
                 touchMoved = true;
-                // Only consider it a scroll if vertical movement dominates
+
                 if (yDiff > xDiff) {
                     isPotentialScroll = true;
                 }
-                // Cancel any pending tafsir display
+
                 if (tafsirTimer) {
                     clearTimeout(tafsirTimer);
                     tafsirTimer = null;
@@ -679,44 +688,40 @@ function setupVerseInteractions() {
             }
         }
 
-function handleTouchEnd(e) {
-    const touchDuration = Date.now() - touchStartTime;
-    const isTap = !touchMoved && touchDuration < 300;
+        function handleTouchEnd(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            const isTap = !touchMoved && touchDuration < 300;
 
-    // If user swiped horizontally (e.g., to scroll pages), skip preventing default
-    const deltaX = Math.abs(touchEndX - touchStartX || 0); // horizontal movement
-    const deltaY = Math.abs(touchEndY - touchStartY || 0); // vertical movement
+            const deltaX = Math.abs(touchEndX - touchStartX);
+            const deltaY = Math.abs(touchEndY - touchStartY);
+            const isHorizontalSwipe = deltaX > deltaY && deltaX > 30;
 
-    const isHorizontalSwipe = deltaX > deltaY && deltaX > 30; // significant horizontal scroll
-    if (!isHorizontalSwipe) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+            if (!isHorizontalSwipe) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
 
-    // Clear any pending tafsir timer
-    if (tafsirTimer) {
-        clearTimeout(tafsirTimer);
-        tafsirTimer = null;
-    }
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
 
-    // Only process tap (not scroll)
-    if (isTap && !isHorizontalSwipe) {
-        const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
-            currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+            if (isTap && !isHorizontalSwipe) {
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 
-        if (isCurrentVersePlaying && !audioPaused) {
-            toggleAudioPlayback();
-        } else {
-            highlightVerse();
-            playEntireSurah(surahNumber, { verseNumber: verseNumber });
-            clearSelection();
+                if (isCurrentVersePlaying && !audioPaused) {
+                    toggleAudioPlayback();
+                } else {
+                    highlightVerse();
+                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                    clearSelection();
+                }
+            }
+
+            touchMoved = false;
+            isPotentialScroll = false;
         }
-    }
-
-    touchMoved = false;
-    isPotentialScroll = false;
-}
-
 
         function handleTouchCancel() {
             if (tafsirTimer) {
@@ -728,13 +733,12 @@ function handleTouchEnd(e) {
         }
 
         function handleDesktopClick(e) {
-            // Only proceed if not clicking on tafsir (including close button)
             if (!e.target.closest('.verse-tafsir')) {
                 const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                     currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 
                 if (isCurrentVersePlaying && !audioPaused) {
-                    toggleAudioPlayback(); // Pause if clicking same verse
+                    toggleAudioPlayback();
                 } else {
                     highlightVerse();
                     playEntireSurah(surahNumber, { verseNumber: verseNumber });
@@ -767,6 +771,7 @@ function handleTouchEnd(e) {
         }
     }
 }
+
 
 
 

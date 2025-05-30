@@ -577,7 +577,8 @@ function renderPage(pageNumber) {
     button.addEventListener('click', () => {
         const val = parseInt(input.value);
         if (!isNaN(val) && val >= 1 && val <= totalPages) {
-            renderPage(val);
+            
+           navigateToPage(val)
         } else {
             alert(`أدخل رقم صفحة من 1 إلى ${totalPages}`);
         }

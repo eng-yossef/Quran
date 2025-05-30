@@ -513,12 +513,13 @@ function organizeVersesByPage(surahs) {
 const stopBtnContainer = document.createElement('div');
 stopBtnContainer.className = 'stop-btn-container';
 stopBtnContainer.innerHTML = `
-    <button class="stop-audio-btn" style="display: none;">
+    <button class="stop-audio-btn" style="display: none; opacity: 0.7;">
         <svg viewBox="0 0 24 24" width="18" height="18">
             <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
         </svg>
     </button>
 `;
+
 document.body.appendChild(stopBtnContainer);
 
 function renderPage(pageNumber) {
@@ -1033,47 +1034,7 @@ function findPageForVerse(surahNumber, ayahNumber) {
     return currentPageNumber;
 }
 
-// async function playVerseAudio(surah, ayah, isSequence = false, onEndedCallback) {
-//     if (currentAudio && !audioPaused) {
-//         currentAudio.pause();
-//         currentAudio = null;
-//     }
 
-//     const apiUrl = `https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`;
-
-//     try {
-//         const response = await fetch(apiUrl);
-//         const data = await response.json();
-
-//         if (data.code === 200 && data.data.audio) {
-//             currentAudio = new Audio(data.data.audio);
-
-//             if (audioPaused) {
-//                 audioPaused = false;
-//                 document.querySelector('.stop-audio-btn').innerHTML = `
-//                     <svg viewBox="0 0 24 24" width="18" height="18">
-//                         <path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-//                     </svg>
-//                 `;
-//             }
-
-//             currentAudio.addEventListener('ended', () => {
-//                 if (typeof onEndedCallback === "function") {
-//                     onEndedCallback();
-//                 }
-//             });
-
-//             try {
-//                 await currentAudio.play();
-//             } catch (err) {
-//                 console.warn("Playback interrupted:", err);
-//             }
-
-//         }
-//     } catch (error) {
-//         console.error(`Error fetching audio for ${surah}:${ayah}`, error);
-//     }
-// }
 
 
 function toggleAudioPlayback() {

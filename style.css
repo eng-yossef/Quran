@@ -96,6 +96,9 @@ z-index: 10;
 }
 
 .header {
+    z-index: 98464;
+    top: 0px;
+    position: sticky;
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
     color: white;
     padding: 0.1rem ;
@@ -286,6 +289,9 @@ z-index: 10;
 
 
 .navigation {
+    z-index: 984;
+    bottom: 0px;
+    position: sticky;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -450,6 +456,8 @@ z-index: 10;
     
     .sidebar.open {
         transform: translateX(0);
+            z-index: 984600;
+
     }
     
     .quran-page {

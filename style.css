@@ -96,7 +96,7 @@ z-index: 10;
 }
 
 .header {
-    z-index: 98464;
+    z-index: 5;
     top: 0px;
     position: sticky;
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));

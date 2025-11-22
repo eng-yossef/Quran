@@ -21,6 +21,9 @@ const tafsirCache = new Map();
 const MAX_CACHE_SIZE = 100; // Maximum size of the cache
 const MAX_PREFETCH_COUNT = 5; // 👈 You can change this number to prefetch more or fewer verses
 let audioQueue = [];
+ // Use reciter 1 (Mishary Alafasy) by default
+ let reciterId = localStorage.getItem("reciterId") || "1";
+
 
 // Night Mode Toggle with better verse number handling
 const nightModeToggle = document.getElementById('nightModeToggle');
@@ -35,6 +38,23 @@ const sidebarEl = document.getElementById('sidebar');
 const menuButtonEl = document.getElementById('menuButton');
 const closeSidebarEl = document.getElementById('closeSidebar');
 const surahListEl = document.getElementById('surahList');
+
+
+
+// Set the dropdown to the saved reciter
+document.addEventListener("DOMContentLoaded", () => {
+    const reciterSelect = document.getElementById("reciterSelect");
+    if (reciterSelect) {
+        reciterSelect.value = reciterId;
+
+        reciterSelect.addEventListener("change", (e) => {
+            reciterId = e.target.value;
+            localStorage.setItem("reciterId", reciterId);
+            console.log("Reciter saved:", reciterId);
+        });
+    }
+});
+
 
 // Main function to play a verse from the queue
 async function playVerseAudioFromQueue(callback = null) {
@@ -111,18 +131,26 @@ async function playVerseAudioFromQueue(callback = null) {
 async function prefetchVerses(startIndex, count) {
     for (let i = startIndex; i < Math.min(startIndex + count, currentVerseSequence.length); i++) {
         const verse = currentVerseSequence[i];
+
         try {
-            const res = await fetch(`https://api.alquran.cloud/v1/ayah/${verse.surahNumber}:${verse.numberInSurah}/ar.alafasy`);
+            const res = await fetch(`https://quranapi.pages.dev/api/audio/${verse.surahNumber}/${verse.numberInSurah}.json`);
             const data = await res.json();
-            if (data.code === 200 && data.data.audio) {
-                const audio = new Audio(data.data.audio);
+
+
+            if (data[reciterId] && data[reciterId].url) {
+                const audio = new Audio(data[reciterId].url);
                 audioQueue.push({ audio, verse });
             }
+
         } catch (err) {
-            console.error(`Error prefetching audio for ${verse.surahNumber}:${verse.numberInSurah}`, err);
+            console.error(
+                `Error prefetching audio for ${verse.surahNumber}:${verse.numberInSurah}`,
+                err
+            );
         }
     }
 }
+
 
 // Play entire surah with prefetching
 async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumber: null }) {

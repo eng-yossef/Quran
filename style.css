@@ -343,7 +343,7 @@ z-index: 10;
     background-color: var(--gold-accent);
     color: var(--dark-green);
     border: none;
-    padding: 0.5rem 1.2rem;
+    padding: 10px;
     border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
@@ -359,7 +359,7 @@ z-index: 10;
 .page-indicator {
     font-size: 1.1rem;
     font-weight: bold;
-    padding: 0.3rem 0.8rem;
+    /* padding: 0.3rem 0.8rem; */
     background-color: rgba(255,255,255,0.2);
     border-radius: 20px;
 }
@@ -557,7 +557,7 @@ z-index: 10;
     }
     
     .navigation {
-        padding: 0.6rem 1rem;
+        /* padding: 0.6rem 1rem; */
     }
 }
 
@@ -1249,4 +1249,60 @@ h1.header-title{
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.page-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* gap: 15px; */
+    padding: 5px;
+    /* background: #f8f4e8; */
+    border-radius: 8px;
+    /* margin-bottom: 20px; */
+}
+
+.juz-info-display {
+    background: var(--gold-accent);
+    padding: 0px 2px;
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.juz-label {
+    color: var(--dark-green);;
+    font-size: .8rem;
+    font-weight: bold;
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    letter-spacing: 0.5px;
+}
+
+.page-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-navigation input {
+    text-align: center;
+    font-size: 1rem;
+    /* padding: 5px; */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.page-navigation  {
+    /* background: #c17e3a; */
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.page-navigation .go-btn:hover {
+    background: #a05e2a;
 }

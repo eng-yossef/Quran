@@ -559,6 +559,16 @@ function renderPage(pageNumber) {
     let html = '';
     let currentSurah = null;
 
+    // Get Juz info for this page (first verse's juz number)
+    const pageJuz = pageVerses[0]?.juz;
+    const pageJuzEnd = pageVerses[pageVerses.length - 1]?.juz;
+    
+    // Format Juz display text
+    let juzDisplayText = `جزء ${toArabicNumber(pageJuz)}`;
+    if (pageJuz !== pageJuzEnd) {
+        juzDisplayText = `جزء ${toArabicNumber(pageJuz)} - ${toArabicNumber(pageJuzEnd)}`;
+    }
+
     pageVerses.forEach(verse => {
         if (verse.surahNumber !== currentSurah) {
             if (verse.numberInSurah === 1) {
@@ -593,10 +603,17 @@ function renderPage(pageNumber) {
 
     quranPageEl.innerHTML = html;
 
-    // =============== Inject Input + Button Next to Page Number ===============
+    // =============== Inject Input + Button Next to Page Number with Juz Info ===============
     pageIndicatorEl.innerHTML = `
-        <input type="number" id="pageInput"  min="1" max="${totalPages}" value="${pageNumber}" style="width: 45px;">
-        <button id="goToPageBtn" class="go-btn">اذهب</button>
+        <div class="page-controls">
+            <div class="juz-info-display">
+                <span class="juz-label">${juzDisplayText}</span>
+            </div>
+            <div class="page-navigation">
+                <input type="number" id="pageInput" min="1" max="${totalPages}" value="${pageNumber}" style="width: 55px;">
+                <button id="goToPageBtn" class="go-btn">اذهب</button>
+            </div>
+        </div>
     `;
 
     // Set up button and input events
@@ -606,8 +623,7 @@ function renderPage(pageNumber) {
     button.addEventListener('click', () => {
         const val = parseInt(input.value);
         if (!isNaN(val) && val >= 1 && val <= totalPages) {
-            
-           navigateToPage(val)
+            navigateToPage(val);
         } else {
             alert(`أدخل رقم صفحة من 1 إلى ${totalPages}`);
         }

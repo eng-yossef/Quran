@@ -564,9 +564,9 @@ function renderPage(pageNumber) {
     const pageJuzEnd = pageVerses[pageVerses.length - 1]?.juz;
     
     // Format Juz display text
-    let juzDisplayText = `جزء ${toArabicNumber(pageJuz)}`;
+    let juzDisplayText = `الجزء ${toArabicNumber(pageJuz)}`;
     if (pageJuz !== pageJuzEnd) {
-        juzDisplayText = `جزء ${toArabicNumber(pageJuz)} - ${toArabicNumber(pageJuzEnd)}`;
+        juzDisplayText = `الجزء ${toArabicNumber(pageJuz)} - ${toArabicNumber(pageJuzEnd)}`;
     }
 
     pageVerses.forEach(verse => {
@@ -1441,12 +1441,7 @@ function createDecoratedVerse(verseContainer, selectedText) {
             </div>
         </div>
         
-        <div class="qv-premium-text">${selectedText}</div>
-        
-        <div class="qv-premium-footer">
-            <div class="qv-premium-decoration"></div>
-            <div class="qv-premium-watermark">${new Date().toLocaleDateString('ar-EG')}</div>
-        </div>
+        <div class="qv-premium-text">${selectedText}</div>   
     `;
 
     document.body.appendChild(decorated);

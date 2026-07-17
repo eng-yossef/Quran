@@ -54,10 +54,12 @@ function performSearch(query) {
         return;
     }
 
+    const normalizedQuery = normalizeArabic(query);
+
     const results = [];
     for (let page in pagesData) {
         pagesData[page].forEach(verse => {
-            if (verse.text && verse.text.includes(query)) {
+            if (verse.text && normalizeArabic(verse.text).includes(normalizedQuery)) {
                 results.push({
                     surahNumber: verse.surahNumber,
                     surahName: verse.surahName,
@@ -87,23 +89,6 @@ function performSearch(query) {
             </div>
         `;
     }).join('');
-}
-
-function highlightMatch(text, query) {
-    if (!query) return text;
-    const maxLength = 100;
-    const index = text.indexOf(query);
-    let start = Math.max(0, index - 30);
-    let end = Math.min(text.length, index + query.length + 70);
-    let snippet = text.substring(start, end);
-    if (start > 0) snippet = '...' + snippet;
-    if (end < text.length) snippet = snippet + '...';
-    const regex = new RegExp(`(${escapeRegex(query)})`, 'g');
-    return snippet.replace(regex, '<mark>$1</mark>');
-}
-
-function escapeRegex(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function navigateToSearchResult(page, surahNumber, verseNumber) {

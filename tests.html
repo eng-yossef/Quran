@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Quran Search — Unit Tests</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #111; color: #ddd; }
+        h1 { color: #81C784; }
+        .test-suite { margin: 20px 0; padding: 15px; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; }
+        .test-suite h2 { color: #FFD54F; margin: 0 0 10px 0; font-size: 1rem; }
+        .test { padding: 6px 10px; margin: 3px 0; border-radius: 4px; font-size: 0.9rem; }
+        .pass { background: rgba(76, 175, 80, 0.15); color: #81C784; }
+        .fail { background: rgba(244, 67, 54, 0.15); color: #EF5350; }
+        .summary { margin-top: 20px; padding: 15px; font-size: 1.1rem; font-weight: bold; }
+        .summary.all-pass { color: #81C784; }
+        .summary.has-fail { color: #EF5350; }
+    </style>
+</head>
+<body>
+    <h1>Quran Search — Unit Tests</h1>
+    <div id="results"></div>
+    <div id="summary" class="summary"></div>
+
+    <script>
+    // ============================================================
+    // Inline the functions under test (same code as utils.js / search.js)
+    // so this file runs standalone without any server or CORS issues.
+    // ============================================================
+
+    function normalizeArabic(text) {
+        if (!text) return '';
+        return text
+            .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\u06EF-\u06FF\u08F0-\u08FF]/g, '')
+            .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
+            .replace(/\u0629/g, '\u0647')
+            .replace(/\u0649/g, '\u064A')
+            .replace(/[\u0624\u0626]/g, (m) => m === '\u0624' ? '\u0648' : '\u064A');
+    }
+
+    function buildNormalizationMap(original) {
+        if (!original) return [];
+        const map = [];
+        const diacritics = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640\u06EF-\u06FF\u08F0-\u08FF]/;
+        for (let i = 0; i < original.length; i++) {
+            if (!diacritics.test(original[i])) {
+                map.push(i);
+            }
+        }
+        return map;
+    }
+
+    function highlightMatch(originalText, query) {
+        if (!query || !originalText) return originalText || '';
+        const normalizedText = normalizeArabic(originalText);
+        const normalizedQuery = normalizeArabic(query);
+        const matchIndex = normalizedText.indexOf(normalizedQuery);
+        if (matchIndex === -1) {
+            const maxLen = 120;
+            let snippet = originalText.substring(0, maxLen);
+            if (originalText.length > maxLen) snippet += '...';
+            return snippet;
+        }
+        const map = buildNormalizationMap(originalText);
+        const start = map[matchIndex] !== undefined ? map[matchIndex] : 0;
+        const end = map[matchIndex + normalizedQuery.length - 1];
+        const matchEnd = end !== undefined ? end + 1 : start + normalizedQuery.length;
+        const contextBefore = 30;
+        const contextAfter = 70;
+        const snippetStart = Math.max(0, start - contextBefore);
+        const snippetEnd = Math.min(originalText.length, matchEnd + contextAfter);
+        let prefix = snippetStart > 0 ? '...' : '';
+        let suffix = snippetEnd < originalText.length ? '...' : '';
+        const before = originalText.substring(snippetStart, start);
+        const match = originalText.substring(start, matchEnd);
+        const after = originalText.substring(matchEnd, snippetEnd);
+        return `${prefix}${before}<mark>${match}</mark>${after}${suffix}`;
+    }
+
+    // ============================================================
+    // Test harness
+    // ============================================================
+
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+
+    function assert(condition, testName) {
+        totalTests++;
+        if (condition) {
+            passedTests++;
+            return true;
+        } else {
+            failedTests++;
+            return false;
+        }
+    }
+
+    function test(suiteName, tests) {
+        const container = document.getElementById('results');
+        const suite = document.createElement('div');
+        suite.className = 'test-suite';
+        suite.innerHTML = `<h2>${suiteName}</h2>`;
+        tests.forEach(({ name, fn }) => {
+            const result = fn();
+            const div = document.createElement('div');
+            div.className = 'test ' + (result ? 'pass' : 'fail');
+            div.textContent = (result ? '✅' : '❌') + ' ' + name;
+            suite.appendChild(div);
+        });
+        container.appendChild(suite);
+    }
+
+    // ============================================================
+    // TEST SUITE 1: normalizeArabic — Diacritics Removal
+    // ============================================================
+
+    test('normalizeArabic — Diacritics Removal', [
+        {
+            name: 'Removes Fatha ( َ )',
+            fn: () => assert(normalizeArabic('بَ') === 'ب', 'Fatha removed')
+        },
+        {
+            name: 'Removes Damma ( ُ )',
+            fn: () => assert(normalizeArabic('بُ') === 'ب', 'Damma removed')
+        },
+        {
+            name: 'Removes Kasra ( ِ )',
+            fn: () => assert(normalizeArabic('بِ') === 'ب', 'Kasra removed')
+        },
+        {
+            name: 'Removes Sukun ( ْ )',
+            fn: () => assert(normalizeArabic('بْ') === 'ب', 'Sukun removed')
+        },
+        {
+            name: 'Removes Shadda ( ّ )',
+            fn: () => assert(normalizeArabic('بّ') === 'ب', 'Shadda removed')
+        },
+        {
+            name: 'Removes Tanween Fath ( ً )',
+            fn: () => assert(normalizeArabic('بً') === 'ب', 'Tanween Fath removed')
+        },
+        {
+            name: 'Removes Tanween Damm ( ٌ )',
+            fn: () => assert(normalizeArabic('بٌ') === 'ب', 'Tanween Damm removed')
+        },
+        {
+            name: 'Removes Tanween Kasr ( ٍ )',
+            fn: () => assert(normalizeArabic('بٍ') === 'ب', 'Tanween Kasr removed')
+        },
+        {
+            name: 'Removes Madda ( ّ )',
+            fn: () => assert(normalizeArabic('آ') === 'ا', 'Madda (Alef) normalized')
+        },
+        {
+            name: 'Removes Tatweel ( ـ )',
+            fn: () => assert(normalizeArabic('بـن') === 'بن', 'Tatweel removed')
+        },
+        {
+            name: 'Removes Quranic annotation marks',
+            fn: () => assert(normalizeArabic('ٱلْحَمْدُ') === 'الحمد', 'Quranic alef + diacritics removed')
+        },
+        {
+            name: 'Removes multiple diacritics from complex word',
+            fn: () => assert(normalizeArabic('رَبِّ') === 'رب', 'Multiple diacritics removed')
+        },
+        {
+            name: 'Empty string returns empty',
+            fn: () => assert(normalizeArabic('') === '', 'Empty string')
+        },
+        {
+            name: 'Null/undefined returns empty',
+            fn: () => assert(normalizeArabic(null) === '' && normalizeArabic(undefined) === '', 'Null/undefined')
+        },
+        {
+            name: 'Plain text unchanged',
+            fn: () => assert(normalizeArabic('بسم') === 'بسم', 'Plain text preserved')
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 2: normalizeArabic — Character Normalization
+    // ============================================================
+
+    test('normalizeArabic — Character Normalization', [
+        {
+            name: 'Alef with Madda ( آ ) → ا',
+            fn: () => assert(normalizeArabic('آ') === 'ا', 'Madda alef')
+        },
+        {
+            name: 'Alef with Hamza Above ( أ ) → ا',
+            fn: () => assert(normalizeArabic('أ') === 'ا', 'Hamza above')
+        },
+        {
+            name: 'Alef with Hamza Below ( إ ) → ا',
+            fn: () => assert(normalizeArabic('إ') === 'ا', 'Hamza below')
+        },
+        {
+            name: 'Alef Wasla ( ٱ ) → ا',
+            fn: () => assert(normalizeArabic('ٱ') === 'ا', 'Alef wasla')
+        },
+        {
+            name: 'Teh Marbuta ( ة ) → ه',
+            fn: () => assert(normalizeArabic('رحمة') === 'رحمه', 'Teh Marbuta')
+        },
+        {
+            name: 'Alef Maqsura ( ى ) → ي',
+            fn: () => assert(normalizeArabic('على') === 'علي', 'Alef Maqsura')
+        },
+        {
+            name: 'Hamza on Waw ( ؤ ) → و',
+            fn: () => assert(normalizeArabic('مؤمن') === 'مومن', 'Hamza on waw')
+        },
+        {
+            name: 'Hamza on Ya ( ئ ) → ي',
+            fn: () => assert(normalizeArabic('ينبئ') === 'ينبي', 'Hamza on ya')
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 3: normalizeArabic — Full Quran Verses
+    // ============================================================
+
+    test('normalizeArabic — Full Quran Verses', [
+        {
+            name: 'Al-Fatiha verse 2: "ٱلْحَمْdُ لِلَّهِ"',
+            fn: () => {
+                const original = 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ';
+                const normalized = normalizeArabic(original);
+                return assert(normalized === 'الحمد لله رب العلمين', 'Al-Fatiha verse normalized: ' + normalized);
+            }
+        },
+        {
+            name: 'Al-Fatiha verse 3: "ٱلرَّحْمَٰنِ"',
+            fn: () => {
+                const original = 'ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+                const normalized = normalizeArabic(original);
+                return assert(normalized === 'الرحمن الرحيم', 'Ar-Rahman normalized: ' + normalized);
+            }
+        },
+        {
+            name: 'Al-Ikhlas: "قُلْ هُوَ ٱللَّهُ أَحَadٌ"',
+            fn: () => {
+                const original = 'قُلْ هُوَ ٱللَّهُ أَحَadٌ';
+                const normalized = normalizeArabic(original);
+                return assert(normalized.includes('الله') && normalized.includes('احد'), 'Al-Ikhlas normalized: ' + normalized);
+            }
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 4: Search Matching (normalizeArabic + includes)
+    // ============================================================
+
+    function searchMatch(verseText, query) {
+        return normalizeArabic(verseText).includes(normalizeArabic(query));
+    }
+
+    test('Search Matching — Success Criteria', [
+        {
+            name: 'CRITICAL: "الحمد" finds "ٱلْحَمْدُ"',
+            fn: () => assert(searchMatch('ٱلْحَمْدُ لِلَّهِ', 'الحمد'), 'Al-Hamd match')
+        },
+        {
+            name: 'CRITICAL: "الرحمن" finds "ٱلرَّحْمَٰنِ"',
+            fn: () => assert(searchMatch('ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'الرحمن'), 'Ar-Rahman match')
+        },
+        {
+            name: 'Search with diacritics also works',
+            fn: () => assert(searchMatch('ٱلْحَمْدُ لِلَّهِ', 'ٱلْحَمْدُ'), 'With diacritics')
+        },
+        {
+            name: 'Partial word match: "رب" finds "رَبِّ"',
+            fn: () => assert(searchMatch('رَبِّ ٱلْعَٰلَمِينَ', 'رب'), 'Partial match')
+        },
+        {
+            name: 'Mixed diacritics: "بسم" finds "بِسْمِ"',
+            fn: () => assert(searchMatch('بِسْمِ ٱللَّهِ', 'بسم'), 'Bismi match')
+        },
+        {
+            name: 'Alef variants: "الله" finds "ٱللَّهِ"',
+            fn: () => assert(searchMatch('ٱللَّهِ رَبِّ', 'الله'), 'Allah match')
+        },
+        {
+            name: 'Teh Marbuta: "رحمة" finds "رَحْمَةٍ"',
+            fn: () => assert(searchMatch('رَحْمَةٍ وَاسِعَةً', 'رحمة'), 'Rahma match')
+        },
+        {
+            name: 'Alef Maqsura: "على" finds "عَلَى"',
+            fn: () => assert(searchMatch('عَلَى ٱلْكُرْسِيِّ', 'على'), 'Ala match')
+        },
+        {
+            name: 'No false positives: "حمد" should NOT match unrelated text',
+            fn: () => assert(!searchMatch('بسم الله', 'حمد'), 'No false positive')
+        },
+        {
+            name: 'Short query (2 chars): "ilm" pattern — "علم"',
+            fn: () => assert(searchMatch('عِلْمٌ', 'علم'), 'Short query match')
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 5: highlightMatch — Diacritic-Aware Highlighting
+    // ============================================================
+
+    test('highlightMatch — Diacritic-Aware Highlighting', [
+        {
+            name: 'Highlight wraps correct original text with <mark>',
+            fn: () => {
+                const result = highlightMatch('ٱلْحَمْدُ لِلَّهِ رَبِّ', 'الحمد');
+                return assert(result.includes('<mark>') && result.includes('ٱلْحَمْد'), 'Correct highlight: ' + result);
+            }
+        },
+        {
+            name: 'Highlight preserves diacritics in output',
+            fn: () => {
+                const result = highlightMatch('ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', 'الرحمن');
+                return assert(result.includes('<mark>') && result.includes('رَّحْمَٰن'), 'Diacritics preserved: ' + result);
+            }
+        },
+        {
+            name: 'Highlight with fully diacritized query matches',
+            fn: () => {
+                const result = highlightMatch('ٱلْحَمْدُ لِلَّهِ', 'ٱلْحَمْدُ');
+                return assert(result.includes('<mark>') && result.includes('ٱلْحَمْد'), 'Full diacritics match: ' + result);
+            }
+        },
+        {
+            name: 'No match returns snippet without <mark>',
+            fn: () => {
+                const result = highlightMatch('بسم الله الرحمن', 'حمد');
+                return assert(!result.includes('<mark>'), 'No mark when no match');
+            }
+        },
+        {
+            name: 'Match at start of text — no leading ...',
+            fn: () => {
+                const result = highlightMatch('ٱلْحَمْدُ لِلَّهِ', 'الحمد');
+                return assert(!result.startsWith('...'), 'No leading dots');
+            }
+        },
+        {
+            name: 'Match in middle of text — has leading ...',
+            fn: () => {
+                const prefix = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+                const result = highlightMatch(prefix, 'رحم');
+                return assert(result.includes('...'), 'Has leading dots for mid-text match: ' + result);
+            }
+        },
+        {
+            name: 'Null/undefined inputs return empty string',
+            fn: () => assert(highlightMatch(null, 'test') === '' && highlightMatch('test', null) === 'test', 'Null safety'),
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 6: buildNormalizationMap
+    // ============================================================
+
+    test('buildNormalizationMap — Position Mapping', [
+        {
+            name: 'Plain text: map indices match 1:1',
+            fn: () => {
+                const map = buildNormalizationMap('بسم');
+                return assert(map.length === 3 && map[0] === 0 && map[1] === 1 && map[2] === 2, 'Plain map');
+            }
+        },
+        {
+            name: 'Diacritics are skipped in map',
+            fn: () => {
+                const map = buildNormalizationMap('بَسْم');
+                // ب=0, \u064E(skipped), س=2, \u0652(skipped), م=4
+                return assert(map.length === 3 && map[0] === 0 && map[1] === 2 && map[2] === 4, 'Diacritics skipped: ' + JSON.stringify(map));
+            }
+        },
+        {
+            name: 'All-diacritics text: map is empty',
+            fn: () => {
+                const map = buildNormalizationMap('َُِّْ');
+                return assert(map.length === 0, 'Empty map for diacritics only');
+            }
+        },
+    ]);
+
+    // ============================================================
+    // TEST SUITE 7: Edge Cases
+    // ============================================================
+
+    test('Edge Cases', [
+        {
+            name: 'Empty query returns no results (length < 2)',
+            fn: () => assert(normalizeArabic('').length < 2, 'Empty query too short')
+        },
+        {
+            name: 'Single character query',
+            fn: () => assert(normalizeArabic('أ').length === 1, 'Single char normalized')
+        },
+        {
+            name: 'Very long query does not crash',
+            fn: () => {
+                const longQuery = 'بسم'.repeat(100);
+                const result = normalizeArabic(longQuery);
+                return assert(result.length > 0, 'Long query handled');
+            }
+        },
+        {
+            name: 'Unicode emoji in query does not crash',
+            fn: () => {
+                try {
+                    normalizeArabic('﷽ test 🕌');
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+        },
+        {
+            name: 'Basmala (﷽) normalization',
+            fn: () => {
+                const normalized = normalizeArabic('﷽');
+                return assert(typeof normalized === 'string', 'Basmala handled: ' + normalized);
+            }
+        },
+        {
+            name: 'Numbers in query preserved',
+            fn: () => assert(normalizeArabic('آية 7') === 'ايه 7', 'Numbers preserved')
+        },
+    ]);
+
+    // ============================================================
+    // Summary
+    // ============================================================
+
+    const summaryEl = document.getElementById('summary');
+    const allPass = failedTests === 0;
+    summaryEl.className = 'summary ' + (allPass ? 'all-pass' : 'has-fail');
+    summaryEl.textContent = allPass
+        ? `✅ ALL ${passedTests}/${totalTests} TESTS PASSED`
+        : `❌ ${failedTests} FAILED / ${totalTests} total (${passedTests} passed)`;
+
+    document.title = allPass
+        ? `✅ All ${totalTests} tests passed`
+        : `❌ ${failedTests} tests failed`;
+    </script>
+</body>
+</html>

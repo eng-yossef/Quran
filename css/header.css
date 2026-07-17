@@ -1,0 +1,71 @@
+/* Header Styles */
+.header {
+    z-index: 5;
+    top: 0px;
+    position: sticky;
+    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+    color: white;
+    padding: 0.1rem ;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 1rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Night Mode Toggle */
+.night-mode-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    margin-left: 10px;
+    padding: 5px;
+}
+
+/* Reciter Select Styling */
+.reciter-select {
+    background: rgba(255, 255, 255, 0.12);
+    color: black;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.reciter-select:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+.reciter-select:focus {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: white;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.35),
+                0 4px 10px rgba(0,0,0,0.3);
+}
+
+.reciter-select option {
+    background-color: var(--primary-green);
+    font-size: 15px;
+}

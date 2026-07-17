@@ -1,0 +1,99 @@
+/* Navigation Bar */
+.navigation {
+    z-index: 984;
+    bottom: 0px;
+    position: sticky;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 1.5rem;
+    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+    color: white;
+    border-top: 3px solid var(--gold-accent);
+}
+
+.nav-button {
+    background-color: var(--gold-accent);
+    color: var(--dark-green);
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.nav-button:hover {
+    background-color: #e6c260;
+    transform: translateY(-1px);
+}
+
+.page-indicator {
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 20px;
+}
+
+/* Page Controls */
+.page-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.juz-info-display {
+    background: var(--gold-accent);
+    padding: 0px 2px;
+    border-radius: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.juz-label {
+    color: var(--dark-green);;
+    font-size: .8rem;
+    font-weight: bold;
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    letter-spacing: 0.5px;
+}
+
+.page-navigation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-navigation input {
+    text-align: center;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.page-navigation  {
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s;
+}
+
+.go-btn {
+    background-color: var(--gold-accent);
+    color: var(--dark-green);
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.page-navigation .go-btn:hover {
+    background: #a05e2a;
+}

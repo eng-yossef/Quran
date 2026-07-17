@@ -1,0 +1,178 @@
+function setupVerseInteractions() {
+    const isTouchDevice = ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0);
+
+    document.querySelectorAll('.verse-container').forEach(verseContainer => {
+        verseContainer.classList.add('no-text-select');
+
+        const surahNumber = parseInt(verseContainer.getAttribute('data-surah'));
+        const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
+
+        let tafsirTimer = null;
+        let touchStartTime = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let touchMoved = false;
+        let isPotentialScroll = false;
+
+        const highlightVerse = () => {
+            document.querySelectorAll('.verse-container').forEach(v => {
+                v.classList.remove('active-verse');
+            });
+            verseContainer.classList.add('active-verse');
+        };
+
+        if (isTouchDevice) {
+            verseContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+            verseContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
+            verseContainer.addEventListener('touchend', handleTouchEnd);
+            verseContainer.addEventListener('touchcancel', handleTouchCancel);
+        } else {
+            verseContainer.addEventListener('click', handleDesktopClick);
+            verseContainer.addEventListener('mouseenter', handleMouseEnter);
+            verseContainer.addEventListener('mouseleave', handleMouseLeave);
+        }
+
+        function handleTouchStart(e) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchEndX = touchStartX;
+            touchEndY = touchStartY;
+            touchStartTime = Date.now();
+            touchMoved = false;
+            isPotentialScroll = false;
+
+            tafsirTimer = setTimeout(() => {
+                if (!touchMoved && !isPotentialScroll) {
+                    clearSelection();
+                    showTafsir(verseContainer, surahNumber, verseNumber);
+                }
+            }, 500);
+        }
+
+        function handleTouchMove(e) {
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+
+            touchEndX = currentX;
+            touchEndY = currentY;
+
+            const xDiff = Math.abs(currentX - touchStartX);
+            const yDiff = Math.abs(currentY - touchStartY);
+
+            if (xDiff > 5 || yDiff > 5) {
+                touchMoved = true;
+
+                if (yDiff > xDiff) {
+                    isPotentialScroll = true;
+                }
+
+                if (tafsirTimer) {
+                    clearTimeout(tafsirTimer);
+                    tafsirTimer = null;
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            const isTap = !touchMoved && touchDuration < 300;
+
+            const deltaX = Math.abs(touchEndX - touchStartX);
+            const deltaY = Math.abs(touchEndY - touchStartY);
+            const isHorizontalSwipe = deltaX > deltaY && deltaX > 30;
+
+            if (!isHorizontalSwipe) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
+
+            if (isTap && !isHorizontalSwipe) {
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+                if (isCurrentVersePlaying && !audioPaused) {
+                    toggleAudioPlayback();
+                } else {
+                    highlightVerse();
+                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                    clearSelection();
+                }
+            }
+
+            touchMoved = false;
+            isPotentialScroll = false;
+        }
+
+        function handleTouchCancel() {
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
+            touchMoved = false;
+            isPotentialScroll = false;
+        }
+
+        function handleDesktopClick(e) {
+            if (!e.target.closest('.verse-tafsir')) {
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+                if (isCurrentVersePlaying && !audioPaused) {
+                    toggleAudioPlayback();
+                } else {
+                    highlightVerse();
+                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                    clearSelection();
+                }
+            }
+        }
+
+        async function handleMouseEnter() {
+            tafsirTimer = setTimeout(async () => {
+                await showTafsir(verseContainer, surahNumber, verseNumber);
+                tafsirTimer = null;
+            }, 1500);
+        }
+
+        function handleMouseLeave() {
+            if (tafsirTimer) {
+                clearTimeout(tafsirTimer);
+                tafsirTimer = null;
+            }
+            hideTafsir(verseContainer);
+        }
+    });
+
+    function clearSelection() {
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+            document.selection.empty();
+        }
+    }
+}
+
+function setupVerseHoverEffects() {
+    const verses = document.querySelectorAll('.verse');
+
+    verses.forEach(verse => {
+        verse.addEventListener('mouseenter', function () {
+            if (document.body.classList.contains('night-mode')) {
+                this.style.setProperty('--glow-intensity', '0.6');
+            }
+        });
+
+        verse.addEventListener('mouseleave', function () {
+            this.style.setProperty('--glow-intensity', '0');
+        });
+    });
+}

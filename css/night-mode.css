@@ -1,0 +1,217 @@
+/* ===== Night Mode Styles ===== */
+
+/* Base Night Mode */
+.night-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .main-content {
+    background-color: #1e1e1e !important;
+}
+
+/* Sidebar Night Mode */
+.night-mode .sidebar {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .surah-list li {
+    color: #e0e0e0 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+.night-mode .surah-list li:hover {
+    background-color: #333 !important;
+}
+
+.night-mode .surah-item:hover {
+    background-color: rgba(50, 205, 50, 0.1);
+}
+
+.night-mode .active-surah {
+    background-color: rgba(70, 130, 180, 0.15);
+    border-right-color: #3CB371;
+}
+
+.night-mode .active-surah::after {
+}
+
+.night-mode .active-surah .surah-name {
+    color: #20B2AA;
+}
+
+.night-mode[dir="rtl"] .active-surah {
+    border-left-color: #3CB371;
+}
+
+/* Quran Page Night Mode */
+.night-mode .quran-page,
+.night-mode .quran-page * {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+.night-mode .verse {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.night-mode ,
+.night-mode ,
+.night-mode  {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #444 !important;
+}
+
+.night-mode .header-title {
+    color: #e0e0e0 !important;
+}
+
+/* Verse Number Night Mode */
+.night-mode .verse-number {
+    background-color: #01579b !important;
+    color: #b3e5fc !important;
+    box-shadow: 0 0 0 1px #0288d1;
+}
+
+/* Surah Info Night Mode */
+.night-mode .surah-info {
+    background-color: #263238;
+    border-right-color: #81C784;
+    color: #E8F5E9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.night-mode .surah-info h2 {
+    color: #81C784;
+}
+
+.night-mode .surah-info h2::after {
+    background: linear-gradient(to right, #FFD54F, #81C784, #FFD54F);
+}
+
+.night-mode .surah-info p {
+    color: #A5D6A7;
+}
+
+.night-mode .surah-info::before,
+.night-mode .surah-info::after {
+    background-color: rgba(129, 199, 132, 0.1);
+}
+
+/* Bismillah Night Mode */
+.night-mode .bismillah-text {
+    color: #81C784;
+    background: linear-gradient(to right, #263238, #37474F, #263238);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    border-color: rgba(129, 199, 132, 0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.night-mode .bismillah-decoration {
+    background: linear-gradient(90deg, #FFD54F, #81C784, #FFD54F);
+}
+
+.night-mode .bismillah-decoration::before {
+    background-color: #FFD54F;
+}
+
+.night-mode .bismillah-decoration.left::after,
+.night-mode .bismillah-decoration.right::after {
+    background-color: #81C784;
+}
+
+/* Current Playing Verse Night Mode */
+.night-mode .current-playing-verse {
+    background-color: rgba(66, 165, 245, 0.1) !important;
+    border-left: 3px solid #4FC3F7;
+}
+
+.night-mode .current-playing-verse .verse-number {
+    background-color: #0288D1 !important;
+    color: #E1F5FE !important;
+    box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+}
+
+.night-mode .current-playing-verse {
+    animation: night-pulse 3s ease infinite;
+}
+
+@keyframes night-pulse {
+    0% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
+    50% { box-shadow: inset 0 0 15px rgba(66, 165, 245, 0.15); }
+    100% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
+}
+
+/* Close Tafsir Button Night Mode */
+.night-mode .close-tafsir-btn {
+    color: #aaa;
+}
+
+.night-mode .close-tafsir-btn:hover {
+    color: #fff;
+}
+
+/* Image Export Night Mode */
+.night-mode .qv-premium-container {
+    background: 
+        linear-gradient(135deg, #1a1a1a 0%, #222 100%),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><path fill="%23222222" d="M100 0L200 100L100 200L0 100Z" opacity="0.5"/></svg>') center/cover;
+    border-color: #7a6b4d;
+}
+
+.night-mode .qv-premium-surah {
+    color: #81C784;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+.night-mode .qv-premium-surah::before,
+.night-mode .qv-premium-surah::after {
+    background: linear-gradient(90deg, transparent, #7a6b4d, transparent);
+}
+
+.night-mode .qv-premium-number {
+    color: #d4b770;
+    background: rgba(122, 107, 77, 0.1);
+    border-color: rgba(122, 107, 77, 0.3);
+}
+
+.night-mode .qv-premium-icon {
+    color: #d4b770;
+    text-shadow: 0 0 10px rgba(122, 107, 77, 0.3);
+}
+
+.night-mode .qv-premium-text {
+    color: #f0f0f0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.night-mode .qv-premium-header,
+.night-mode .qv-premium-footer {
+    border-color: rgba(122, 107, 77, 0.3);
+}
+
+.night-mode .qv-premium-decoration {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 30"><path d="M0,15 Q37.5,30 75,15 T150,15" fill="none" stroke="%23d4b770" stroke-width="1.5" stroke-dasharray="3,2"/><path d="M0,15 Q37.5,0 75,15 T150,15" fill="none" stroke="%23d4b770" stroke-width="1.5" stroke-dasharray="3,2"/></svg>');
+}
+
+.night-mode .qv-premium-watermark {
+    color: #999;
+}
+
+.night-mode .qv-premium-pattern {
+    background-image: 
+        radial-gradient(circle at 25% 25%, #81C784 1px, transparent 1px),
+        radial-gradient(circle at 75% 75%, #81C784 1px, transparent 1px);
+}
+
+.night-mode .qv-premium-corner {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><path fill="none" stroke="%23d4b770" stroke-width="1.5" d="M0,40 Q20,0 40,40 T80,40 Q60,80 40,40 T0,40Z" opacity="0.5"/></svg>');
+}
+
+.night-mode .qv-premium-gold-accent {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="680" height="800" viewBox="0 0 680 800"><path fill="none" stroke="%23d4b770" stroke-width="1" stroke-opacity="0.1" d="M0,200 Q170,0 340,200 T680,200 M0,400 Q170,200 340,400 T680,400 M0,600 Q170,400 340,600 T680,600"/></svg>');
+}

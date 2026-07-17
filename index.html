@@ -19,8 +19,20 @@
     <link rel="stylesheet" href="css/image-export.css">
     <link rel="stylesheet" href="css/night-mode.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <!-- New Feature CSS -->
+    <link rel="stylesheet" href="css/search.css">
+    <link rel="stylesheet" href="css/bookmarks.css">
+    <link rel="stylesheet" href="css/controls.css">
+    <link rel="stylesheet" href="css/share.css">
+    <link rel="stylesheet" href="css/reading-progress.css">
+    <link rel="stylesheet" href="css/fullscreen.css">
 </head>
 <body>
+    <!-- Reading Progress Bar -->
+    <div class="reading-progress-bar">
+        <div class="reading-progress-fill" id="readingProgressFill"></div>
+    </div>
+
     <div class="app-container">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
@@ -29,30 +41,48 @@
                 <button class="close-sidebar" id="closeSidebar">&times;</button>
             </div>
             <ul class="surah-list" id="surahList">
-                <!-- Surah list will be populated here -->
             </ul>
         </div>
         
-        <!-- Main Content  -->
+        <!-- Main Content -->
         <div class="main-content">
-<div class="header">
-    <button class="menu-button" id="menuButton">☰</button>
-    <button class="night-mode-toggle" id="nightModeToggle">🌙</button>
-    <h1 class="header-title">المصحف الشريف</h1>
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-button" id="menuButton">☰</button>
+                    <button class="night-mode-toggle" id="nightModeToggle">🌙</button>
+                </div>
+                <h1 class="header-title">المصحف الشريف</h1>
+                <div class="header-controls">
+                    <div class="progress-bar-container" id="progressBarContainer" onclick="openStatsModal()" title="إحصائيات القراءة">
+                        <div class="progress-bar" id="progressBarFill"></div>
+                        <span class="progress-text" id="progressText">0%</span>
+                    </div>
+                    <button class="header-btn" id="searchBtn" title="بحث (Ctrl+F)">🔍</button>
+                    <button class="header-btn" id="bookmarksBtn" title="المفضلة">📑</button>
+                    <div class="font-controls">
+                        <button class="font-btn" id="fontDecrease" title="تصغير الخط">Aa-</button>
+                        <button class="font-btn" id="fontIncrease" title="تكبير الخط">Aa+</button>
+                    </div>
+                    <button class="header-btn" id="fullscreenBtn" title="وضع ملء الشاشة">⛶</button>
+                    <select id="reciterSelect" class="reciter-select">
+                        <option value="1">مشاري راشد العفاسي</option>
+                        <option value="2">أبو بكر الشاطري</option>
+                        <option value="3">ناصر القطامي</option>
+                        <option value="4">ياسر الدوسري</option>
+                        <option value="5">هاني الرفاعي</option>
+                    </select>
+                    <select id="audioSpeedSelect" class="audio-speed-select" title="سرعة التشغيل">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+            </div>
 
-    <!-- Reciter Select -->
-    <select id="reciterSelect" class="reciter-select">
-        <option value="1">مشاري راشد العفاسي</option>
-        <option value="2">أبو بكر الشاطري</option>
-        <option value="3">ناصر القطامي</option>
-        <option value="4">ياسر الدوسري</option>
-        <option value="5">هاني الرفاعي</option>
-    </select>
-</div>
-
-            
             <div class="quran-page" id="quranPage">
-                <!-- Quran content will be loaded here -->
             </div>
             
             <div class="navigation">
@@ -61,13 +91,90 @@
                 <button class="nav-button" id="nextPage">التالي</button>
             </div>
         </div>
-    </div>    
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-modal">
+            <div class="search-header">
+                <input type="text" class="search-input" id="searchInput" placeholder="ابحث في آيات القرآن الكريم..." autocomplete="off">
+                <button class="search-close-btn" id="searchCloseBtn">&times;</button>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Bookmarks Panel -->
+    <div class="bookmarks-panel" id="bookmarksPanel">
+        <div class="bookmarks-header">
+            <h3>📑 المفضلة</h3>
+            <button class="bookmarks-close-btn" id="bookmarksCloseBtn">&times;</button>
+        </div>
+        <div class="bookmarks-stats" id="bookmarksStats"></div>
+        <div class="bookmarks-list" id="bookmarksList"></div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div class="stats-overlay" id="statsOverlay">
+        <div class="stats-modal">
+            <div class="stats-header">
+                <h2>📊 إحصائيات القراءة</h2>
+                <button class="stats-close-btn" onclick="closeStatsModal()">&times;</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="statsPagesRead">0</span>
+                    <div class="stat-label">صفحة مقروءة</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statsVersesRead">0</span>
+                    <div class="stat-label">آية مستمع إليها</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statsStreak">0</span>
+                    <div class="stat-label">أيام متتالية</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statsJuz">0/30</span>
+                    <div class="stat-label">جزء مكتمل</div>
+                </div>
+            </div>
+            <div class="stats-progress-section">
+                <div class="stats-progress-label">
+                    <span>تقدم القراءة</span>
+                    <span id="statsProgressText">0%</span>
+                </div>
+                <div class="stats-progress-bar">
+                    <div class="stats-progress-fill" id="statsProgressFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Exit Hint -->
+    <div class="fullscreen-exit-hint">اضغط ESC للخروج من وضع ملء الشاشة</div>
+
+    <!-- Repeat Controls -->
+    <div class="repeat-controls" id="repeatControls">
+        <span class="repeat-label">التكرار:</span>
+        <select id="repeatSelect" class="repeat-select">
+            <option value="1">1x</option>
+            <option value="3">3x</option>
+            <option value="5">5x</option>
+            <option value="10">10x</option>
+            <option value="0">∞</option>
+        </select>
+        <span class="repeat-count-display" id="repeatCountDisplay">0/1</span>
+    </div>
+
     <!-- JS Modules (loaded in dependency order) -->
     <script src="js/config.js"></script>
     <script src="js/state.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/share.js"></script>
     <script src="js/audio.js"></script>
+    <script src="js/audio-controls.js"></script>
     <script src="js/render.js"></script>
     <script src="js/tafsir.js"></script>
     <script src="js/verse-interactions.js"></script>
@@ -75,6 +182,11 @@
     <script src="js/sidebar.js"></script>
     <script src="js/night-mode.js"></script>
     <script src="js/image-export.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/bookmarks.js"></script>
+    <script src="js/font-controls.js"></script>
+    <script src="js/reading-progress.js"></script>
+    <script src="js/fullscreen.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

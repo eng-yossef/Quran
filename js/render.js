@@ -1,6 +1,7 @@
 function renderPage(pageNumber) {
     currentPageNumber = pageNumber;
     saveCurrentPage(pageNumber);
+    if (typeof trackPageVisit === 'function') trackPageVisit(pageNumber);
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
@@ -89,6 +90,7 @@ function renderPage(pageNumber) {
 
     history.replaceState({ page: pageNumber }, '', `?page=${pageNumber}`);
     setupVerseInteractions();
+    if (typeof updateBookmarkIcons === 'function') updateBookmarkIcons();
     highlightSurahForCurrentPage();
     matchSidebarHeight();
 }

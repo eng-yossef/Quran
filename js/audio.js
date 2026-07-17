@@ -34,6 +34,7 @@ async function playVerseAudioFromQueue(callback = null) {
     currentAudio.addEventListener('ended', currentAudio._endedHandler);
 
     try {
+        applyAudioSpeed(currentAudio);
         await currentAudio.play();
         
         if (isPlayingEntireSurah && currentVerseSequence) {
@@ -148,6 +149,8 @@ async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumbe
         </svg>`;
 
     audioQueue = [];
+    resetRepeatCount();
+    showRepeatControls();
     await prefetchVerses(currentVerseIndex, MAX_PREFETCH_COUNT);
     playNextVerseInSequence();
 }
@@ -159,6 +162,7 @@ function stopAudio() {
     }
     audioQueue = [];
     isPlayingEntireSurah = false;
+    hideRepeatControls();
     document.querySelector('.stop-audio-btn').style.display = 'none';
 }
 
@@ -193,6 +197,14 @@ async function playNextVerseInSequence() {
     }
 
     playVerseAudioFromQueue(async () => {
+        trackVerseListened(verse.surahNumber, verse.numberInSurah);
+
+        if (shouldRepeat()) {
+            playNextVerseInSequence();
+            return;
+        }
+        resetRepeatCount();
+
         currentVerseIndex++;
 
         if (audioQueue.length < MAX_PREFETCH_COUNT - 1) {

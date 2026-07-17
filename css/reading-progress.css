@@ -1,0 +1,24 @@
+/* Reading Progress */
+.reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+
+.reading-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-green), var(--gold-accent));
+    transition: width 0.5s ease;
+}
+
+.night-mode .reading-progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.night-mode .reading-progress-fill {
+    background: linear-gradient(90deg, #81C784, #FFD54F);
+}

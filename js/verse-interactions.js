@@ -8,6 +8,18 @@ function setupVerseInteractions() {
 
         const surahNumber = parseInt(verseContainer.getAttribute('data-surah'));
         const verseNumber = parseInt(verseContainer.getAttribute('data-ayah'));
+        const surahName = verseContainer.getAttribute('data-surah-name') || '';
+
+        if (!verseContainer.querySelector('.verse-actions')) {
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'verse-actions';
+            actionsDiv.innerHTML = `
+                <span class="verse-bookmark-icon" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)">☆</span>
+                <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ">📋</button>
+                <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة">↗</button>
+            `;
+            verseContainer.appendChild(actionsDiv);
+        }
 
         let tafsirTimer = null;
         let touchStartTime = 0;

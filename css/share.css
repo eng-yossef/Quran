@@ -1,0 +1,75 @@
+/* Share/Copy Buttons */
+.verse-actions {
+    display: none;
+    gap: 4px;
+    position: absolute;
+    top: -8px;
+    left: 0;
+    z-index: 10;
+    background: white;
+    padding: 3px 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border: 1px solid #eee;
+}
+
+.verse-container:hover .verse-actions {
+    display: flex;
+}
+
+.verse-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verse-action-btn:hover {
+    background: var(--light-green);
+}
+
+.verse-action-btn.copied {
+    color: var(--primary-green);
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    bottom: 130px;
+    right: 50%;
+    transform: translateX(50%);
+    background: #333;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    z-index: 10000;
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(50%) translateY(0); }
+}
+
+@keyframes toastOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Night Mode */
+.night-mode .verse-actions {
+    background: #333;
+    border-color: #555;
+}
+
+.night-mode .verse-action-btn:hover {
+    background: rgba(50, 205, 50, 0.1);
+}

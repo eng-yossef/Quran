@@ -160,6 +160,14 @@ async function initApp() {
         setupSwipeNavigation();
         setupTafsirClickHandlers();
 
+        initSearch();
+        initBookmarks();
+        initFontControls();
+        initAudioControls();
+        initReadingProgress();
+        initFullscreen();
+        updateBookmarkIcons();
+
     } catch (error) {
         console.error('App initialization failed:', error);
         quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">حدث خطأ أثناء تحميل التطبيق. يرجى تحديث الصفحة.</p>';

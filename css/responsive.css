@@ -1,162 +1,25 @@
-/* ===== Responsive Styles — Mushaf Layout ===== */
+/* ===== Responsive Styles — Mobile-First ===== */
 
-/* ========== Large Tablets / Small Desktops (≤992px) ========== */
-@media (max-width: 992px) {
+/* ============================================================
+   BASE (mobile-first, ≤640px)
+   ============================================================ */
+@media (max-width: 640px) {
+
+    /* --- Sidebar: overlay drawer --- */
     .sidebar {
         position: fixed;
         top: 0;
         right: 0;
         bottom: 0;
-        transform: translateX(100%);
+        width: 85vw;
+        max-width: 300px;
         z-index: 984600;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
     }
 
     .sidebar.open {
         transform: translateX(0);
-    }
-
-    .quran-page {
-        --quran-font-size: 1.5rem;
-        --quran-line-height: 2.5;
-        padding: 2rem;
-    }
-
-    .verse-container {
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-}
-
-/* ========== Tablets (≤768px) ========== */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 280px;
-    }
-
-    .main-content {
-        width: 100%;
-    }
-
-    .quran-page {
-        --quran-font-size: 1.4rem;
-        --quran-line-height: 2.3;
-        --quran-page-padding: 1.5rem;
-        margin: 0.3rem 0.4rem;
-        border-radius: 3px;
-    }
-
-    .verse-number {
-        min-width: 28px;
-        min-height: 28px;
-        font-size: 0.5em;
-    }
-
-    /* Surah Info Responsive */
-    .surah-info {
-        padding: 0.8rem 1.2rem;
-        margin: 0.5rem auto;
-        border-radius: 10px;
-    }
-
-    .surah-info h2 {
-        font-size: 1.3rem;
-    }
-
-    .surah-info p {
-        font-size: 0.9rem;
-    }
-
-    /* Bismillah Responsive */
-    .bismillah-text {
-        font-size: 1.3rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .bismillah-decoration.left {
-        margin-right: 0.3rem;
-    }
-
-    .bismillah-decoration.right {
-        margin-left: 0.3rem;
-    }
-
-    /* Navigation */
-    .navigation {
-        padding: 0.25rem 0.8rem;
-    }
-
-    .nav-button {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-    }
-
-    .page-indicator {
-        font-size: 0.9rem;
-    }
-
-    /* Verse Actions */
-    .verse-actions {
-        top: -6px;
-        left: 0;
-    }
-
-    .verse-action-btn {
-        font-size: 0.8rem;
-        padding: 2px 5px;
-    }
-
-    /* Verse bookmark icon */
-    .verse-bookmark-icon {
-        font-size: 0.85rem;
-        top: -3px;
-        left: 3px;
-    }
-
-    /* Stop button */
-    .stop-btn-container {
-        bottom: 60px;
-        right: 15px;
-    }
-
-    .stop-audio-btn {
-        width: 36px;
-        height: 36px;
-    }
-
-    /* Toast notification */
-    .toast-notification {
-        bottom: 100px;
-        font-size: 0.8rem;
-        padding: 8px 18px;
-    }
-
-    /* Image export */
-    .qv-premium-container {
-        padding: 1rem;
-    }
-
-    .qv-premium-surah {
-        font-size: 1.2rem;
-    }
-
-    .qv-premium-number {
-        font-size: 0.7rem;
-        padding: 3px 6px;
-    }
-}
-
-/* ========== Mobile (≤480px) ========== */
-@media (max-width: 480px) {
-    .sidebar {
-        width: 85vw;
-        max-width: 300px;
     }
 
     .sidebar-header {
@@ -189,10 +52,88 @@
         margin-left: 8px;
     }
 
+    /* --- Header: compact --- */
+    .header {
+        padding: 0.05rem 0.1rem;
+        flex-wrap: nowrap;
+    }
+
+    .header-left {
+        gap: 0;
+    }
+
+    .header-title {
+        font-size: 0.7rem;
+        padding: 0 0.2rem;
+    }
+
+    .menu-button,
+    .night-mode-toggle {
+        font-size: 1rem;
+        min-width: 28px;
+        min-height: 28px;
+        padding: 0.15rem;
+    }
+
+    .header-controls {
+        gap: 3px;
+        flex-shrink: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .header-controls::-webkit-scrollbar {
+        display: none;
+    }
+
+    .header-btn {
+        min-width: 26px;
+        min-height: 26px;
+        padding: 2px 4px;
+        font-size: 0.75rem;
+    }
+
+    .progress-bar-container {
+        width: 35px;
+    }
+
+    .progress-text {
+        font-size: 0.5rem;
+    }
+
+    .font-controls {
+        gap: 1px;
+        padding: 1px 2px;
+    }
+
+    .font-btn {
+        font-size: 0.6rem;
+        padding: 1px 3px;
+        min-width: 24px;
+        min-height: 24px;
+    }
+
+    .font-size-display {
+        font-size: 0.6rem;
+        min-width: 20px;
+    }
+
+    .reciter-select {
+        font-size: 0.55rem;
+        padding: 2px 3px;
+        max-width: 80px;
+    }
+
+    .audio-speed-select {
+        font-size: 0.55rem;
+        padding: 2px 3px;
+    }
+
+    /* --- Quran page: smaller text --- */
     .quran-page {
-        --quran-font-size: 1.25rem;
-        --quran-line-height: 2.1;
-        --quran-page-padding: 1rem;
+        --quran-font-size: 1.2rem;
+        --quran-line-height: 2.0;
+        --quran-page-padding: 0.8rem;
         margin: 0.15rem;
         border-radius: 2px;
     }
@@ -203,24 +144,7 @@
         font-size: 0.45em;
     }
 
-    .navigation {
-        padding: 0.2rem 0.5rem;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    .nav-button {
-        padding: 6px 10px;
-        font-size: 0.78rem;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .page-indicator {
-        font-size: 0.8rem;
-        padding: 2px 8px;
-    }
-
+    /* --- Surah info --- */
     .surah-info {
         padding: 0.5rem 0.8rem;
         margin: 0.3rem auto;
@@ -235,6 +159,7 @@
         font-size: 0.8rem;
     }
 
+    /* --- Bismillah --- */
     .bismillah-text {
         font-size: 1.1rem;
         padding: 0.4rem 0.8rem;
@@ -244,40 +169,26 @@
         display: none;
     }
 
-    /* Export image button - show ONLY export on active verse, hide copy/share */
-    .verse-container.active-verse .verse-actions {
-        display: flex;
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-top: 4px;
-        background: transparent;
-        box-shadow: none;
-        border: none;
-        padding: 0;
-        justify-content: flex-start;
+    /* --- Navigation --- */
+    .navigation {
+        padding: 0.15rem 0.5rem;
+        gap: 4px;
     }
 
-    .verse-container.active-verse .verse-actions .verse-action-btn:not(.verse-export-btn) {
-        display: none;
+    .nav-button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        flex: 1;
+        min-width: 0;
     }
 
-    .verse-container.active-verse .verse-actions .verse-export-btn {
-        display: flex;
-        font-size: 0.9rem;
-        padding: 4px 8px;
-        min-width: 32px;
-        min-height: 32px;
+    .page-indicator {
+        font-size: 0.78rem;
+        padding: 2px 8px;
+        white-space: nowrap;
     }
 
-    .verse-action-btn {
-        font-size: 0.9rem;
-        padding: 4px 8px;
-        min-width: 32px;
-        min-height: 32px;
-    }
-
-    /* Stop button */
+    /* --- Stop button --- */
     .stop-btn-container {
         bottom: 55px;
         right: 10px;
@@ -288,16 +199,37 @@
         height: 34px;
     }
 
-    /* Toast notification */
+    /* --- Repeat controls --- */
+    .repeat-controls {
+        bottom: 55px;
+        right: 6px;
+        padding: 3px 6px;
+        gap: 3px;
+        border-radius: 15px;
+    }
+
+    .repeat-label {
+        font-size: 0.6rem;
+    }
+
+    .repeat-select {
+        font-size: 0.65rem;
+        padding: 2px 3px;
+    }
+
+    .repeat-count-display {
+        font-size: 0.6rem;
+    }
+
+    /* --- Toast --- */
     .toast-notification {
         bottom: 80px;
         font-size: 0.75rem;
         padding: 6px 14px;
-        width: auto;
         max-width: 85vw;
     }
 
-    /* Search overlay */
+    /* --- Search modal --- */
     .search-overlay {
         padding-top: 10px;
     }
@@ -310,6 +242,7 @@
 
     .search-header {
         padding: 10px 12px;
+        gap: 8px;
     }
 
     .search-input {
@@ -334,7 +267,11 @@
         font-size: 1rem;
     }
 
-    /* Bookmarks panel */
+    .search-result-surah {
+        font-size: 0.8rem;
+    }
+
+    /* --- Bookmarks panel --- */
     .bookmarks-panel {
         width: 100% !important;
     }
@@ -363,11 +300,13 @@
         font-size: 0.95rem;
     }
 
-    /* Stats modal */
+    /* --- Stats modal --- */
     .stats-modal {
         width: 98%;
         padding: 15px;
         border-radius: 8px;
+        max-height: 85vh;
+        overflow-y: auto;
     }
 
     .stats-grid {
@@ -395,11 +334,79 @@
         font-size: 0.9rem;
     }
 
-    /* Fullscreen hint */
+    /* --- Fullscreen hint --- */
     .fullscreen-exit-hint {
         font-size: 0.75rem;
         padding: 6px 14px;
         bottom: 10px;
+    }
+
+    /* --- Verse actions --- */
+    .verse-actions {
+        top: -6px;
+        left: 0;
+    }
+
+    .verse-action-btn {
+        font-size: 0.9rem;
+        padding: 4px 8px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .verse-bookmark-icon {
+        font-size: 0.85rem;
+        top: -3px;
+        left: 3px;
+    }
+
+    /* Export image button - show ONLY export on active verse, hide copy/share */
+    .verse-container.active-verse .verse-actions {
+        display: flex;
+        position: relative;
+        top: auto;
+        left: auto;
+        margin-top: 4px;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        justify-content: flex-start;
+    }
+
+    .verse-container.active-verse .verse-actions .verse-action-btn:not(.verse-export-btn) {
+        display: none;
+    }
+
+    .verse-container.active-verse .verse-actions .verse-export-btn {
+        display: flex;
+        font-size: 0.9rem;
+        padding: 4px 8px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    /* --- Image export --- */
+    .qv-premium-container {
+        padding: 1rem;
+    }
+
+    .qv-premium-surah {
+        font-size: 1.2rem;
+    }
+
+    .qv-premium-number {
+        font-size: 0.7rem;
+        padding: 3px 6px;
+    }
+
+    /* --- Verse text touch --- */
+    .verse-container {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .verse-text {
@@ -407,20 +414,223 @@
     }
 }
 
-/* ========== Very small screens (≤360px) ========== */
+/* Very small screens */
 @media (max-width: 360px) {
     .quran-page {
         --quran-font-size: 1.1rem;
         --quran-line-height: 1.9;
-        --quran-page-padding: 0.8rem;
+        --quran-page-padding: 0.7rem;
     }
 
     .header-title {
-        font-size: 0.7rem;
+        font-size: 0.62rem;
     }
 
     .reciter-select {
-        max-width: 90px;
-        font-size: 0.6rem;
+        max-width: 70px;
+        font-size: 0.5rem;
+    }
+
+    .surah-info h2 {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================================
+   SMALL TABLETS (≥641px)
+   ============================================================ */
+@media (min-width: 641px) and (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 984600;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .quran-page {
+        --quran-font-size: 1.35rem;
+        --quran-line-height: 2.3;
+        --quran-page-padding: 1.2rem;
+        margin: 0.3rem 0.5rem;
+        border-radius: 3px;
+    }
+
+    .verse-number {
+        min-width: 28px;
+        min-height: 28px;
+        font-size: 0.5em;
+    }
+
+    .surah-info {
+        padding: 0.8rem 1.2rem;
+        margin: 0.5rem auto;
+        border-radius: 10px;
+    }
+
+    .surah-info h2 {
+        font-size: 1.3rem;
+    }
+
+    .surah-info p {
+        font-size: 0.9rem;
+    }
+
+    .bismillah-text {
+        font-size: 1.3rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .bismillah-decoration.left {
+        margin-right: 0.3rem;
+    }
+
+    .bismillah-decoration.right {
+        margin-left: 0.3rem;
+    }
+
+    .navigation {
+        padding: 0.2rem 0.8rem;
+    }
+
+    .nav-button {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .page-indicator {
+        font-size: 0.9rem;
+    }
+
+    .verse-actions {
+        top: -6px;
+        left: 0;
+    }
+
+    .verse-action-btn {
+        font-size: 0.8rem;
+        padding: 2px 5px;
+    }
+
+    .verse-bookmark-icon {
+        font-size: 0.85rem;
+        top: -3px;
+        left: 3px;
+    }
+
+    .stop-btn-container {
+        bottom: 60px;
+        right: 15px;
+    }
+
+    .stop-audio-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .bookmarks-panel {
+        width: 320px;
+    }
+
+    .search-modal {
+        width: 95%;
+        max-height: 85vh;
+    }
+
+    .search-overlay {
+        padding-top: 20px;
+    }
+
+    .stats-modal {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-card {
+        padding: 12px 8px;
+    }
+
+    .repeat-controls {
+        bottom: 65px;
+        right: 10px;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .repeat-label {
+        font-size: 0.7rem;
+    }
+
+    .repeat-select {
+        font-size: 0.75rem;
+        padding: 2px 4px;
+    }
+}
+
+/* ============================================================
+   LARGE TABLETS (≥769px)
+   ============================================================ */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 984600;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .quran-page {
+        --quran-font-size: 1.5rem;
+        --quran-line-height: 2.5;
+        --quran-page-padding: 2rem;
+    }
+
+    .verse-container {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ============================================================
+   SMALL DESKTOPS (≥1025px) — sidebar is always visible
+   ============================================================ */
+@media (min-width: 1025px) {
+    .sidebar {
+        transform: none;
+        position: relative;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   LARGE DESKTOPS (≥1280px) — wider Quran page
+   ============================================================ */
+@media (min-width: 1280px) {
+    .quran-page {
+        --quran-max-width: 860px;
     }
 }

@@ -1,5 +1,6 @@
 const sidebarEl = document.getElementById('sidebar');
 const surahListEl = document.getElementById('surahList');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 function populateSurahList(surahs) {
     surahListEl.innerHTML = surahs.map(surah => `
@@ -54,10 +55,33 @@ function highlightActiveSurah(surahNumber) {
     }
 }
 
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
 function toggleSidebar() {
-    sidebarEl.classList.toggle('open');
+    const isOpen = sidebarEl.classList.contains('open');
+    if (isOpen) {
+        closeSidebar();
+    } else {
+        sidebarEl.classList.add('open');
+        sidebarOverlay.classList.add('active');
+        if (isMobile()) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
 }
 
 function closeSidebar() {
     sidebarEl.classList.remove('open');
+    sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = '';
 }
+
+sidebarOverlay.addEventListener('click', closeSidebar);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebarEl.classList.contains('open')) {
+        closeSidebar();
+    }
+});

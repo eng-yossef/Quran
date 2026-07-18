@@ -107,9 +107,9 @@
     right: 0;
 }
 
-/* Sidebar Backdrop (mobile) — triggered when sidebar is open */
-.sidebar.open ~ .main-content::before {
-    content: '';
+/* Sidebar Overlay (mobile backdrop) */
+.sidebar-overlay {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -117,5 +117,14 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 984599;
-    animation: fadeIn 0.2s ease;
+    animation: overlayFadeIn 0.2s ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

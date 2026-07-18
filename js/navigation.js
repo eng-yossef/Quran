@@ -43,12 +43,13 @@ function handleSwipe() {
 }
 
 function navigateToPage(newPage) {
+    const direction = newPage > currentPage ? 5 : -5;
     currentPage = newPage;
     renderPage(currentPage);
     saveCurrentPage(currentPage);
     highlightSurahForCurrentPage();
 
-    document.getElementById('quranPage').style.transform = `translateX(${newPage > currentPage ? 5 : -5}px)`;
+    document.getElementById('quranPage').style.transform = `translateX(${direction}px)`;
     setTimeout(() => {
         document.getElementById('quranPage').style.transform = 'translateX(0)';
     }, 300);

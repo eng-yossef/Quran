@@ -36,7 +36,11 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 - **Persistent Storage**: Bookmarks saved in localStorage, survive page reloads
 - **Bookmarks Panel**: Slide-out panel with bookmark list, stats, and clear-all
 - **Visual Indicators**: Gold bookmark icon on bookmarked verses
-- **Jump to Verse**: Click any bookmark to navigate directly to it
+- **Jump to Verse**: Click any bookmark to navigate directly to it (MutationObserver-based, no fixed timeout)
+- **Sort Controls**: Sort bookmarks by Newest, Oldest, or Surah order
+- **Per-bookmark Actions**: Open, Share (Web Share API), Copy (clipboard), Note (prompt), Delete
+- **Verse Key**: Each bookmark stores `surah:ayah` key for direct verse identification
+- **Overlay Background**: Dimmed backdrop when panel is open, click to dismiss
 
 ### Verse Interactions
 - **Action Toolbar**: Hover (desktop) or tap (mobile) any verse to reveal copy, share, tafsir, and bookmark buttons
@@ -50,6 +54,18 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 - **Reading Statistics**: Pages read, verses listened, streak days, Juz completed
 - **Stats Modal**: Detailed progress overview with visual progress bar
 - **State Persistence**: Remembers last read page across sessions
+
+### Last Read (Continue Reading)
+- **Smart Detection**: IntersectionObserver tracks which verse you're reading (40% center band, 0.5 threshold, 1s dwell time)
+- **CSS-only Marker**: Green left-border indicator on the last-read verse via `.last-read-verse::before` pseudo-element (no DOM injection)
+- **Card Banner**: Top card showing last-read position with Surah name, verse number, Arabic/English relative timestamps, and Continue/Dismiss buttons
+- **Dual Storage**: IndexedDB primary (`QuranLastReadDB`) with localStorage fallback
+- **Data Validation**: Validates surah (1–114) and verse (1–286) ranges before saving
+- **Audio Integration**: Tracks position during audio playback via `onAudioVerseChange()` callback, suppresses observer during audio navigation
+- **MutationObserver Navigation**: Waits for DOM render to complete before scrolling (no fixed setTimeout)
+- **Dismiss Logic**: Per-verse-key dismissal — dismissing re-shows only when you reach a new verse position
+- **Reduced Motion**: Respects `prefers-reduced-motion` (no animations)
+- **High Contrast**: Supports `forced-colors` (Windows High Contrast Mode)
 
 ### Responsive Design
 - **Mobile-first**: Optimized for phones (≤640px), small tablets (641–768px), large tablets (769–1024px), and desktops (≥1025px)
@@ -120,10 +136,11 @@ Quran/
 │
 ├── icons/                  # PWA icons
 │   ├── icon.svg            # Master SVG icon (source for all sizes)
+│   ├── apple-touch-icon.png # Apple Touch Icon (180px)
 │   └── icon-*.png          # Generated PNG icons (72–512px)
 │
-├── css/                    # 19 CSS modules (load order matters)
-│   ├── variables.css       # CSS custom properties: colors, fonts, layout, verse markers
+├── css/                    # 20 CSS modules (load order matters)
+│   ├── variables.css       # CSS custom properties: colors, fonts, layout, verse markers, last-read
 │   ├── base.css            # Reset, body, app-container, touch scrolling
 │   ├── sidebar.css         # Sidebar drawer, overlay, surah list
 │   ├── header.css          # Header bar, controls, progress display
@@ -136,22 +153,23 @@ Quran/
 │   ├── night-mode.css      # Dark theme overrides for all components
 │   ├── responsive.css      # Mobile-first breakpoints: ≤640px, 641–768px, 769–1024px, ≥1025px, ≥1280px
 │   ├── search.css          # Search modal, results, highlight animations
-│   ├── bookmarks.css       # Bookmarks panel, bookmark items, toggle icons
+│   ├── bookmarks.css       # Bookmarks panel, sort controls, action buttons, overlay
 │   ├── controls.css        # Font size controls, audio speed, reciter select
 │   ├── share.css           # Verse action toolbar (copy, share, tafsir, bookmark)
 │   ├── reading-progress.css # Reading progress bar
-│   ├── fullscreen.css      # Fullscreen mode styles
+│   ├── fullscreen.css      # Fullscreen mode, centering, mobile exit button
+│   ├── last-read.css       # Continue Reading card, CSS-only verse marker, pulse animation
 │   └── font-uthmanic.css   # Base64 Uthmanic font (unused, superseded by Amiri)
 │
 ├── js/                     # 20 JS modules (loaded in dependency order)
 │   ├── config.js           # API URLs, reciter configurations, default settings
 │   ├── state.js            # Global state: currentPage, audioQueue, activeSurah
-│   ├── utils.js            # cleanVerseText(), normalizeArabic(), toArabicNumber()
-│   ├── storage.js          # localStorage helpers, organizeVersesByPage()
+│   ├── utils.js            # cleanVerseText(), normalizeArabic(), toArabicNumber(), findPageForVerse()
+│   ├── storage.js          # IndexedDB (QuranCacheDB), localStorage helpers, organizeVersesByPage()
 │   ├── share.js            # copyVerseText(), shareVerse(), fallbackCopy(), showToast()
-│   ├── audio.js            # Audio playback engine, pre-fetch queue, verse sync
+│   ├── audio.js            # Audio playback engine, pre-fetch queue, verse sync, audio navigation flag
 │   ├── audio-controls.js   # Play/pause, stop, speed control, repeat/loop logic
-│   ├── render.js           # renderPage() — verse HTML generation, surah headers, bismillah
+│   ├── render.js           # renderPage() — verse HTML generation, surah headers, bismillah, last-read marker
 │   ├── tafsir.js           # Tafsir Al-Muyassar fetch and tooltip display
 │   ├── verse-interactions.js # Verse hover/tap, action toolbar, copy/share/bookmark/tafsir
 │   ├── navigation.js       # Page navigation, keyboard shortcuts, page input
@@ -159,12 +177,13 @@ Quran/
 │   ├── night-mode.js       # Theme toggle, localStorage persistence
 │   ├── image-export.js     # html2canvas verse image generation
 │   ├── search.js           # Full-text search engine, recent searches, result highlighting
-│   ├── bookmarks.js        # Bookmark CRUD, panel UI, icon updates
+│   ├── bookmarks.js        # Bookmark CRUD, sort, share/copy/note, MutationObserver navigation, overlay
 │   ├── font-controls.js    # Font size increase/decrease, localStorage persistence
 │   ├── reading-progress.js # Progress tracking, stats modal, streak calculation
-│   ├── fullscreen.js       # Fullscreen API toggle, exit hint
+│   ├── last-read.js        # IntersectionObserver tracking, IndexedDB+localStorage, CSS marker, card UI
+│   ├── fullscreen.js       # Fullscreen API toggle, exit hint, mobile exit button
 │   ├── pwa.js              # PWA: SW registration, install prompt, update detection, offline indicator
-│   └── app.js              # DOMContentLoaded init, event binding, click-outside handler
+│   └── app.js              # DOMContentLoaded init, event binding, click-outside handler, flag init
 │
 └── fonts/                  # Local font files
     ├── UthmanicHafs_V22.ttf       # Original Uthmanic font (unused, GDEF bug)
@@ -174,17 +193,18 @@ Quran/
 ## Architecture
 
 ### Modular Design
-- **13 JS modules** split from a single monolithic `script.js`
-- **19 CSS partials** split from a single `style.css`
+- **20 JS modules** split from a single monolithic `script.js`
+- **20 CSS partials** split from a single `style.css`
 - **No build system** — all files loaded via `<script>` and `<link>` tags
 - **Dependency order** — JS modules loaded config → state → utils → storage → ... → app
 
 ### Data Flow
 1. `config.js` defines API URLs and reciter base URLs
 2. `storage.js` fetches Quran text from API, organizes into `pagesData` (keyed by page number)
-3. `render.js` reads `pagesData[currentPage]` and generates verse HTML
+3. `render.js` reads `pagesData[currentPage]` and generates verse HTML, marks `.last-read-verse` if applicable
 4. `verse-interactions.js` attaches hover/tap handlers to rendered verses
 5. `audio.js` fetches and plays audio, syncs with DOM via `current-playing-verse` class
+6. `last-read.js` observes visible verses via IntersectionObserver, saves position to IndexedDB/localStorage, shows card banner on page load
 
 ### Font Choice
 - **Amiri** (Google Fonts) — selected over KFGQPC Uthmanic V22 due to a GDEF class bug in the WOFF2/TTF files that broke combining marks
@@ -196,7 +216,7 @@ Quran/
 variables → base → sidebar → header → main-content → navigation →
 components → tafsir → animations → image-export → night-mode →
 responsive → search → bookmarks → controls → share →
-reading-progress → fullscreen
+reading-progress → last-read → fullscreen
 ```
 
 ### JS Load Order
@@ -204,14 +224,14 @@ reading-progress → fullscreen
 config → state → utils → storage → share → audio → audio-controls →
 render → tafsir → verse-interactions → navigation → sidebar →
 night-mode → image-export → search → bookmarks → font-controls →
-reading-progress → fullscreen → pwa → app
+reading-progress → last-read → fullscreen → pwa → app
 ```
 
 ### PWA Architecture
-- **Service Worker** (`sw.js`): Pre-caches all static assets on install. Routes requests to cache-first (CSS/JS/fonts), network-first (API), or cache-on-demand (audio) strategies.
+- **Service Worker** (`sw.js` v1.1.0): Pre-caches all static assets on install using individual `cache.add()` per asset (one failure doesn't kill the entire install). Routes requests to cache-first (CSS/JS/fonts), network-first (API), or cache-on-demand (audio) strategies.
 - **PWA Manager** (`js/pwa.js`): Registers service worker, handles `beforeinstallprompt` event, detects updates via `updatefound`, syncs theme color, shows offline/install/update banners.
 - **Offline Support**: Layered approach — service worker caches network responses, IndexedDB caches Quran data, localStorage caches user preferences. Quran text, bookmarks, settings, and reading progress all survive offline.
-- **Icons**: SVG master icon in `icons/icon.svg`. Use `generate-icons.html` to create all required PNG sizes (72–512px).
+- **Icons**: Custom `quran.png` source icon. All required PNG sizes (72–512px) generated from it.
 
 ## Responsive Breakpoints
 
@@ -228,11 +248,16 @@ reading-progress → fullscreen → pwa → app
 
 - **Vanilla JS** — no frameworks, no bundlers, zero dependencies
 - **localStorage** for persistence (bookmarks, font size, night mode, reading progress, last page)
+- **IndexedDB** for large data (Quran cache, last-read position) with localStorage fallback
 - **Inline verse layout** (`display: inline`) so verses flow naturally like printed Mushaf text
 - **Gold gradient verse markers** with layered box-shadow for depth
 - **Parchment page background** (`#FFFDF7`) with decorative inner border
 - **Mobile overlay sidebar** with backdrop blur, ESC key close, and body scroll lock
 - **Touch-first verse actions** — tap toggles toolbar on mobile, hover shows on desktop
+- **IntersectionObserver** for last-read tracking — no scroll event listeners, no performance overhead
+- **CSS-only verse marker** via `::before` pseudo-element — no DOM injection during scroll
+- **MutationObserver navigation** — waits for actual DOM render before scrolling, no fixed timeouts
+- **Individual SW caching** — `cache.add()` per asset prevents one failure from breaking the entire install
 
 ## Browser Support
 - Chrome 80+

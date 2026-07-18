@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="css/controls.css">
     <link rel="stylesheet" href="css/share.css">
     <link rel="stylesheet" href="css/reading-progress.css">
+    <link rel="stylesheet" href="css/last-read.css">
     <link rel="stylesheet" href="css/fullscreen.css">
 </head>
 <body>
@@ -118,6 +119,8 @@
                 </div>
             </header>
 
+            <div id="continueReadingCard"></div>
+
             <div class="quran-page" id="quranPage" role="article" aria-label="Quran page">
             </div>
             
@@ -142,6 +145,7 @@
     </div>
 
     <!-- Bookmarks Panel -->
+    <div class="bookmarks-overlay-bg" id="bookmarksOverlay"></div>
     <aside class="bookmarks-panel" id="bookmarksPanel" role="complementary" aria-label="Bookmarks">
         <div class="bookmarks-header">
             <h3>&#128209; المفضلة</h3>
@@ -224,6 +228,7 @@
     <script src="js/bookmarks.js"></script>
     <script src="js/font-controls.js"></script>
     <script src="js/reading-progress.js"></script>
+    <script src="js/last-read.js"></script>
     <script src="js/fullscreen.js"></script>
     <script src="js/pwa.js"></script>
     <script src="js/app.js"></script>

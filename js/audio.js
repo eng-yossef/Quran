@@ -180,13 +180,16 @@ async function playNextVerseInSequence() {
 
     const versePage = findPageForVerse(verse.surahNumber, verse.numberInSurah);
     if (versePage !== currentPageNumber) {
+        window._isAudioNavigation = true;
         try {
             await renderPage(versePage);
         } catch (error) {
             console.error("Error rendering page:", error);
+            window._isAudioNavigation = false;
             stopAudio();
             return;
         }
+        window._isAudioNavigation = false;
     }
 
     const verseElement = document.querySelector(
@@ -223,6 +226,13 @@ function highlightCurrentVerse(verseElement) {
     if (!verseElement) return;
 
     verseElement.classList.add('current-playing-verse');
+
+    if (typeof onAudioVerseChange === 'function') {
+        onAudioVerseChange(
+            parseInt(verseElement.getAttribute('data-surah')),
+            parseInt(verseElement.getAttribute('data-ayah'))
+        );
+    }
 
     setTimeout(() => {
         verseElement.scrollIntoView({

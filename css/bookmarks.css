@@ -69,10 +69,57 @@
     color: var(--primary-green);
 }
 
+.bookmarks-overlay-bg {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9400;
+}
+
+.bookmarks-overlay-bg.active {
+    display: block;
+}
+
 .bookmarks-list {
     flex: 1;
     overflow-y: auto;
     padding: 10px;
+}
+
+.bookmarks-sort {
+    display: flex;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+}
+
+.sort-btn {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    color: #666;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 32px;
+}
+
+.sort-btn:hover {
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.sort-btn.active {
+    background: var(--primary-green);
+    color: white;
+    border-color: var(--primary-green);
 }
 
 .bookmark-item {
@@ -90,11 +137,17 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.bookmark-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
 .bookmark-item-surah {
     font-weight: bold;
     color: var(--primary-green);
     font-size: 0.9rem;
-    margin-bottom: 4px;
 }
 
 .bookmark-item-text {
@@ -210,6 +263,27 @@
 .night-mode .bookmark-item-note {
     background: #333;
     color: #aaa;
+}
+
+.night-mode .sort-btn {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #aaa;
+}
+
+.night-mode .sort-btn:hover {
+    border-color: #81C784;
+    color: #81C784;
+}
+
+.night-mode .sort-btn.active {
+    background: #2E7D32;
+    color: #e0e0e0;
+    border-color: #2E7D32;
+}
+
+.night-mode .bookmarks-sort {
+    border-bottom-color: #333;
 }
 
 .night-mode .bookmark-action-btn {

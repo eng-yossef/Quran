@@ -5,6 +5,8 @@ function renderPage(pageNumber) {
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
+    const lastRead = (typeof getLastRead === 'function') ? getLastRead() : null;
+
     let html = '';
     let currentSurah = null;
 
@@ -40,8 +42,12 @@ function renderPage(pageNumber) {
             currentSurah = verse.surahNumber;
         }
 
+        const isLastRead = lastRead &&
+            lastRead.surahNumber === verse.surahNumber &&
+            lastRead.ayahNumber === verse.numberInSurah;
+
         html += `
-        <div class="verse-container" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}" data-surah-name="${verse.surahName}">
+        <div class="verse-container${isLastRead ? ' last-read-verse' : ''}" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}" data-surah-name="${verse.surahName}">
             <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
             <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
         </div>
@@ -93,4 +99,6 @@ function renderPage(pageNumber) {
     if (typeof updateBookmarkIcons === 'function') updateBookmarkIcons();
     highlightSurahForCurrentPage();
     matchSidebarHeight();
+    if (typeof trackReadingPosition === 'function') trackReadingPosition();
+    if (typeof updateLastReadMarker === 'function') updateLastReadMarker();
 }

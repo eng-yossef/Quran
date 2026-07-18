@@ -28,6 +28,8 @@ window.addEventListener('resize', function () {
     matchSidebarHeight();
 });
 
+window._isAudioNavigation = false;
+
 const stopBtnContainer = document.createElement('div');
 stopBtnContainer.className = 'stop-btn-container';
 stopBtnContainer.innerHTML = `
@@ -165,6 +167,7 @@ async function initApp() {
         initFontControls();
         initAudioControls();
         initReadingProgress();
+        initLastRead();
         initFullscreen();
         updateBookmarkIcons();
 

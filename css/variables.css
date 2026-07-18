@@ -30,4 +30,8 @@
     /* Surah Header */
     --surah-bg: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #E8F5E9 100%);
     --surah-border: 3px solid var(--primary-green);
+
+    /* Last Read Marker */
+    --last-read-color: #2E8B57;
+    --last-read-glow: rgba(46, 139, 87, 0.3);
 }

@@ -201,7 +201,7 @@ function setupVerseInteractions() {
 }
 
 function setupVerseHoverEffects() {
-    const verses = document.querySelectorAll('.verse');
+    const verses = document.querySelectorAll('.verse-container');
 
     verses.forEach(verse => {
         verse.addEventListener('mouseenter', function () {

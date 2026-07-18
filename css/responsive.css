@@ -132,16 +132,20 @@
     /* --- Quran page: smaller text --- */
     .quran-page {
         --quran-font-size: 1.2rem;
-        --quran-line-height: 2.0;
-        --quran-page-padding: 0.8rem;
+        --quran-line-height: 1.9;
+        --quran-page-padding: 0.75rem;
         margin: 0.15rem;
-        border-radius: 2px;
+        border-radius: 3px;
     }
 
     .verse-number {
-        min-width: 24px;
-        min-height: 24px;
+        min-width: 26px;
+        min-height: 26px;
         font-size: 0.45em;
+    }
+
+    .verse-container + .verse-container {
+        margin-left: 0.5em;
     }
 
     /* --- Surah info --- */
@@ -385,8 +389,13 @@
 @media (max-width: 360px) {
     .quran-page {
         --quran-font-size: 1.1rem;
-        --quran-line-height: 1.9;
-        --quran-page-padding: 0.7rem;
+        --quran-line-height: 1.8;
+        --quran-page-padding: 0.65rem;
+    }
+
+    .verse-number {
+        min-width: 22px;
+        min-height: 22px;
     }
 
     .header-title {
@@ -424,16 +433,16 @@
 
     .quran-page {
         --quran-font-size: 1.35rem;
-        --quran-line-height: 2.3;
-        --quran-page-padding: 1.2rem;
+        --quran-line-height: 2.0;
+        --quran-page-padding: 1.1rem;
         margin: 0.3rem 0.5rem;
-        border-radius: 3px;
+        border-radius: 4px;
     }
 
     .verse-number {
         min-width: 28px;
         min-height: 28px;
-        font-size: 0.5em;
+        font-size: 0.48em;
     }
 
     .surah-info {
@@ -561,8 +570,8 @@
 
     .quran-page {
         --quran-font-size: 1.5rem;
-        --quran-line-height: 2.5;
-        --quran-page-padding: 2rem;
+        --quran-line-height: 2.15;
+        --quran-page-padding: 1.8rem;
     }
 
     .verse-container {

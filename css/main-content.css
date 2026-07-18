@@ -7,112 +7,148 @@
     min-width: 0;
 }
 
-/* ========== QURAN PAGE — Mushaf Layout ========== */
+/* ================================================================
+   QURAN PAGE — Premium Mushaf Reading Surface
+   ================================================================ */
 .quran-page {
     flex: 1;
     width: 100%;
     max-width: var(--quran-max-width);
-    padding: var(--quran-page-padding);
-    background-color: white;
+    padding: var(--quran-page-padding) calc(var(--quran-page-padding) * 1.15);
+    background-color: var(--quran-page-bg);
     margin: 0.6rem auto;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
+    box-shadow: var(--quran-page-shadow);
+    border-radius: 6px;
+    border: 1px solid var(--quran-page-border);
 
     /* Mushaf typography */
     font-family: var(--quran-font);
     font-size: var(--quran-font-size);
     line-height: var(--quran-line-height);
+    word-spacing: var(--quran-word-spacing);
+    letter-spacing: var(--quran-letter-spacing);
 
     /* Center text — Mushaf style */
     text-align: center;
     direction: rtl;
     unicode-bidi: embed;
 
-    /* Text rendering — no overrides; let HarfBuzz handle Arabic shaping defaults */
+    /* Crisp Arabic rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga' 1, 'calt' 1;
 
     /* Vertical rhythm */
     overflow-x: hidden;
     overflow-y: auto;
     scroll-behavior: smooth;
+
+    /* Subtle inner texture */
+    position: relative;
 }
 
-/* ========== VERSE CONTAINER — Inline flow ========== */
+/* Decorative page border accent */
+.quran-page::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ================================================================
+   VERSE CONTAINER — Inline flow with proper separation
+   ================================================================ */
 .verse-container {
     display: inline;
     position: relative;
     cursor: default;
     word-break: keep-all;
-    overflow-wrap: normal;
+    overflow-wrap: anywhere;
 }
 
-/* ========== VERSE TEXT ========== */
+/* Spacing between consecutive verses */
+.verse-container + .verse-container {
+    margin-left: 0.7em;
+}
+
+/* ================================================================
+   VERSE TEXT — Refined Arabic typography
+   ================================================================ */
 .verse-text {
-    transition: all 0.3s ease;
+    transition: background-color 0.25s ease, text-shadow 0.25s ease;
     border-radius: 3px;
+    padding: 1px 0;
+    position: relative;
 }
 
 /* Light Mode Hover */
 .verse-text:hover {
-    background-color: rgba(46, 139, 87, 0.1);
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+    background-color: rgba(46, 139, 87, 0.08);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
-/* ========== VERSE NUMBER — Decorative Mushaf Marker ========== */
+/* ================================================================
+   VERSE NUMBER — Ornamental Mushaf End-of-Ayah Marker
+   ================================================================ */
 .verse-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: var(--verse-marker-size);
     height: var(--verse-marker-size);
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 34px;
+    min-height: 34px;
     padding: 2px 5px;
-    margin: 0 2px;
+    margin: 0 3px;
     vertical-align: middle;
 
-    /* Mushaf verse ornament styling */
+    /* Ornamental gold marker */
     background: var(--verse-marker-bg);
     color: white;
     border: var(--verse-marker-border);
     border-radius: 50%;
-    font-size: 0.55em;
-    font-weight: bold;
+    font-size: 0.52em;
+    font-weight: 700;
     line-height: 1;
     text-align: center;
 
-    /* Decorative shadow */
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.15),
-        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    /* Layered shadow for depth */
+    box-shadow: var(--verse-marker-shadow);
 
     /* Prevent line break */
     flex-shrink: 0;
     white-space: nowrap;
+
+    /* Smooth transitions for state changes */
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Inner number text */
-.verse-number::after {
-    content: none;
-}
+/* Inner number text — no pseudo-element override needed */
 
-/* ========== SURAH INFO HEADER — Mushaf Style ========== */
+/* ================================================================
+   SURAH INFO HEADER — Premium Mushaf Header
+   ================================================================ */
 .surah-info {
     background: var(--surah-bg);
     border: var(--surah-border);
     border-radius: 12px;
-    margin: 1rem auto;
-    padding: 1.2rem 2rem;
+    margin: 1.2rem auto 0.8rem;
+    padding: 1.2rem 2rem 1rem;
     text-align: center;
     color: #1B5E20;
     box-shadow:
-        0 2px 8px rgba(46, 139, 87, 0.1),
+        0 2px 8px rgba(46, 139, 87, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     max-width: 500px;
     width: fit-content;
+    z-index: 1;
 }
 
 .surah-info h2 {
@@ -141,7 +177,7 @@
     font-size: 1rem;
     color: #388E3C;
     font-style: italic;
-    font-family: 'Amiri', serif;
+    font-family: var(--quran-font);
 }
 
 /* Decorative corners */
@@ -165,7 +201,9 @@
     right: -15px;
 }
 
-/* ========== BISMILLAH — Centered Mushaf Style ========== */
+/* ================================================================
+   BISMILLAH — Centered Mushaf Style
+   ================================================================ */
 .bismillah-container {
     display: flex;
     align-items: center;
@@ -231,9 +269,4 @@
 .bismillah-decoration.right::after {
     right: 15px;
     background-color: var(--primary-green);
-}
-
-/* ========== VERSE SPACING & FLOW ========== */
-.verse-container + .verse-container {
-    margin-right: 0.5em;
 }

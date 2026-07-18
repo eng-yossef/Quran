@@ -8,17 +8,17 @@
 
 /* Light Mode */
 .current-playing-verse {
-    background-color: rgba(46, 139, 87, 0.12) !important;
-    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.25);
+    background-color: rgba(46, 139, 87, 0.10) !important;
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.20);
     padding: 2px 6px;
     border-radius: 6px;
 }
 
 .current-playing-verse .verse-number {
-    background-color: #2E8B57 !important;
+    background: linear-gradient(145deg, #2E8B57 0%, #1B6B3A 40%, #2E8B57 60%, #3CB371 100%) !important;
     color: white !important;
     transform: scale(1.15);
-    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.35);
+    box-shadow: 0 2px 8px rgba(46, 139, 87, 0.45), 0 0 0 3px rgba(46, 139, 87, 0.20);
     transition: all 0.3s ease;
 }
 

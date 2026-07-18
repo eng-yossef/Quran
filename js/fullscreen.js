@@ -2,6 +2,11 @@ function initFullscreen() {
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     fullscreenBtn.addEventListener('click', toggleFullscreen);
 
+    const exitBtn = document.querySelector('.fullscreen-exit-btn');
+    if (exitBtn) {
+        exitBtn.addEventListener('click', exitFullscreen);
+    }
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('fullscreen-mode')) {
             exitFullscreen();

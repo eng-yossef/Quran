@@ -3,6 +3,10 @@ body.fullscreen-mode .sidebar {
     display: none;
 }
 
+body.fullscreen-mode .sidebar-overlay {
+    display: none !important;
+}
+
 body.fullscreen-mode .header {
     display: none;
 }
@@ -21,21 +25,23 @@ body.fullscreen-mode .repeat-controls {
 
 body.fullscreen-mode .main-content {
     margin: 0;
+    justify-content: center;
 }
 
 body.fullscreen-mode .quran-page {
-    margin: 0;
+    margin: 0 auto;
     border-radius: 0;
     border: none;
     min-height: 100vh;
     padding: 2rem;
+    max-width: 100%;
 }
 
 body.fullscreen-mode .reading-progress-bar {
     display: none;
 }
 
-/* Fullscreen exit hint */
+/* Fullscreen exit hint — desktop (keyboard) */
 .fullscreen-exit-hint {
     display: none;
     position: fixed;
@@ -50,6 +56,7 @@ body.fullscreen-mode .reading-progress-bar {
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s;
+    pointer-events: none;
 }
 
 body.fullscreen-mode .fullscreen-exit-hint {
@@ -58,4 +65,53 @@ body.fullscreen-mode .fullscreen-exit-hint {
 
 body.fullscreen-mode .fullscreen-exit-hint.show {
     opacity: 1;
+}
+
+/* Fullscreen exit button — mobile (tap target) */
+.fullscreen-exit-btn {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 10001;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: background 0.2s, transform 0.15s;
+}
+
+.fullscreen-exit-btn:active {
+    transform: scale(0.9);
+}
+
+body.fullscreen-mode .fullscreen-exit-btn {
+    display: flex;
+}
+
+body.fullscreen-mode .fullscreen-exit-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* On mobile, show exit button larger and more prominent */
+@media (max-width: 768px) {
+    body.fullscreen-mode .fullscreen-exit-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+        top: 8px;
+        left: 8px;
+    }
+
+    body.fullscreen-mode .fullscreen-exit-hint {
+        display: none;
+    }
 }

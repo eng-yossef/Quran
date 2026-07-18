@@ -203,8 +203,61 @@
     .search-overlay {
         padding-top: 20px;
     }
+
     .search-modal {
         width: 95%;
         max-height: 85vh;
+    }
+
+    .search-header {
+        padding: 12px 15px;
+    }
+
+    .search-input {
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-overlay {
+        padding-top: 10px;
+    }
+
+    .search-modal {
+        width: 98%;
+        max-height: 90vh;
+        border-radius: 8px;
+    }
+
+    .search-header {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .search-input {
+        font-size: 0.95rem;
+        padding: 8px 10px;
+    }
+
+    .search-close-btn {
+        font-size: 1.3rem;
+        min-width: 40px;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-result-item {
+        padding: 10px 12px;
+    }
+
+    .search-result-text {
+        font-size: 1rem;
+    }
+
+    .search-result-surah {
+        font-size: 0.8rem;
     }
 }

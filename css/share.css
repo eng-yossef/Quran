@@ -73,3 +73,32 @@
 .night-mode .verse-action-btn:hover {
     background: rgba(50, 205, 50, 0.1);
 }
+
+/* Mobile: show verse actions permanently (no hover on touch) */
+@media (max-width: 480px) {
+    .verse-actions {
+        display: flex !important;
+        position: relative;
+        top: auto;
+        left: auto;
+        margin-top: 4px;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+    }
+
+    .verse-action-btn {
+        font-size: 0.9rem;
+        padding: 4px 8px;
+        min-width: 32px;
+        min-height: 32px;
+    }
+
+    .toast-notification {
+        bottom: 80px;
+        font-size: 0.75rem;
+        padding: 6px 14px;
+        max-width: 85vw;
+    }
+}

@@ -5,11 +5,20 @@
     position: sticky;
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
     color: white;
-    padding: 0.1rem ;
+    padding: 0.1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
 }
 
 .menu-button {
@@ -19,12 +28,23 @@
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-title {
     margin: 0;
     font-size: 1rem;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    flex-shrink: 1;
+    min-width: 0;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Night Mode Toggle */
@@ -35,6 +55,11 @@
     cursor: pointer;
     margin-left: 10px;
     padding: 5px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Reciter Select Styling */
@@ -68,4 +93,71 @@
 .reciter-select option {
     background-color: var(--primary-green);
     font-size: 15px;
+}
+
+/* Header responsive */
+@media (max-width: 992px) {
+    .header {
+        padding: 0.05rem 0.25rem;
+    }
+
+    .header-title {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-wrap: wrap;
+        padding: 0.05rem 0.15rem;
+    }
+
+    .header-left {
+        gap: 0;
+    }
+
+    .header-title {
+        font-size: 0.85rem;
+        order: -1;
+        flex: 1 1 100%;
+        text-align: center;
+        padding: 0.15rem 0;
+    }
+
+    .menu-button, .night-mode-toggle {
+        font-size: 1.2rem;
+        padding: 0.3rem;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    .night-mode-toggle {
+        margin-left: 4px;
+    }
+
+    .header-controls {
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        width: 100%;
+        padding: 0.2rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 0.78rem;
+    }
+
+    .menu-button, .night-mode-toggle {
+        font-size: 1.1rem;
+        min-width: 36px;
+        min-height: 36px;
+    }
+
+    .reciter-select {
+        font-size: 0.75rem;
+        padding: 4px 6px;
+        max-width: 130px;
+    }
 }

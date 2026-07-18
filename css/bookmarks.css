@@ -43,6 +43,11 @@
     font-size: 1.5rem;
     cursor: pointer;
     padding: 5px;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bookmarks-stats {
@@ -128,6 +133,10 @@
     cursor: pointer;
     font-size: 0.8rem;
     transition: all 0.2s;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bookmark-action-btn:hover {
@@ -240,8 +249,30 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+    .bookmarks-panel {
+        width: 320px;
+    }
+}
+
 @media (max-width: 480px) {
     .bookmarks-panel {
-        width: 100%;
+        width: 100% !important;
+    }
+
+    .bookmarks-header {
+        padding: 10px 15px;
+    }
+
+    .bookmarks-header h3 {
+        font-size: 1rem;
+    }
+
+    .bookmark-item {
+        padding: 10px 12px;
+    }
+
+    .bookmark-item-text {
+        font-size: 0.95rem;
     }
 }

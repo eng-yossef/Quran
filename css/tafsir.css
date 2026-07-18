@@ -77,3 +77,25 @@
 .close-tafsir-btn:hover {
     color: #333;
 }
+
+/* Mobile */
+@media (max-width: 480px) {
+    .verse-tafsir {
+        min-width: 0;
+        max-width: 95vw;
+        width: 95vw;
+        left: 2.5vw !important;
+        right: 2.5vw;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .verse-tafsir::before,
+    .verse-tafsir::after {
+        display: none;
+    }
+
+    .verse-tafsir-header {
+        font-size: 15px;
+    }
+}

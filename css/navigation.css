@@ -22,6 +22,11 @@
     cursor: pointer;
     font-size: 0.95rem;
     transition: all 0.2s;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .nav-button:hover {
@@ -53,7 +58,7 @@
 }
 
 .juz-label {
-    color: var(--dark-green);;
+    color: var(--dark-green);
     font-size: .8rem;
     font-weight: bold;
     font-family: 'Amiri', 'Traditional Arabic', serif;
@@ -74,7 +79,7 @@
     font-family: inherit;
 }
 
-.page-navigation  {
+.page-navigation {
     color: white;
     border: none;
     padding: 5px 12px;
@@ -96,4 +101,40 @@
 
 .page-navigation .go-btn:hover {
     background: #a05e2a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navigation {
+        padding: 0.2rem 0.8rem;
+    }
+
+    .nav-button {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .page-indicator {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .navigation {
+        padding: 0.15rem 0.5rem;
+        gap: 4px;
+    }
+
+    .nav-button {
+        padding: 6px 10px;
+        font-size: 0.78rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .page-indicator {
+        font-size: 0.78rem;
+        padding: 2px 8px;
+        white-space: nowrap;
+    }
 }

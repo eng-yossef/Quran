@@ -17,6 +17,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 38px;
+    min-height: 38px;
 }
 
 .header-btn:hover {
@@ -49,6 +51,11 @@
     transition: all 0.2s;
     font-weight: bold;
     white-space: nowrap;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .font-btn:hover {
@@ -203,6 +210,11 @@
     font-size: 1.5rem;
     cursor: pointer;
     color: #666;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .stats-grid {
@@ -287,22 +299,132 @@
     color: #aaa;
 }
 
-/* Responsive */
+/* ========== RESPONSIVE ========== */
+
+/* Tablet */
 @media (max-width: 768px) {
     .header-controls {
         gap: 4px;
+    }
+
+    .header-btn {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 4px 8px;
+        font-size: 0.95rem;
     }
 
     .progress-bar-container {
         width: 60px;
     }
 
-    .font-controls {
-        display: none;
+    .reciter-select {
+        font-size: 0.75rem;
+        padding: 4px 6px;
+    }
+
+    .audio-speed-select {
+        font-size: 0.75rem;
+        padding: 4px 6px;
     }
 
     .repeat-controls {
+        bottom: 65px;
         right: 10px;
-        bottom: 80px;
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .repeat-label {
+        font-size: 0.7rem;
+    }
+
+    .repeat-select {
+        font-size: 0.75rem;
+        padding: 2px 4px;
+    }
+
+    .stats-modal {
+        width: 95%;
+        padding: 20px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-card {
+        padding: 12px 8px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .header-controls {
+        gap: 3px;
+    }
+
+    .header-btn {
+        min-width: 32px;
+        min-height: 32px;
+        padding: 3px 6px;
+        font-size: 0.85rem;
+    }
+
+    .font-controls {
+        gap: 2px;
+        padding: 1px 3px;
+    }
+
+    .font-btn {
+        font-size: 0.7rem;
+        padding: 3px 5px;
+        min-width: 30px;
+        min-height: 30px;
+    }
+
+    .progress-bar-container {
+        width: 50px;
+    }
+
+    .progress-text {
+        font-size: 0.6rem;
+    }
+
+    .reciter-select {
+        font-size: 0.65rem;
+        padding: 3px 4px;
+        max-width: 110px;
+    }
+
+    .audio-speed-select {
+        font-size: 0.65rem;
+        padding: 3px 4px;
+    }
+
+    .repeat-controls {
+        bottom: 60px;
+        right: 8px;
+        padding: 3px 6px;
+        border-radius: 15px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+
+    .stats-header h2 {
+        font-size: 1rem;
     }
 }

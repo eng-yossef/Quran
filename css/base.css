@@ -1,3 +1,7 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Amiri', serif;
     background-color: var(--cream-bg);
@@ -6,9 +10,24 @@ body {
     padding: 0;
     line-height: 1.8;
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
 }
 
 .app-container {
     display: flex;
     min-height: 100vh;
+}
+
+/* Prevent horizontal scroll on mobile */
+img, video, select, input {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Touch-friendly scrolling */
+@supports (-webkit-overflow-scrolling: touch) {
+    .sidebar, .bookmarks-list, .search-results {
+        -webkit-overflow-scrolling: touch;
+    }
 }

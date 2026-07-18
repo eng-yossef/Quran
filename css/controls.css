@@ -303,31 +303,6 @@
 
 /* Tablet */
 @media (max-width: 768px) {
-    .header-controls {
-        gap: 4px;
-    }
-
-    .header-btn {
-        min-width: 34px;
-        min-height: 34px;
-        padding: 4px 8px;
-        font-size: 0.95rem;
-    }
-
-    .progress-bar-container {
-        width: 60px;
-    }
-
-    .reciter-select {
-        font-size: 0.75rem;
-        padding: 4px 6px;
-    }
-
-    .audio-speed-select {
-        font-size: 0.75rem;
-        padding: 4px 6px;
-    }
-
     .repeat-controls {
         bottom: 65px;
         right: 10px;
@@ -362,69 +337,51 @@
 
 /* Mobile */
 @media (max-width: 480px) {
-    .header-controls {
-        gap: 3px;
-    }
-
-    .header-btn {
-        min-width: 32px;
-        min-height: 32px;
+    .repeat-controls {
+        bottom: 55px;
+        right: 6px;
         padding: 3px 6px;
-        font-size: 0.85rem;
+        gap: 3px;
+        border-radius: 15px;
     }
 
-    .font-controls {
-        gap: 2px;
-        padding: 1px 3px;
-    }
-
-    .font-btn {
-        font-size: 0.7rem;
-        padding: 3px 5px;
-        min-width: 30px;
-        min-height: 30px;
-    }
-
-    .progress-bar-container {
-        width: 50px;
-    }
-
-    .progress-text {
+    .repeat-label {
         font-size: 0.6rem;
     }
 
-    .reciter-select {
+    .repeat-select {
         font-size: 0.65rem;
-        padding: 3px 4px;
-        max-width: 110px;
+        padding: 2px 3px;
     }
 
-    .audio-speed-select {
-        font-size: 0.65rem;
-        padding: 3px 4px;
-    }
-
-    .repeat-controls {
-        bottom: 60px;
-        right: 8px;
-        padding: 3px 6px;
-        border-radius: 15px;
+    .repeat-count-display {
+        font-size: 0.6rem;
     }
 
     .stats-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 10px 6px;
     }
 
     .stat-value {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
     }
 
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
     .stats-header h2 {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .stats-modal {
+        width: 98%;
+        padding: 15px;
+        border-radius: 8px;
     }
 }

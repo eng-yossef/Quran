@@ -17,6 +17,7 @@ function setupVerseInteractions() {
                 <span class="verse-bookmark-icon" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)">☆</span>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ">📋</button>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة">↗</button>
+                <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة">🖼</button>
             `;
             verseContainer.appendChild(actionsDiv);
         }

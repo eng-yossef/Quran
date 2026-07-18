@@ -5,12 +5,11 @@
     position: sticky;
     background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
     color: white;
-    padding: 0.1rem;
+    padding: 0.1rem 0.2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    flex-wrap: wrap;
     gap: 0;
 }
 
@@ -25,19 +24,20 @@
     background: none;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     cursor: pointer;
-    padding: 0.5rem;
-    min-width: 44px;
-    min-height: 44px;
+    padding: 0.4rem;
+    min-width: 36px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .header-title {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.9rem;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     flex-shrink: 1;
     min-width: 0;
@@ -51,15 +51,15 @@
 .night-mode-toggle {
     background: none;
     border: none;
-    font-size: 1.5em;
+    font-size: 1.3em;
     cursor: pointer;
-    margin-left: 10px;
-    padding: 5px;
-    min-width: 44px;
-    min-height: 44px;
+    padding: 0.3rem;
+    min-width: 36px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 /* Reciter Select Styling */
@@ -67,14 +67,15 @@
     background: rgba(255, 255, 255, 0.12);
     color: black;
     border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 5px 8px;
+    border-radius: 10px;
+    font-size: 13px;
     cursor: pointer;
     outline: none;
     transition: all 0.2s ease-in-out;
     backdrop-filter: blur(6px);
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    flex-shrink: 0;
 }
 
 .reciter-select:hover {
@@ -92,24 +93,23 @@
 
 .reciter-select option {
     background-color: var(--primary-green);
-    font-size: 15px;
+    font-size: 14px;
 }
 
-/* Header responsive */
+/* ========== RESPONSIVE ========== */
+
+/* Tablet */
 @media (max-width: 992px) {
     .header {
-        padding: 0.05rem 0.25rem;
-    }
-
-    .header-title {
-        font-size: 0.9rem;
+        padding: 0.05rem 0.15rem;
     }
 }
 
+/* Mobile - ONE ROW */
 @media (max-width: 768px) {
     .header {
-        flex-wrap: wrap;
-        padding: 0.05rem 0.15rem;
+        padding: 0.05rem 0.1rem;
+        flex-wrap: nowrap;
     }
 
     .header-left {
@@ -117,47 +117,116 @@
     }
 
     .header-title {
-        font-size: 0.85rem;
-        order: -1;
-        flex: 1 1 100%;
-        text-align: center;
-        padding: 0.15rem 0;
-    }
-
-    .menu-button, .night-mode-toggle {
-        font-size: 1.2rem;
-        padding: 0.3rem;
-        min-width: 40px;
-        min-height: 40px;
-    }
-
-    .night-mode-toggle {
-        margin-left: 4px;
-    }
-
-    .header-controls {
-        flex-wrap: wrap;
-        gap: 4px;
-        justify-content: center;
-        width: 100%;
-        padding: 0.2rem 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .header-title {
         font-size: 0.78rem;
+        padding: 0 0.3rem;
     }
 
     .menu-button, .night-mode-toggle {
         font-size: 1.1rem;
-        min-width: 36px;
-        min-height: 36px;
+        padding: 0.2rem;
+        min-width: 30px;
+        min-height: 30px;
+    }
+
+    .night-mode-toggle {
+        margin-left: 2px;
+    }
+
+    .header-controls {
+        gap: 3px;
+        flex-shrink: 0;
+    }
+
+    .header-btn {
+        min-width: 28px;
+        min-height: 28px;
+        padding: 2px 5px;
+        font-size: 0.8rem;
+    }
+
+    .progress-bar-container {
+        width: 45px;
+    }
+
+    .progress-text {
+        font-size: 0.55rem;
+    }
+
+    .font-controls {
+        gap: 1px;
+        padding: 1px 2px;
+    }
+
+    .font-btn {
+        font-size: 0.65rem;
+        padding: 2px 4px;
+        min-width: 26px;
+        min-height: 26px;
     }
 
     .reciter-select {
+        font-size: 0.65rem;
+        padding: 3px 4px;
+        max-width: 100px;
+    }
+
+    .audio-speed-select {
+        font-size: 0.65rem;
+        padding: 3px 4px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 0.7rem;
+    }
+
+    .menu-button, .night-mode-toggle {
+        font-size: 1rem;
+        min-width: 28px;
+        min-height: 28px;
+        padding: 0.15rem;
+    }
+
+    .header-btn {
+        min-width: 26px;
+        min-height: 26px;
+        padding: 2px 4px;
         font-size: 0.75rem;
-        padding: 4px 6px;
-        max-width: 130px;
+    }
+
+    .progress-bar-container {
+        width: 35px;
+    }
+
+    .font-btn {
+        font-size: 0.6rem;
+        padding: 1px 3px;
+        min-width: 24px;
+        min-height: 24px;
+    }
+
+    .reciter-select {
+        font-size: 0.58rem;
+        padding: 2px 3px;
+        max-width: 85px;
+    }
+
+    .audio-speed-select {
+        font-size: 0.58rem;
+        padding: 2px 3px;
+    }
+}
+
+/* Very small */
+@media (max-width: 360px) {
+    .header-title {
+        font-size: 0.62rem;
+    }
+
+    .reciter-select {
+        max-width: 70px;
+        font-size: 0.52rem;
     }
 }

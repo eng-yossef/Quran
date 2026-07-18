@@ -246,9 +246,9 @@
         display: none;
     }
 
-    /* Verse actions - always show on mobile (no hover) */
-    .verse-actions {
-        display: flex !important;
+    /* Export image button - show ONLY export on active verse, hide copy/share */
+    .verse-container.active-verse .verse-actions {
+        display: flex;
         position: relative;
         top: auto;
         left: auto;
@@ -258,6 +258,18 @@
         border: none;
         padding: 0;
         justify-content: flex-start;
+    }
+
+    .verse-container.active-verse .verse-actions .verse-action-btn:not(.verse-export-btn) {
+        display: none;
+    }
+
+    .verse-container.active-verse .verse-actions .verse-export-btn {
+        display: flex;
+        font-size: 0.9rem;
+        padding: 4px 8px;
+        min-width: 32px;
+        min-height: 32px;
     }
 
     .verse-action-btn {

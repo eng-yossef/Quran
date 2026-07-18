@@ -38,6 +38,23 @@
     color: var(--primary-green);
 }
 
+.verse-export-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verse-export-btn:hover {
+    background: var(--light-green);
+}
+
 /* Toast Notification */
 .toast-notification {
     position: fixed;
@@ -74,27 +91,8 @@
     background: rgba(50, 205, 50, 0.1);
 }
 
-/* Mobile: show verse actions permanently (no hover on touch) */
+/* Mobile: toast smaller */
 @media (max-width: 480px) {
-    .verse-actions {
-        display: flex !important;
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-top: 4px;
-        background: transparent;
-        box-shadow: none;
-        border: none;
-        padding: 0;
-    }
-
-    .verse-action-btn {
-        font-size: 0.9rem;
-        padding: 4px 8px;
-        min-width: 32px;
-        min-height: 32px;
-    }
-
     .toast-notification {
         bottom: 80px;
         font-size: 0.75rem;

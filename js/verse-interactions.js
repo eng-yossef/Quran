@@ -13,11 +13,13 @@ function setupVerseInteractions() {
         if (!verseContainer.querySelector('.verse-actions')) {
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'verse-actions';
+            actionsDiv.setAttribute('role', 'toolbar');
+            actionsDiv.setAttribute('aria-label', 'إجراءات الآية');
             actionsDiv.innerHTML = `
-                <span class="verse-bookmark-icon" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)">☆</span>
-                <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ">📋</button>
-                <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة">↗</button>
-                <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة">🖼</button>
+                <button class="verse-action-btn verse-bookmark-btn" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)" title="إضافة للمفضلة" aria-label="إضافة للمفضلة">☆</button>
+                <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ" aria-label="نسخ الآية">📋</button>
+                <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة" aria-label="مشاركة الآية">⤴</button>
+                <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة" aria-label="تصدير الآية كصورة">🖼</button>
             `;
             verseContainer.appendChild(actionsDiv);
         }
@@ -98,25 +100,39 @@ function setupVerseInteractions() {
             const deltaY = Math.abs(touchEndY - touchStartY);
             const isHorizontalSwipe = deltaX > deltaY && deltaX > 30;
 
-            if (!isHorizontalSwipe) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
             if (tafsirTimer) {
                 clearTimeout(tafsirTimer);
                 tafsirTimer = null;
             }
 
             if (isTap && !isHorizontalSwipe) {
-                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
-                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+                const target = e.target;
 
-                if (isCurrentVersePlaying && !audioPaused) {
-                    toggleAudioPlayback();
+                if (target.closest('.verse-actions')) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                const isAlreadyActive = verseContainer.classList.contains('active-verse');
+
+                document.querySelectorAll('.verse-container').forEach(v => {
+                    v.classList.remove('active-verse');
+                });
+
+                if (isAlreadyActive) {
+                    verseContainer.classList.remove('active-verse');
                 } else {
-                    highlightVerse();
-                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                    verseContainer.classList.add('active-verse');
+
+                    const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                        currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+                    if (isCurrentVersePlaying && !audioPaused) {
+                        toggleAudioPlayback();
+                    } else {
+                        playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                    }
                     clearSelection();
                 }
             }
@@ -135,7 +151,7 @@ function setupVerseInteractions() {
         }
 
         function handleDesktopClick(e) {
-            if (!e.target.closest('.verse-tafsir')) {
+            if (!e.target.closest('.verse-tafsir') && !e.target.closest('.verse-actions')) {
                 const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                     currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 
@@ -171,6 +187,16 @@ function setupVerseInteractions() {
         } else if (document.selection) {
             document.selection.empty();
         }
+    }
+
+    if (isTouchDevice) {
+        document.addEventListener('touchend', function (e) {
+            if (!e.target.closest('.verse-container')) {
+                document.querySelectorAll('.verse-container').forEach(v => {
+                    v.classList.remove('active-verse');
+                });
+            }
+        }, { passive: true });
     }
 }
 

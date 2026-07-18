@@ -188,31 +188,6 @@
     margin-top: 6px;
 }
 
-/* Verse bookmark icon */
-.verse-bookmark-icon {
-    display: none;
-    cursor: pointer;
-    font-size: 1rem;
-    position: absolute;
-    top: -5px;
-    left: 5px;
-    z-index: 5;
-    transition: transform 0.2s;
-}
-
-.verse-bookmark-icon:hover {
-    transform: scale(1.2);
-}
-
-.verse-container:hover .verse-bookmark-icon {
-    display: block;
-}
-
-.verse-bookmark-icon.bookmarked {
-    display: block;
-    color: var(--gold-accent);
-}
-
 /* Night Mode */
 .night-mode .bookmarks-panel {
     background: #1e1e1e;

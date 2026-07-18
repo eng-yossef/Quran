@@ -160,14 +160,14 @@ function updateBookmarkIcons() {
     document.querySelectorAll('.verse-container').forEach(verse => {
         const surah = parseInt(verse.getAttribute('data-surah'));
         const ayah = parseInt(verse.getAttribute('data-ayah'));
-        const icon = verse.querySelector('.verse-bookmark-icon');
-        if (icon) {
+        const btn = verse.querySelector('.verse-bookmark-btn');
+        if (btn) {
             if (isBookmarked(surah, ayah)) {
-                icon.classList.add('bookmarked');
-                icon.textContent = '★';
+                btn.classList.add('bookmarked');
+                btn.textContent = '★';
             } else {
-                icon.classList.remove('bookmarked');
-                icon.textContent = '☆';
+                btn.classList.remove('bookmarked');
+                btn.textContent = '☆';
             }
         }
     });

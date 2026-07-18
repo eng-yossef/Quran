@@ -343,47 +343,14 @@
 
     /* --- Verse actions --- */
     .verse-actions {
-        top: -6px;
-        left: 0;
+        padding: 3px 5px;
+        gap: 1px;
     }
 
     .verse-action-btn {
-        font-size: 0.9rem;
-        padding: 4px 8px;
-        min-width: 32px;
-        min-height: 32px;
-    }
-
-    .verse-bookmark-icon {
-        font-size: 0.85rem;
-        top: -3px;
-        left: 3px;
-    }
-
-    /* Export image button - show ONLY export on active verse, hide copy/share */
-    .verse-container.active-verse .verse-actions {
-        display: flex;
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-top: 4px;
-        background: transparent;
-        box-shadow: none;
-        border: none;
-        padding: 0;
-        justify-content: flex-start;
-    }
-
-    .verse-container.active-verse .verse-actions .verse-action-btn:not(.verse-export-btn) {
-        display: none;
-    }
-
-    .verse-container.active-verse .verse-actions .verse-export-btn {
-        display: flex;
-        font-size: 0.9rem;
-        padding: 4px 8px;
-        min-width: 32px;
-        min-height: 32px;
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
     }
 
     /* --- Image export --- */
@@ -510,19 +477,14 @@
     }
 
     .verse-actions {
-        top: -6px;
-        left: 0;
+        padding: 3px 5px;
+        gap: 1px;
     }
 
     .verse-action-btn {
-        font-size: 0.8rem;
-        padding: 2px 5px;
-    }
-
-    .verse-bookmark-icon {
+        width: 34px;
+        height: 34px;
         font-size: 0.85rem;
-        top: -3px;
-        left: 3px;
     }
 
     .stop-btn-container {

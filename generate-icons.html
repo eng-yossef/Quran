@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generate PWA Icons</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background: #1a1a1a; color: #e0e0e0; }
+        h1 { color: #2E8B57; }
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .icon-card { background: #2a2a2a; border-radius: 8px; padding: 1rem; text-align: center; }
+        .icon-card img { width: 64px; height: 64px; margin-bottom: 0.5rem; }
+        .icon-card p { font-size: 0.8rem; margin: 0; color: #aaa; }
+        .icon-card a { color: #2E8B57; text-decoration: none; font-size: 0.75rem; display: block; margin-top: 0.3rem; }
+        .btn { background: #2E8B57; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 6px; font-size: 1rem; cursor: pointer; margin: 1rem 0; }
+        .btn:hover { background: #1B6B3A; }
+        #status { margin-top: 1rem; color: #81C784; }
+    </style>
+</head>
+<body>
+    <h1>Quran PWA Icon Generator</h1>
+    <p>Click the button to generate all required PWA icon sizes from the SVG source.</p>
+    <button class="btn" onclick="generateAll()">Generate All Icons</button>
+    <div id="status"></div>
+    <div class="icon-grid" id="iconGrid"></div>
+
+    <script>
+    const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+
+    function generateIcon(size) {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+                resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = () => resolve(null);
+            img.src = '../quran.png';
+        });
+    }
+
+    function downloadDataUrl(dataUrl, filename) {
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = filename;
+        a.click();
+    }
+
+    async function generateAll() {
+        const status = document.getElementById('status');
+        const grid = document.getElementById('iconGrid');
+        grid.innerHTML = '';
+        status.textContent = 'Generating icons...';
+
+        for (const size of SIZES) {
+            const dataUrl = await generateIcon(size);
+            if (!dataUrl) { status.textContent = 'Error generating icons'; return; }
+
+            const card = document.createElement('div');
+            card.className = 'icon-card';
+
+            const img = document.createElement('img');
+            img.src = dataUrl;
+
+            const p = document.createElement('p');
+            p.textContent = `${size}x${size}`;
+
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `icon-${size}x${size}.png`;
+            a.textContent = 'Download';
+
+            card.appendChild(img);
+            card.appendChild(p);
+            card.appendChild(a);
+            grid.appendChild(card);
+        }
+
+        status.textContent = `Generated ${SIZES.length} icon sizes. Click each to download.`;
+    }
+    </script>
+</body>
+</html>

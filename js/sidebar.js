@@ -4,7 +4,7 @@ const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 function populateSurahList(surahs) {
     surahListEl.innerHTML = surahs.map(surah => `
-        <li class="surah-item" data-surah="${surah.number}">
+        <li class="surah-item" data-surah="${surah.number}" role="listitem" tabindex="0" aria-label="${surah.name} (${surah.englishName})">
             <span class="surah-number">${toArabicNumber(surah.number)}</span>
             <span class="surah-name">${surah.name} (${surah.englishName})</span>
         </li>
@@ -15,6 +15,14 @@ function populateSurahList(surahs) {
             const surahNumber = parseInt(item.getAttribute('data-surah'));
             goToSurah(surahNumber);
             closeSidebar();
+        });
+        item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const surahNumber = parseInt(item.getAttribute('data-surah'));
+                goToSurah(surahNumber);
+                closeSidebar();
+            }
         });
     });
 }
@@ -66,6 +74,8 @@ function toggleSidebar() {
     } else {
         sidebarEl.classList.add('open');
         sidebarOverlay.classList.add('active');
+        sidebarOverlay.setAttribute('aria-hidden', 'false');
+        menuButtonEl.setAttribute('aria-expanded', 'true');
         if (isMobile()) {
             document.body.style.overflow = 'hidden';
         }
@@ -75,6 +85,8 @@ function toggleSidebar() {
 function closeSidebar() {
     sidebarEl.classList.remove('open');
     sidebarOverlay.classList.remove('active');
+    sidebarOverlay.setAttribute('aria-hidden', 'true');
+    menuButtonEl.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
 }
 

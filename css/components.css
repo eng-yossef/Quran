@@ -18,3 +18,224 @@
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
+/* ===== PWA Banners ===== */
+.pwa-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    background: white;
+    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
+    border-top: 1px solid #e0e0e0;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    font-family: 'Amiri', serif;
+}
+
+.pwa-banner.visible {
+    transform: translateY(0);
+}
+
+.pwa-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pwa-banner-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    color: var(--primary-green);
+}
+
+.pwa-banner-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pwa-banner-text strong {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.pwa-banner-text span {
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pwa-banner-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.pwa-banner-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-family: 'Amiri', serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    font-weight: 600;
+}
+
+.pwa-banner-btn:active {
+    transform: scale(0.96);
+}
+
+.pwa-install-btn,
+.pwa-update-btn {
+    background: var(--primary-green);
+    color: white;
+}
+
+.pwa-install-btn:hover,
+.pwa-update-btn:hover {
+    background: #1B6B3A;
+}
+
+.pwa-dismiss-btn {
+    background: transparent;
+    color: #666;
+    font-size: 1.2rem;
+    padding: 8px;
+    min-width: 36px;
+}
+
+.pwa-dismiss-btn:hover {
+    color: #333;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.pwa-offline {
+    background: #FFF3E0;
+    border-top-color: #FFB74D;
+}
+
+.pwa-offline .pwa-banner-icon {
+    color: #E65100;
+}
+
+.pwa-offline .pwa-banner-text strong {
+    color: #E65100;
+}
+
+.pwa-offline .pwa-banner-text span {
+    color: #BF360C;
+}
+
+/* ===== Night Mode PWA Banners ===== */
+.night-mode .pwa-banner {
+    background: #2a2a2a;
+    border-top-color: #444;
+}
+
+.night-mode .pwa-banner-text strong {
+    color: #e0e0e0;
+}
+
+.night-mode .pwa-banner-text span {
+    color: #aaa;
+}
+
+.night-mode .pwa-dismiss-btn {
+    color: #aaa;
+}
+
+.night-mode .pwa-dismiss-btn:hover {
+    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.night-mode .pwa-offline {
+    background: #332200;
+    border-top-color: #5D4037;
+}
+
+/* ===== Skip Link (Accessibility) ===== */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: var(--primary-green);
+    color: white;
+    padding: 8px 16px;
+    z-index: 100000;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* ===== Screen Reader Only ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .pwa-banner {
+        transition: none;
+    }
+}
+
+/* ===== Focus Visible Styles ===== */
+:focus-visible {
+    outline: 2px solid var(--primary-green);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: 2px solid var(--primary-green);
+    outline-offset: 2px;
+}
+
+/* ===== High Contrast Mode ===== */
+@media (forced-colors: active) {
+    .pwa-banner {
+        border: 2px solid CanvasText;
+    }
+
+    .verse-number {
+        border: 2px solid CanvasText;
+    }
+
+    .surah-info {
+        border: 2px solid CanvasText;
+    }
+}

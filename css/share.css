@@ -44,6 +44,7 @@
     justify-content: center;
     flex-shrink: 0;
     line-height: 1;
+    color: #333;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -96,6 +97,10 @@
     background: #333;
     border-color: #555;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.night-mode .verse-action-btn {
+    color: #e0e0e0;
 }
 
 .night-mode .verse-action-btn:hover {

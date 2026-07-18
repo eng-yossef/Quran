@@ -58,6 +58,26 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 - **Compact Header**: Scrollable header controls on small screens
 - **Body Scroll Lock**: Prevents background scrolling when sidebar is open on mobile
 
+### Progressive Web App (PWA)
+- **Installable**: Install on Android, iOS, Windows, macOS, and Linux
+- **Offline Support**: Quran text, bookmarks, settings, and reading progress available offline
+- **Service Worker**: Cache-first for static assets, network-first for API, cache-on-demand for audio
+- **App Shortcuts**: Quick access to "Continue Reading" and "Search Quran"
+- **Update Detection**: Automatic notification when a new version is available
+- **Offline Indicator**: Banner when device loses connectivity
+- **Splash Screen**: Standalone mode with themed background
+- **iOS Support**: Apple Touch Icons, standalone mode, status bar styling
+- **Safe Area Insets**: Respects notch and rounded corners via `viewport-fit=cover`
+
+### Accessibility
+- **Skip to Content**: Keyboard navigation skip link
+- **ARIA Labels**: All interactive elements have proper labels
+- **Keyboard Navigation**: Full keyboard support for all features
+- **Reduced Motion**: Respects `prefers-reduced-motion` system setting
+- **High Contrast**: Supports `forced-colors` (Windows High Contrast Mode)
+- **Focus Visible**: Clear focus indicators for keyboard users
+- **Screen Reader**: Semantic HTML with proper roles and landmarks
+
 ## Getting Started
 
 ### Prerequisites
@@ -89,9 +109,18 @@ Open `http://localhost:8080` in your browser.
 ```
 Quran/
 ├── index.html              # Main HTML entry point
+├── manifest.json           # PWA manifest with icons, shortcuts, display mode
+├── sw.js                   # Service worker with caching strategies
+├── generate-icons.html     # Tool to generate PNG icons from SVG
 ├── README.md               # This file
-├── quran (1).png           # Favicon
+├── favicon-16x16.png       # Tab favicon (16px)
+├── favicon-32x32.png       # Bookmark bar favicon (32px)
+├── favicon-48x48.png       # Windows tile (48px)
 ├── tests.html              # Test page
+│
+├── icons/                  # PWA icons
+│   ├── icon.svg            # Master SVG icon (source for all sizes)
+│   └── icon-*.png          # Generated PNG icons (72–512px)
 │
 ├── css/                    # 19 CSS modules (load order matters)
 │   ├── variables.css       # CSS custom properties: colors, fonts, layout, verse markers
@@ -100,7 +129,7 @@ Quran/
 │   ├── header.css          # Header bar, controls, progress display
 │   ├── main-content.css    # Quran page, verse containers, verse markers, surah headers, bismillah
 │   ├── navigation.css      # Bottom nav bar, page indicator, juz label
-│   ├── components.css      # Stop button, misc UI components
+│   ├── components.css      # Stop button, PWA banners, skip-link, accessibility, reduced motion
 │   ├── tafsir.css          # Tafsir tooltip positioning and styling
 │   ├── animations.css      # Verse pulse, current-playing glow, fade-in, night-mode effects
 │   ├── image-export.css    # Premium image export container with ornamental borders
@@ -134,6 +163,7 @@ Quran/
 │   ├── font-controls.js    # Font size increase/decrease, localStorage persistence
 │   ├── reading-progress.js # Progress tracking, stats modal, streak calculation
 │   ├── fullscreen.js       # Fullscreen API toggle, exit hint
+│   ├── pwa.js              # PWA: SW registration, install prompt, update detection, offline indicator
 │   └── app.js              # DOMContentLoaded init, event binding, click-outside handler
 │
 └── fonts/                  # Local font files
@@ -174,8 +204,14 @@ reading-progress → fullscreen
 config → state → utils → storage → share → audio → audio-controls →
 render → tafsir → verse-interactions → navigation → sidebar →
 night-mode → image-export → search → bookmarks → font-controls →
-reading-progress → fullscreen → app
+reading-progress → fullscreen → pwa → app
 ```
+
+### PWA Architecture
+- **Service Worker** (`sw.js`): Pre-caches all static assets on install. Routes requests to cache-first (CSS/JS/fonts), network-first (API), or cache-on-demand (audio) strategies.
+- **PWA Manager** (`js/pwa.js`): Registers service worker, handles `beforeinstallprompt` event, detects updates via `updatefound`, syncs theme color, shows offline/install/update banners.
+- **Offline Support**: Layered approach — service worker caches network responses, IndexedDB caches Quran data, localStorage caches user preferences. Quran text, bookmarks, settings, and reading progress all survive offline.
+- **Icons**: SVG master icon in `icons/icon.svg`. Use `generate-icons.html` to create all required PNG sizes (72–512px).
 
 ## Responsive Breakpoints
 

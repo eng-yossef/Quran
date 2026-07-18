@@ -2,10 +2,40 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> المصحف الشريف</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>المصحف الشريف</title>
+    <meta name="description" content="تطبيق المصحف الشريف - قراءة واستماع القرآن الكريم مع بحث وحفظ ووضع عدم اتصال">
+    <meta name="theme-color" content="#2E8B57">
+    <meta name="color-scheme" content="light dark">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="المصحف">
+    <meta name="application-name" content="المصحف الشريف">
+    <meta name="msapplication-TileColor" content="#2E8B57">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Icons -->
+    <link rel="icon" href="favicon-16x16.png" type="image/png" sizes="16x16">
+    <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="favicon-48x48.png" type="image/png" sizes="48x48">
+    <link rel="icon" href="icons/icon-192x192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+
+    <!-- Preconnect to external origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://api.alquran.cloud">
+    <link rel="preconnect" href="https://quranapi.pages.dev">
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="quran (1).png" type="image/png" sizes="16x16">
+
     <!-- CSS Modules -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/base.css">
@@ -28,53 +58,56 @@
     <link rel="stylesheet" href="css/fullscreen.css">
 </head>
 <body>
+    <!-- Skip to content for keyboard navigation -->
+    <a href="#quranPage" class="skip-link">تخطي إلى المصحف</a>
+
     <!-- Reading Progress Bar -->
-    <div class="reading-progress-bar">
+    <div class="reading-progress-bar" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100">
         <div class="reading-progress-fill" id="readingProgressFill"></div>
     </div>
 
     <div class="app-container">
         <!-- Sidebar Overlay (mobile backdrop) -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
 
         <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
+        <nav class="sidebar" id="sidebar" aria-label="Surah navigation">
             <div class="sidebar-header">
                 <h3 class="sidebar-title">سور القرآن الكريم</h3>
-                <button class="close-sidebar" id="closeSidebar">&times;</button>
+                <button class="close-sidebar" id="closeSidebar" aria-label="Close sidebar">&times;</button>
             </div>
-            <ul class="surah-list" id="surahList">
+            <ul class="surah-list" id="surahList" role="list">
             </ul>
-        </div>
+        </nav>
         
         <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
+        <main class="main-content" id="mainContent">
+            <header class="header" role="banner">
                 <div class="header-left">
-                    <button class="menu-button" id="menuButton">☰</button>
-                    <button class="night-mode-toggle" id="nightModeToggle">🌙</button>
+                    <button class="menu-button" id="menuButton" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">&#9776;</button>
+                    <button class="night-mode-toggle" id="nightModeToggle" aria-label="Toggle night mode">&#127769;</button>
                 </div>
                
-                <div class="header-controls">
-                    <div class="progress-bar-container" id="progressBarContainer" onclick="openStatsModal()" title="إحصائيات القراءة">
+                <div class="header-controls" role="toolbar" aria-label="Reading controls">
+                    <div class="progress-bar-container" id="progressBarContainer" onclick="openStatsModal()" title="إحصائيات القراءة" role="button" tabindex="0" aria-label="Reading statistics">
                         <div class="progress-bar" id="progressBarFill"></div>
                         <span class="progress-text" id="progressText">0%</span>
                     </div>
-                    <button class="header-btn" id="searchBtn" title="بحث (Ctrl+F)">🔍</button>
-                    <button class="header-btn" id="bookmarksBtn" title="المفضلة">📑</button>
-                    <div class="font-controls">
-                        <button class="font-btn" id="fontDecrease" title="تصغير الخط">Aa-</button>
-                        <button class="font-btn" id="fontIncrease" title="تكبير الخط">Aa+</button>
+                    <button class="header-btn" id="searchBtn" title="بحث (Ctrl+F)" aria-label="Search">&#128269;</button>
+                    <button class="header-btn" id="bookmarksBtn" title="المفضلة" aria-label="Bookmarks">&#128209;</button>
+                    <div class="font-controls" role="group" aria-label="Font size controls">
+                        <button class="font-btn" id="fontDecrease" title="تصغير الخط" aria-label="Decrease font size">Aa-</button>
+                        <button class="font-btn" id="fontIncrease" title="تكبير الخط" aria-label="Increase font size">Aa+</button>
                     </div>
-                    <button class="header-btn" id="fullscreenBtn" title="وضع ملء الشاشة">⛶</button>
-                    <select id="reciterSelect" class="reciter-select">
+                    <button class="header-btn" id="fullscreenBtn" title="وضع ملء الشاشة" aria-label="Toggle fullscreen">&#9974;</button>
+                    <select id="reciterSelect" class="reciter-select" aria-label="Select reciter">
                         <option value="1">مشاري راشد العفاسي</option>
                         <option value="2">أبو بكر الشاطري</option>
                         <option value="3">ناصر القطامي</option>
                         <option value="4">ياسر الدوسري</option>
                         <option value="5">هاني الرفاعي</option>
                     </select>
-                    <select id="audioSpeedSelect" class="audio-speed-select" title="سرعة التشغيل">
+                    <select id="audioSpeedSelect" class="audio-speed-select" title="سرعة التشغيل" aria-label="Playback speed">
                         <option value="0.5">0.5x</option>
                         <option value="0.75">0.75x</option>
                         <option value="1" selected>1x</option>
@@ -83,46 +116,47 @@
                         <option value="2">2x</option>
                     </select>
                 </div>
-            </div>
+            </header>
 
-            <div class="quran-page" id="quranPage">
+            <div class="quran-page" id="quranPage" role="article" aria-label="Quran page">
             </div>
             
-            <div class="navigation">
-                <button class="nav-button" id="prevPage">السابق</button>
-                <span class="page-indicator" id="pageIndicator">الصفحة 1</span>
-                <button class="nav-button" id="nextPage">التالي</button>
-            </div>
-        </div>
+            <nav class="navigation" role="navigation" aria-label="Page navigation">
+                <button class="nav-button" id="prevPage" aria-label="Previous page">السابق</button>
+                <span class="page-indicator" id="pageIndicator" aria-live="polite">الصفحة 1</span>
+                <button class="nav-button" id="nextPage" aria-label="Next page">التالي</button>
+            </nav>
+        </main>
     </div>
 
     <!-- Search Modal -->
-    <div class="search-overlay" id="searchOverlay">
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Search">
         <div class="search-modal">
             <div class="search-header">
+                <label for="searchInput" class="sr-only">ابحث في آيات القرآن الكريم</label>
                 <input type="text" class="search-input" id="searchInput" placeholder="ابحث في آيات القرآن الكريم..." autocomplete="off">
-                <button class="search-close-btn" id="searchCloseBtn">&times;</button>
+                <button class="search-close-btn" id="searchCloseBtn" aria-label="Close search">&times;</button>
             </div>
-            <div class="search-results" id="searchResults"></div>
+            <div class="search-results" id="searchResults" role="listbox"></div>
         </div>
     </div>
 
     <!-- Bookmarks Panel -->
-    <div class="bookmarks-panel" id="bookmarksPanel">
+    <aside class="bookmarks-panel" id="bookmarksPanel" role="complementary" aria-label="Bookmarks">
         <div class="bookmarks-header">
-            <h3>📑 المفضلة</h3>
-            <button class="bookmarks-close-btn" id="bookmarksCloseBtn">&times;</button>
+            <h3>&#128209; المفضلة</h3>
+            <button class="bookmarks-close-btn" id="bookmarksCloseBtn" aria-label="Close bookmarks">&times;</button>
         </div>
-        <div class="bookmarks-stats" id="bookmarksStats"></div>
-        <div class="bookmarks-list" id="bookmarksList"></div>
-    </div>
+        <div class="bookmarks-stats" id="bookmarksStats" aria-live="polite"></div>
+        <div class="bookmarks-list" id="bookmarksList" role="list"></div>
+    </aside>
 
     <!-- Stats Modal -->
-    <div class="stats-overlay" id="statsOverlay">
+    <div class="stats-overlay" id="statsOverlay" role="dialog" aria-modal="true" aria-label="Reading statistics">
         <div class="stats-modal">
             <div class="stats-header">
-                <h2>📊 إحصائيات القراءة</h2>
-                <button class="stats-close-btn" onclick="closeStatsModal()">&times;</button>
+                <h2>&#128202; إحصائيات القراءة</h2>
+                <button class="stats-close-btn" onclick="closeStatsModal()" aria-label="Close statistics">&times;</button>
             </div>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -158,9 +192,9 @@
     <div class="fullscreen-exit-hint">اضغط ESC للخروج من وضع ملء الشاشة</div>
 
     <!-- Repeat Controls -->
-    <div class="repeat-controls" id="repeatControls">
+    <div class="repeat-controls" id="repeatControls" role="toolbar" aria-label="Repeat controls">
         <span class="repeat-label">التكرار:</span>
-        <select id="repeatSelect" class="repeat-select">
+        <select id="repeatSelect" class="repeat-select" aria-label="Repeat count">
             <option value="1">1x</option>
             <option value="3">3x</option>
             <option value="5">5x</option>
@@ -190,6 +224,7 @@
     <script src="js/font-controls.js"></script>
     <script src="js/reading-progress.js"></script>
     <script src="js/fullscreen.js"></script>
+    <script src="js/pwa.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

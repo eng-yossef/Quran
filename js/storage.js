@@ -96,6 +96,7 @@ function organizeVersesByPage(surahs) {
             }
             pages[ayah.page].push({
                 ...ayah,
+                text: cleanVerseText(ayah.text),
                 surahName: surah.name,
                 surahNumber: surah.number,
                 englishName: surah.englishName,

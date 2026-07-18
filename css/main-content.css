@@ -3,33 +3,50 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
-/* Quran Page */
+/* ========== QURAN PAGE — Mushaf Layout ========== */
 .quran-page {
     flex: 1;
-    padding: 1rem;
+    width: 100%;
+    max-width: var(--quran-max-width);
+    padding: var(--quran-page-padding);
     background-color: white;
-    margin: 0.8rem;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    margin: 0.6rem auto;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
     border-radius: 4px;
     border: 1px solid #e0e0e0;
-    font-size: 1.5rem;
-    line-height: 2.5;
+
+    /* Mushaf typography */
+    font-family: var(--quran-font);
+    font-size: var(--quran-font-size);
+    line-height: var(--quran-line-height);
+
+    /* Center text — Mushaf style */
+    text-align: center;
+    direction: rtl;
+    unicode-bidi: embed;
+
+    /* Text rendering — no overrides; let HarfBuzz handle Arabic shaping defaults */
+
+    /* Vertical rhythm */
+    overflow-y: auto;
+    scroll-behavior: smooth;
 }
 
-/* Verse Container */
+/* ========== VERSE CONTAINER — Inline flow ========== */
 .verse-container {
     display: inline;
-    align-items: center;
-    margin: 0 0.1rem 0.3rem 0;
     position: relative;
     cursor: default;
+    word-break: keep-all;
+    overflow-wrap: normal;
 }
 
+/* ========== VERSE TEXT ========== */
 .verse-text {
     transition: all 0.3s ease;
-    padding: 2px 4px;
     border-radius: 3px;
 }
 
@@ -37,60 +54,73 @@
 .verse-text:hover {
     background-color: rgba(46, 139, 87, 0.1);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
 }
 
-/* Verse Number Styling */
+/* ========== VERSE NUMBER — Decorative Mushaf Marker ========== */
 .verse-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: var(--verse-marker-size);
+    height: var(--verse-marker-size);
+    min-width: 32px;
+    min-height: 32px;
+    padding: 2px 5px;
+    margin: 0 2px;
+    vertical-align: middle;
+
+    /* Mushaf verse ornament styling */
+    background: var(--verse-marker-bg);
+    color: white;
+    border: var(--verse-marker-border);
     border-radius: 50%;
-    background-color: #e0f7fa;
-    color: #006064;
+    font-size: 0.55em;
     font-weight: bold;
-    font-size: 0.8em;
-    text-align: center;
     line-height: 1;
-    padding: 2px;
-}
-
-/* Verse Spacing */
-.verse {
-    margin-bottom: 10px;
-    padding-bottom: 5px;
-    line-height: 1.8;
-}
-
-.verse:hover {
-    transform: translateX(3px);
-    transition: transform 0.3s ease;
-}
-
-/* Surah Info - Light Mode */
-.surah-info {
-    background-color: #E8F5E9;
-    border-radius: 8px;
-    margin: .5rem 0;
-    border-right: 4px solid #2E8B57;
     text-align: center;
-    font-size: 1.4rem;
+
+    /* Decorative shadow */
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.3);
+
+    /* Prevent line break */
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Inner number text */
+.verse-number::after {
+    content: none;
+}
+
+/* ========== SURAH INFO HEADER — Mushaf Style ========== */
+.surah-info {
+    background: var(--surah-bg);
+    border: var(--surah-border);
+    border-radius: 12px;
+    margin: 1rem auto;
+    padding: 1.2rem 2rem;
+    text-align: center;
     color: #1B5E20;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow:
+        0 2px 8px rgba(46, 139, 87, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    max-width: 500px;
+    width: fit-content;
 }
 
 .surah-info h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.8rem;
+    margin: 0 0 0.4rem 0;
+    font-size: 1.6rem;
     font-weight: 700;
-    color: #2E8B57;
+    color: var(--primary-green);
     position: relative;
     display: inline-block;
+    font-family: var(--quran-font);
 }
 
 .surah-info h2::after {
@@ -99,26 +129,27 @@
     bottom: -5px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
+    width: 60px;
     height: 2px;
-    background: linear-gradient(to right, #D4AF37, #2E8B57, #D4AF37);
+    background: linear-gradient(to right, transparent, var(--gold-accent), var(--primary-green), var(--gold-accent), transparent);
 }
 
 .surah-info p {
     margin: 0.5rem 0 0 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #388E3C;
     font-style: italic;
+    font-family: 'Amiri', serif;
 }
 
-/* Decorative corner elements */
+/* Decorative corners */
 .surah-info::before,
 .surah-info::after {
     content: "";
     position: absolute;
     width: 30px;
     height: 30px;
-    background-color: rgba(46, 139, 87, 0.1);
+    background-color: rgba(46, 139, 87, 0.08);
     border-radius: 50%;
 }
 
@@ -132,55 +163,54 @@
     right: -15px;
 }
 
-/* Bismillah Container - Light Mode */
+/* ========== BISMILLAH — Centered Mushaf Style ========== */
 .bismillah-container {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0.5rem 0 1rem 0;
 }
 
 .bismillah-text {
-    font-family: 'Amiri', serif;
-    font-size: 2rem;
-    color: #2E8B57;
+    font-family: var(--quran-font);
+    font-size: 1.5rem;
+    color: var(--primary-green);
     text-align: center;
-    padding: 1rem 2rem;
+    padding: 0.8rem 2rem;
     position: relative;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    background: linear-gradient(to right, #F5F5F0, #E8F5E9, #F5F5F0);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(to right, rgba(245, 245, 240, 0), rgba(232, 245, 233, 0.6), rgba(245, 245, 240, 0));
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: 1px solid rgba(46, 139, 87, 0.3);
-    transition: all 0.3s ease;
+    border: 1px solid rgba(46, 139, 87, 0.15);
 }
 
 .bismillah-decoration {
     flex: 1;
-    height: 2px;
-    background: linear-gradient(90deg, #D4AF37, #2E8B57, #D4AF37);
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), var(--primary-green), var(--gold-accent), transparent);
     position: relative;
-    opacity: 0.8;
+    opacity: 0.6;
+    max-width: 80px;
 }
 
 .bismillah-decoration.left {
-    margin-right: 1rem;
+    margin-right: 0.8rem;
 }
 
 .bismillah-decoration.right {
-    margin-left: 1rem;
+    margin-left: 0.8rem;
 }
 
 .bismillah-decoration::before,
 .bismillah-decoration::after {
     content: "";
     position: absolute;
-    width: 12px;
-    height: 12px;
-    background-color: #D4AF37;
+    width: 8px;
+    height: 8px;
+    background-color: var(--gold-accent);
     border-radius: 50%;
     top: 50%;
     transform: translateY(-50%);
-    transition: all 0.3s ease;
 }
 
 .bismillah-decoration.left::before {
@@ -188,8 +218,8 @@
 }
 
 .bismillah-decoration.left::after {
-    left: 20px;
-    background-color: #2E8B57;
+    left: 15px;
+    background-color: var(--primary-green);
 }
 
 .bismillah-decoration.right::before {
@@ -197,6 +227,11 @@
 }
 
 .bismillah-decoration.right::after {
-    right: 20px;
-    background-color: #2E8B57;
+    right: 15px;
+    background-color: var(--primary-green);
+}
+
+/* ========== VERSE SPACING & FLOW ========== */
+.verse-container + .verse-container {
+    margin-right: 0.5em;
 }

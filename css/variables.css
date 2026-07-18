@@ -4,4 +4,22 @@
     --light-green: #E8F5E9;
     --gold-accent: #D4AF37;
     --cream-bg: #F5F5F0;
+
+    /* Quran Mushaf Typography — Amiri has full GPOS mark-to-base for all Quranic annotation signs */
+    --quran-font: 'Amiri', serif;
+    --quran-font-size: 1.65rem;
+    --quran-line-height: 2.8;
+
+    /* Layout */
+    --quran-max-width: 820px;
+    --quran-page-padding: 2.5rem;
+
+    /* Verse Marker */
+    --verse-marker-size: 1.1em;
+    --verse-marker-bg: linear-gradient(135deg, #D4AF37 0%, #C5962C 50%, #D4AF37 100%);
+    --verse-marker-border: 1.5px solid #B8860B;
+
+    /* Surah Header */
+    --surah-bg: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #E8F5E9 100%);
+    --surah-border: 3px solid var(--primary-green);
 }

@@ -95,6 +95,11 @@ function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function cleanVerseText(text) {
+    if (!text) return '';
+    return text.replace(/\u0627\u065F/g, '\u0627');
+}
+
 function findPageForVerse(surahNumber, ayahNumber) {
     for (let page in pagesData) {
         if (pagesData[page].some(v => v.surahNumber == surahNumber && v.numberInSurah == ayahNumber)) {

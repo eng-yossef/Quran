@@ -3,20 +3,22 @@
     position: relative;
     transition: all 0.3s ease;
     z-index: 1;
+    border-radius: 4px;
 }
 
 /* Light Mode */
 .current-playing-verse {
-    background-color: rgba(46, 139, 87, 0.08) !important;
-    border-left: 3px solid #2E8B57;
-    padding-left: 8px;
+    background-color: rgba(46, 139, 87, 0.12) !important;
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.25);
+    padding: 2px 6px;
+    border-radius: 6px;
 }
 
 .current-playing-verse .verse-number {
     background-color: #2E8B57 !important;
     color: white !important;
-    transform: scale(1.1);
-    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.3);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.35);
     transition: all 0.3s ease;
 }
 

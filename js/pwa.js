@@ -17,6 +17,13 @@ async function registerServiceWorker() {
         swRegistration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
         console.log('[PWA] Service worker registered:', swRegistration.scope);
 
+        if (swRegistration.installing) {
+            console.log('[PWA] SW installing...');
+            swRegistration.installing.addEventListener('statechange', (e) => {
+                console.log('[PWA] SW state:', e.target.state);
+            });
+        }
+
         // Detect updates
         swRegistration.addEventListener('updatefound', () => {
             const newWorker = swRegistration.installing;

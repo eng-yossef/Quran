@@ -2,6 +2,7 @@
     "name": "المصحف الشريف - Digital Quran",
     "short_name": "المصحف",
     "description": "A premium digital Quran reader with audio, search, bookmarks, and offline support. Read and listen to the Holy Quran anywhere.",
+    "id": "/",
     "start_url": "./index.html",
     "scope": "./",
     "display": "standalone",
@@ -31,7 +32,8 @@
         {
             "src": "icons/icon-144x144.png",
             "sizes": "144x144",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/icon-152x152.png",
@@ -41,7 +43,8 @@
         {
             "src": "icons/icon-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "icons/icon-384x384.png",

@@ -10,7 +10,7 @@
  *   - Images: Cache First
  */
 
-const SW_VERSION = '1.0.0';
+const SW_VERSION = '1.1.0';
 const CACHE_PREFIX = 'quran-pwa';
 
 // ─── Cache Names ───────────────────────────────────────────────
@@ -25,7 +25,6 @@ const CACHES = {
 
 // ─── Assets to pre-cache on install ────────────────────────────
 const PRECACHE_ASSETS = [
-    './',
     './index.html',
     './manifest.json',
     './favicon-16x16.png',
@@ -76,9 +75,21 @@ const PRECACHE_ASSETS = [
 self.addEventListener('install', (event) => {
     console.log(`[SW] Installing v${SW_VERSION}`);
     event.waitUntil(
-        caches.open(CACHES.static)
-            .then((cache) => cache.addAll(PRECACHE_ASSETS))
-            .then(() => self.skipWaiting())
+        caches.open(CACHES.static).then(async (cache) => {
+            let successCount = 0;
+            let failCount = 0;
+            for (const url of PRECACHE_ASSETS) {
+                try {
+                    await cache.add(url);
+                    successCount++;
+                } catch (err) {
+                    console.warn(`[SW] Failed to cache: ${url}`, err);
+                    failCount++;
+                }
+            }
+            console.log(`[SW] Pre-cache done: ${successCount} ok, ${failCount} failed`);
+            return self.skipWaiting();
+        })
     );
 });
 

@@ -84,6 +84,9 @@ function setupVerseInteractions() {
         let touchEndY = 0;
         let touchMoved = false;
         let isPotentialScroll = false;
+        let longPressTimer = null;
+        let longPressFired = false;
+        const LONG_PRESS_DELAY = 400;
 
         const highlightVerse = () => {
             document.querySelectorAll('.verse-container').forEach(v => {
@@ -103,7 +106,35 @@ function setupVerseInteractions() {
             verseContainer.addEventListener('mouseleave', handleMouseLeave);
         }
 
+        function activateVerse(x, y) {
+            const isAlreadyActive = verseContainer.classList.contains('active-verse');
+
+            document.querySelectorAll('.verse-container').forEach(v => {
+                v.classList.remove('active-verse');
+            });
+
+            if (isAlreadyActive) {
+                verseContainer.classList.remove('active-verse');
+            } else {
+                _showToolbar(verseContainer);
+                _positionToolbarNearCursor(verseContainer, x, y);
+
+                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+                if (isCurrentVersePlaying && !audioPaused) {
+                    toggleAudioPlayback();
+                } else {
+                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
+                }
+                clearSelection();
+            }
+        }
+
         function handleTouchStart(e) {
+            if (e.target.closest('.verse-actions')) {
+                return;
+            }
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             touchEndX = touchStartX;
@@ -111,6 +142,15 @@ function setupVerseInteractions() {
             touchStartTime = Date.now();
             touchMoved = false;
             isPotentialScroll = false;
+            longPressFired = false;
+
+            clearTimeout(longPressTimer);
+            longPressTimer = setTimeout(() => {
+                if (!touchMoved) {
+                    longPressFired = true;
+                    activateVerse(touchStartX, touchStartY);
+                }
+            }, LONG_PRESS_DELAY);
         }
 
         function handleTouchMove(e) {
@@ -123,8 +163,9 @@ function setupVerseInteractions() {
             const xDiff = Math.abs(currentX - touchStartX);
             const yDiff = Math.abs(currentY - touchStartY);
 
-            if (xDiff > 5 || yDiff > 5) {
+            if (xDiff > 8 || yDiff > 8) {
                 touchMoved = true;
+                clearTimeout(longPressTimer);
 
                 if (yDiff > xDiff) {
                     isPotentialScroll = true;
@@ -133,8 +174,17 @@ function setupVerseInteractions() {
         }
 
         function handleTouchEnd(e) {
+            clearTimeout(longPressTimer);
+
+            if (longPressFired) {
+                longPressFired = false;
+                touchMoved = false;
+                isPotentialScroll = false;
+                return;
+            }
+
             const touchDuration = Date.now() - touchStartTime;
-            const isTap = !touchMoved && touchDuration < 300;
+            const isTap = !touchMoved && touchDuration < 500;
 
             const deltaX = Math.abs(touchEndX - touchStartX);
             const deltaY = Math.abs(touchEndY - touchStartY);
@@ -148,29 +198,7 @@ function setupVerseInteractions() {
                 }
 
                 e.preventDefault();
-
-                const isAlreadyActive = verseContainer.classList.contains('active-verse');
-
-                document.querySelectorAll('.verse-container').forEach(v => {
-                    v.classList.remove('active-verse');
-                });
-
-                if (isAlreadyActive) {
-                    verseContainer.classList.remove('active-verse');
-                } else {
-                    _showToolbar(verseContainer);
-                    _positionToolbarNearCursor(verseContainer, touchEndX, touchEndY);
-
-                    const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
-                        currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
-
-                    if (isCurrentVersePlaying && !audioPaused) {
-                        toggleAudioPlayback();
-                    } else {
-                        playEntireSurah(surahNumber, { verseNumber: verseNumber });
-                    }
-                    clearSelection();
-                }
+                activateVerse(touchEndX, touchEndY);
             }
 
             touchMoved = false;
@@ -178,8 +206,10 @@ function setupVerseInteractions() {
         }
 
         function handleTouchCancel() {
+            clearTimeout(longPressTimer);
             touchMoved = false;
             isPotentialScroll = false;
+            longPressFired = false;
         }
 
         function handleDesktopClick(e) {
@@ -218,7 +248,8 @@ function setupVerseInteractions() {
         }
     }
 
-    if (isTouchDevice) {
+    if (isTouchDevice && !window._verseDismissListenerAdded) {
+        window._verseDismissListenerAdded = true;
         document.addEventListener('touchend', function (e) {
             if (!e.target.closest('.verse-container')) {
                 document.querySelectorAll('.verse-container').forEach(v => {

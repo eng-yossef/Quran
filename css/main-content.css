@@ -507,7 +507,7 @@
     align-items: center;
     gap: 2px;
     position: fixed;
-    z-index: 100;
+    z-index: 9999;
     background: rgba(253, 248, 238, 0.95);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);

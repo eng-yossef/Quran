@@ -23,19 +23,35 @@ function _positionToolbarNearCursor(verseContainer, x, y) {
     const actionsDiv = verseContainer.querySelector('.verse-actions');
     if (!actionsDiv) return;
 
+    const isMobile = window.innerWidth <= 768;
     const gap = 10;
     const toolbarW = actionsDiv.offsetWidth || 200;
     const toolbarH = actionsDiv.offsetHeight || 40;
 
-    let top = y - toolbarH - gap;
-    let left = x;
+    let top, left;
 
-    if (top < 0) {
+    if (isMobile) {
+        const verseRect = verseContainer.getBoundingClientRect();
+        left = verseRect.left + verseRect.width / 2;
         top = y + gap;
-    }
 
-    left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
-    top = Math.max(4, Math.min(window.innerHeight - toolbarH - 4, top));
+        if (top + toolbarH > window.innerHeight - 8) {
+            top = y - toolbarH - gap;
+        }
+
+        left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
+        top = Math.max(4, Math.min(window.innerHeight - toolbarH - 4, top));
+    } else {
+        top = y - toolbarH - gap;
+        left = x;
+
+        if (top < 0) {
+            top = y + gap;
+        }
+
+        left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
+        top = Math.max(4, Math.min(window.innerHeight - toolbarH - 4, top));
+    }
 
     actionsDiv.style.top = top + 'px';
     actionsDiv.style.left = left + 'px';
@@ -113,7 +129,11 @@ function setupVerseInteractions() {
             if (isCurrentVersePlaying && !audioPaused) {
                 toggleAudioPlayback();
             } else {
-                highlightVerse();
+                document.querySelectorAll('.verse-container').forEach(v => {
+                    v.classList.remove('active-verse');
+                });
+                verseContainer.style.opacity = '0.7';
+                setTimeout(() => { verseContainer.style.opacity = ''; }, 300);
                 playEntireSurah(surahNumber, { verseNumber: verseNumber });
             }
             clearSelection();
@@ -188,7 +208,7 @@ function setupVerseInteractions() {
             }
 
             const touchDuration = Date.now() - touchStartTime;
-            const isTap = !touchMoved && touchDuration < 500;
+            const isTap = !touchMoved && touchDuration < 250;
 
             const deltaX = Math.abs(touchEndX - touchStartX);
             const deltaY = Math.abs(touchEndY - touchStartY);

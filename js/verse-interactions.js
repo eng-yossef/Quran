@@ -1,3 +1,47 @@
+let _toolbarHideTimer = null;
+const TOOLBAR_HIDE_DELAY = 300;
+
+function _showToolbar(verseContainer) {
+    clearTimeout(_toolbarHideTimer);
+    document.querySelectorAll('.verse-container').forEach(v => {
+        if (v !== verseContainer) v.classList.remove('active-verse');
+    });
+    verseContainer.classList.add('active-verse');
+}
+
+function _hideToolbar(verseContainer) {
+    _toolbarHideTimer = setTimeout(() => {
+        verseContainer.classList.remove('active-verse');
+    }, TOOLBAR_HIDE_DELAY);
+}
+
+function _cancelHide() {
+    clearTimeout(_toolbarHideTimer);
+}
+
+function _positionToolbarNearCursor(verseContainer, x, y) {
+    const actionsDiv = verseContainer.querySelector('.verse-actions');
+    if (!actionsDiv) return;
+
+    const gap = 10;
+    const toolbarW = actionsDiv.offsetWidth || 200;
+    const toolbarH = actionsDiv.offsetHeight || 40;
+
+    let top = y - toolbarH - gap;
+    let left = x;
+
+    if (top < 0) {
+        top = y + gap;
+    }
+
+    left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
+    top = Math.max(4, Math.min(window.innerHeight - toolbarH - 4, top));
+
+    actionsDiv.style.top = top + 'px';
+    actionsDiv.style.left = left + 'px';
+    actionsDiv.style.transform = 'translateX(-50%)';
+}
+
 function setupVerseInteractions() {
     const isTouchDevice = ('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
@@ -23,29 +67,14 @@ function setupVerseInteractions() {
                 <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة" aria-label="تصدير الآية كصورة">🖼</button>
             `;
             verseContainer.appendChild(actionsDiv);
-        }
 
-        function positionToolbar() {
-            const actionsDiv = verseContainer.querySelector('.verse-actions');
-            if (!actionsDiv) return;
+            actionsDiv.addEventListener('mouseenter', () => {
+                _cancelHide();
+            });
 
-            const verseRect = verseContainer.getBoundingClientRect();
-            const gap = 8;
-            const toolbarW = actionsDiv.offsetWidth || 200;
-            const toolbarH = actionsDiv.offsetHeight || 40;
-
-            let top = verseRect.top - toolbarH - gap;
-            let left = verseRect.left + verseRect.width / 2;
-
-            if (top < 0) {
-                top = verseRect.bottom + gap;
-            }
-
-            left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
-
-            actionsDiv.style.top = top + 'px';
-            actionsDiv.style.left = left + 'px';
-            actionsDiv.style.transform = 'translateX(-50%)';
+            actionsDiv.addEventListener('mouseleave', () => {
+                _hideToolbar(verseContainer);
+            });
         }
 
         let tafsirTimer = null;
@@ -147,8 +176,8 @@ function setupVerseInteractions() {
                 if (isAlreadyActive) {
                     verseContainer.classList.remove('active-verse');
                 } else {
-                    verseContainer.classList.add('active-verse');
-                    positionToolbar();
+                    _showToolbar(verseContainer);
+                    _positionToolbarNearCursor(verseContainer, touchEndX, touchEndY);
 
                     const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                         currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
@@ -184,19 +213,22 @@ function setupVerseInteractions() {
                     toggleAudioPlayback();
                 } else {
                     highlightVerse();
-                    positionToolbar();
+                    _positionToolbarNearCursor(verseContainer, e.clientX, e.clientY);
                     playEntireSurah(surahNumber, { verseNumber: verseNumber });
                     clearSelection();
                 }
             }
         }
 
-        async function handleMouseEnter() {
-            positionToolbar();
+        function handleMouseEnter(e) {
+            if (!verseContainer.classList.contains('active-verse')) {
+                _showToolbar(verseContainer);
+                _positionToolbarNearCursor(verseContainer, e.clientX, e.clientY);
+            }
         }
 
         function handleMouseLeave() {
-            // No hover-to-hide tafsir — modal handles its own close
+            _hideToolbar(verseContainer);
         }
     });
 

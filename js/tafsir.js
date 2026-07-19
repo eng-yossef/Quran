@@ -16,7 +16,7 @@ async function showTafsir(verseElement, surahNumber, verseNumber) {
     modal.className = 'tafsir-modal';
     modal.innerHTML = `
         <div class="tafsir-modal-header">
-            <span class="tafsir-modal-title">تفسير المياسر (${surahNumber}:${verseNumber})</span>
+            <span class="tafsir-modal-title">تفسير الميسر (${surahNumber}:${verseNumber})</span>
             <button class="close-tafsir-btn" aria-label="إغلاق التفسير">×</button>
         </div>
         <div class="tafsir-modal-body">
@@ -89,17 +89,8 @@ function setupTafsirCloseHandlers() {
 }
 
 function setupTafsirClickHandlers() {
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.tafsir-modal')) {
-            e.stopImmediatePropagation();
-        }
-    }, true);
-
-    document.addEventListener('touchend', function (e) {
-        if (e.target.closest('.tafsir-modal')) {
-            e.stopImmediatePropagation();
-        }
-    }, true);
+    // Close button and overlay click handlers are set up in showTafsir().
+    // No global capturing listeners needed here.
 }
 
 function setupTafsirHideOnScroll() {

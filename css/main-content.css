@@ -498,9 +498,9 @@
    VERSE ACTIONS — Floating Contextual Toolbar
    
    Actions are hidden by default, appearing on hover (desktop)
-   or tap/long-press (mobile). They float above the verse text
-   without disrupting the reading flow.
+   or tap (mobile). They appear at the cursor/touch position.
    Uses position: fixed so the scroll container never clips them.
+   Visibility is managed by JS via .active-verse class only.
    ================================================================ */
 .verse-actions {
     display: flex;
@@ -521,14 +521,15 @@
     white-space: nowrap;
     visibility: hidden;
     opacity: 0;
-    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    transform: translateY(4px) scale(0.95);
+    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
     pointer-events: none;
 }
 
-.verse-container:hover .verse-actions,
 .verse-container.active-verse .verse-actions {
     visibility: visible;
     opacity: 1;
+    transform: translateY(0) scale(1);
     pointer-events: auto;
 }
 

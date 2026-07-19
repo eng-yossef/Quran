@@ -30,7 +30,7 @@ const QV_FORMATS = {
 };
 
 const QV_EXPORT_OPTIONS = {
-    showVerseNumber: true,
+    showVerseNumber: false,
     showBismillah: false,
     showTranslation: false,
     showBranding: true,
@@ -318,84 +318,6 @@ function qvDrawWrappedVerse(ctx, text, cx, startY, font, color, maxWidth, lineHe
     return lines.length;
 }
 
-/**
- * Draw the verse number inside an ornamental circle.
- */
-function qvDrawVerseNumber(ctx, num, cx, cy, radius, template) {
-    const arabic = qvArabicNum(num);
-    const fontSize = radius * 0.72;
-
-    let bgGrad;
-    if (template === 'modern') {
-        ctx.fillStyle = '#111827';
-    } else if (template === 'emerald') {
-        bgGrad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-        bgGrad.addColorStop(0, '#d4af37');
-        bgGrad.addColorStop(0.4, '#b8960e');
-        bgGrad.addColorStop(0.6, '#d4af37');
-        bgGrad.addColorStop(1, '#e8c84a');
-        ctx.fillStyle = bgGrad;
-    } else if (template === 'dark') {
-        bgGrad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-        bgGrad.addColorStop(0, '#d4af37');
-        bgGrad.addColorStop(0.4, '#b8960e');
-        bgGrad.addColorStop(0.6, '#d4af37');
-        bgGrad.addColorStop(1, '#e8c84a');
-        ctx.fillStyle = bgGrad;
-    } else if (template === 'night') {
-        bgGrad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-        bgGrad.addColorStop(0, '#ffd54f');
-        bgGrad.addColorStop(0.4, '#ffb300');
-        bgGrad.addColorStop(0.6, '#ffd54f');
-        bgGrad.addColorStop(1, '#ffe082');
-        ctx.fillStyle = bgGrad;
-    } else if (template === 'glass') {
-        ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    } else {
-        bgGrad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-        bgGrad.addColorStop(0, '#D4AF37');
-        bgGrad.addColorStop(0.4, '#B8960E');
-        bgGrad.addColorStop(0.6, '#D4AF37');
-        bgGrad.addColorStop(1, '#E8C84A');
-        ctx.fillStyle = bgGrad;
-    }
-
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    if (template === 'emerald' || template === 'dark' || template === 'classic') {
-        ctx.strokeStyle = (template === 'emerald' || template === 'dark') ? '#b8960e' : '#B8860B';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
-    if (template === 'glass') {
-        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
-    if (template === 'night') {
-        ctx.strokeStyle = '#ffb300';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
-
-    let textColor;
-    switch (template) {
-        case 'modern':   textColor = '#ffffff'; break;
-        case 'emerald':  textColor = '#065f46'; break;
-        case 'dark':     textColor = '#1a1a1a'; break;
-        case 'night':    textColor = '#1a237e'; break;
-        case 'glass':    textColor = '#ffffff'; break;
-        default:         textColor = '#ffffff'; break;
-    }
-    ctx.font = `bold ${fontSize}px ${QV_FONT_FAMILY}`;
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(arabic, cx, cy);
-}
-
 // ===========================
 // Template Color Palettes
 // ===========================
@@ -546,32 +468,15 @@ async function qvRenderCanvas(w, h, data, opts) {
     const surahFontSize = Math.round(w * 0.036);
     const metaFontSize  = Math.round(w * 0.022);
     const verseFontSize = Math.round(w * opts.fontSize * 0.039);
-    const bismFontSize  = Math.round(w * 0.024);
     const brandFontSize = Math.round(w * 0.020);
-    const transFontSize = Math.round(verseFontSize * 0.38);
 
     const verseLineHeight = verseFontSize * 2.1;
     const verseFont = `${verseFontSize}px ${QV_FONT_FAMILY}`;
     const verseLines = qvWrapText(ctx, data.verseText, textMaxW * 0.92);
     const verseBlockH = verseLines.length * verseLineHeight;
 
-    const numRadius = Math.round(verseFontSize * 0.55);
-
-    const bismillahH = opts.showBismillah && data.surahNum !== 1 && data.surahNum !== 9
-        ? bismFontSize * 2.2 : 0;
-
-    const verseNumH = opts.showVerseNumber ? numRadius * 2.8 : 0;
-
-    let transLines = [];
-    let transBlockH = 0;
-    if (opts.showTranslation && opts.translationText) {
-        ctx.font = `italic ${transFontSize}px Georgia, 'Times New Roman', serif`;
-        transLines = qvWrapText(ctx, opts.translationText, textMaxW * 0.85);
-        transBlockH = transLines.length * transFontSize * 2.0 + transFontSize;
-    }
-
     const contentBlockH = surahFontSize * 1.5 + metaFontSize * 1.8 + surahFontSize * 0.6
-        + bismillahH + verseBlockH + verseNumH + transBlockH;
+        + verseBlockH;
     const brandBottom = h - padY;
     const contentStartMin = padY;
     const contentStartMax = brandBottom - contentBlockH;
@@ -586,43 +491,16 @@ async function qvRenderCanvas(w, h, data, opts) {
     qvDrawDivider(ctx, cx, cursorY, textMaxW * 0.22, palette.dividerColor);
     cursorY += surahFontSize * 0.6;
 
-    const metaText = data.englishName + '  \u00B7  ' + 'الآية ' + qvArabicNum(data.ayahNum);
+    const metaText = data.englishName;
     qvDrawText(ctx, metaText, cx, cursorY,
         `${metaFontSize}px ${QV_FONT_FAMILY}`, palette.metaColor, textMaxW);
     cursorY += metaFontSize * 1.8;
 
-    // --- 6. Bismillah ---
-    if (bismillahH > 0) {
-        qvDrawText(ctx, QV_BISMILLAH, cx, cursorY,
-            `${bismFontSize}px ${QV_FONT_FAMILY}`, palette.metaColor, textMaxW);
-        cursorY += bismillahH;
-    }
-
-    // --- 7. Verse Text (the critical rendering step) ---
+    // --- 6. Verse Text (the critical rendering step) ---
     const verseStartY = cursorY + verseLineHeight * 0.5;
     qvDrawWrappedVerse(ctx, data.verseText, cx, verseStartY,
         verseFont, palette.verseColor, textMaxW * 0.92, verseLineHeight);
     cursorY = verseStartY + verseBlockH;
-
-    // --- 8. Verse Number ---
-    if (opts.showVerseNumber) {
-        cursorY += numRadius * 1.2;
-        qvDrawVerseNumber(ctx, data.ayahNum, cx, cursorY, numRadius, t);
-        cursorY += numRadius * 1.6;
-    }
-
-    // --- 9. Translation ---
-    if (transLines.length > 0) {
-        cursorY += transFontSize * 0.5;
-        ctx.font = `italic ${transFontSize}px Georgia, 'Times New Roman', serif`;
-        ctx.fillStyle = palette.transColor;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        for (const line of transLines) {
-            ctx.fillText(line, cx, cursorY, textMaxW * 0.85);
-            cursorY += transFontSize * 2.0;
-        }
-    }
 
     // Safety: push content up if it would overlap branding
     if (opts.showBranding && cursorY + brandFontSize * 5 > h - padY) {
@@ -668,8 +546,20 @@ async function qvUpdatePreview() {
     if (!frame || !window._qvCurrentData) return;
 
     const opts = window._qvExportOpts;
-    const previewW = 580;
-    const previewH = Math.round(previewW * (opts.aspectH / opts.aspectW));
+    const wrapper = document.querySelector('.qv-export-preview-frame');
+    const availW = wrapper ? wrapper.clientWidth - 16 : 580;
+    const availH = wrapper ? wrapper.clientHeight - 16 : 800;
+    const ratio = opts.aspectH / opts.aspectW;
+    let previewW, previewH;
+    if (availH / availW > ratio) {
+        previewW = Math.min(availW, 800);
+        previewH = Math.round(previewW * ratio);
+    } else {
+        previewH = Math.min(availH, 1200);
+        previewW = Math.round(previewH / ratio);
+    }
+    previewW = Math.max(previewW, 200);
+    previewH = Math.max(previewH, 200);
 
     try {
         const canvas = await qvRenderCanvas(previewW, previewH, window._qvCurrentData, opts);
@@ -774,28 +664,12 @@ function qvBuildModal() {
                     <input type="range" class="qv-range-slider" id="qvFontSize" min="0.1" max="5" step="0.1" value="2.8">
                 </div>
                 <div class="qv-toggle-row">
-                    <span class="qv-toggle-label">رقم الآية</span>
-                    <label class="qv-toggle-switch"><input type="checkbox" id="qvShowVerseNum" checked><span class="qv-toggle-slider"></span></label>
-                </div>
-                <div class="qv-toggle-row">
-                    <span class="qv-toggle-label">بسم الله</span>
-                    <label class="qv-toggle-switch"><input type="checkbox" id="qvShowBismillah"><span class="qv-toggle-slider"></span></label>
-                </div>
-                <div class="qv-toggle-row">
-                    <span class="qv-toggle-label">الترجمة</span>
-                    <label class="qv-toggle-switch"><input type="checkbox" id="qvShowTranslation"><span class="qv-toggle-slider"></span></label>
-                </div>
-                <div class="qv-toggle-row">
                     <span class="qv-toggle-label">الحدود والزخارف</span>
                     <label class="qv-toggle-switch"><input type="checkbox" id="qvShowBorder" checked><span class="qv-toggle-slider"></span></label>
                 </div>
                 <div class="qv-toggle-row">
                     <span class="qv-toggle-label">العلامة المائية</span>
                     <label class="qv-toggle-switch"><input type="checkbox" id="qvShowWatermark" checked><span class="qv-toggle-slider"></span></label>
-                </div>
-                <div class="qv-select-row" id="qvTranslationRow" style="display:none;">
-                    <label class="qv-select-label">الترجمة</label>
-                    <input type="text" class="qv-select" id="qvTranslationInput" placeholder="أدخل الترجمة (اختياري)" dir="ltr" style="text-align:left;">
                 </div>
                 <div class="qv-select-row">
                     <label class="qv-select-label">صيغة الملف</label>
@@ -868,9 +742,6 @@ function qvBindModalEvents(overlay) {
     });
 
     const toggles = {
-        qvShowVerseNum: 'showVerseNumber',
-        qvShowBismillah: 'showBismillah',
-        qvShowTranslation: 'showTranslation',
         qvShowBorder: 'showBorder',
         qvShowWatermark: 'showWatermark'
     };
@@ -883,22 +754,17 @@ function qvBindModalEvents(overlay) {
         });
     });
 
-    const transRow = overlay.querySelector('#qvTranslationRow');
-    const transInput = overlay.querySelector('#qvTranslationInput');
-    const transToggle = overlay.querySelector('#qvShowTranslation');
-    transToggle.addEventListener('change', () => {
-        transRow.style.display = transToggle.checked ? 'block' : 'none';
-    });
-    transInput.addEventListener('input', () => {
-        window._qvExportOpts.translationText = transInput.value;
-        qvUpdatePreview();
-    });
-
     overlay.querySelector('#qvExportFormat').addEventListener('change', e => {
         window._qvExportOpts.exportFormat = e.target.value;
     });
 
     overlay.querySelector('#qvDownloadBtn').addEventListener('click', qvExportImage);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => qvUpdatePreview(), 200);
+    });
 
     document.addEventListener('keydown', qvEscHandler);
 }

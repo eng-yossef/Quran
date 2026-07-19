@@ -77,7 +77,6 @@ function setupVerseInteractions() {
             });
         }
 
-        let tafsirTimer = null;
         let touchStartTime = 0;
         let touchStartX = 0;
         let touchStartY = 0;
@@ -112,13 +111,6 @@ function setupVerseInteractions() {
             touchStartTime = Date.now();
             touchMoved = false;
             isPotentialScroll = false;
-
-            tafsirTimer = setTimeout(() => {
-                if (!touchMoved && !isPotentialScroll) {
-                    clearSelection();
-                    showTafsir(verseContainer, surahNumber, verseNumber);
-                }
-            }, 500);
         }
 
         function handleTouchMove(e) {
@@ -137,11 +129,6 @@ function setupVerseInteractions() {
                 if (yDiff > xDiff) {
                     isPotentialScroll = true;
                 }
-
-                if (tafsirTimer) {
-                    clearTimeout(tafsirTimer);
-                    tafsirTimer = null;
-                }
             }
         }
 
@@ -152,11 +139,6 @@ function setupVerseInteractions() {
             const deltaX = Math.abs(touchEndX - touchStartX);
             const deltaY = Math.abs(touchEndY - touchStartY);
             const isHorizontalSwipe = deltaX > deltaY && deltaX > 30;
-
-            if (tafsirTimer) {
-                clearTimeout(tafsirTimer);
-                tafsirTimer = null;
-            }
 
             if (isTap && !isHorizontalSwipe) {
                 const target = e.target;
@@ -196,10 +178,6 @@ function setupVerseInteractions() {
         }
 
         function handleTouchCancel() {
-            if (tafsirTimer) {
-                clearTimeout(tafsirTimer);
-                tafsirTimer = null;
-            }
             touchMoved = false;
             isPotentialScroll = false;
         }

@@ -106,7 +106,20 @@ function setupVerseInteractions() {
             verseContainer.addEventListener('mouseleave', handleMouseLeave);
         }
 
-        function activateVerse(x, y) {
+        function playVerse() {
+            const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
+                currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
+
+            if (isCurrentVersePlaying && !audioPaused) {
+                toggleAudioPlayback();
+            } else {
+                highlightVerse();
+                playEntireSurah(surahNumber, { verseNumber: verseNumber });
+            }
+            clearSelection();
+        }
+
+        function showControls(x, y) {
             const isAlreadyActive = verseContainer.classList.contains('active-verse');
 
             document.querySelectorAll('.verse-container').forEach(v => {
@@ -118,15 +131,6 @@ function setupVerseInteractions() {
             } else {
                 _showToolbar(verseContainer);
                 _positionToolbarNearCursor(verseContainer, x, y);
-
-                const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
-                    currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
-
-                if (isCurrentVersePlaying && !audioPaused) {
-                    toggleAudioPlayback();
-                } else {
-                    playEntireSurah(surahNumber, { verseNumber: verseNumber });
-                }
                 clearSelection();
             }
         }
@@ -148,7 +152,7 @@ function setupVerseInteractions() {
             longPressTimer = setTimeout(() => {
                 if (!touchMoved) {
                     longPressFired = true;
-                    activateVerse(touchStartX, touchStartY);
+                    showControls(touchStartX, touchStartY);
                 }
             }, LONG_PRESS_DELAY);
         }
@@ -198,7 +202,7 @@ function setupVerseInteractions() {
                 }
 
                 e.preventDefault();
-                activateVerse(touchEndX, touchEndY);
+                playVerse();
             }
 
             touchMoved = false;

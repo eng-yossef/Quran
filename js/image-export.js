@@ -570,11 +570,12 @@ async function qvRenderCanvas(w, h, data, opts) {
         transBlockH = transLines.length * transFontSize * 2.0 + transFontSize;
     }
 
-    const brandH = opts.showBranding ? brandFontSize * 5 : 0;
-
-    const fixedH = surahFontSize * 1.5 + metaFontSize * 1.8 + surahFontSize * 0.6
-        + bismillahH + verseBlockH + verseNumH + transBlockH + brandH;
-    const availTop = padY + (h - padY * 2 - fixedH) * 0.35;
+    const contentBlockH = surahFontSize * 1.5 + metaFontSize * 1.8 + surahFontSize * 0.6
+        + bismillahH + verseBlockH + verseNumH + transBlockH;
+    const brandBottom = h - padY;
+    const contentStartMin = padY;
+    const contentStartMax = brandBottom - contentBlockH;
+    const availTop = contentStartMin + (contentStartMax - contentStartMin) * 0.5;
 
     // --- 5. Surah Header ---
     let cursorY = availTop;
@@ -623,6 +624,12 @@ async function qvRenderCanvas(w, h, data, opts) {
         }
     }
 
+    // Safety: push content up if it would overlap branding
+    if (opts.showBranding && cursorY + brandFontSize * 5 > h - padY) {
+        const overflow = cursorY + brandFontSize * 5 - (h - padY);
+        cursorY -= overflow;
+    }
+
     // --- 10. Branding ---
     if (opts.showBranding) {
         const brandY = h - padY - brandFontSize * 2;
@@ -666,21 +673,12 @@ async function qvUpdatePreview() {
 
     try {
         const canvas = await qvRenderCanvas(previewW, previewH, window._qvCurrentData, opts);
-        canvas.style.maxWidth = '100%';
-        canvas.style.height = 'auto';
         canvas.style.borderRadius = '4px';
+        canvas.style.maxWidth = '100%';
+        canvas.style.maxHeight = '100%';
+        canvas.style.height = 'auto';
         frame.innerHTML = '';
         frame.appendChild(canvas);
-
-        requestAnimationFrame(() => {
-            const previewFrame = document.querySelector('.qv-export-preview-frame');
-            if (!previewFrame) return;
-            const maxW = previewFrame.clientWidth - 16;
-            const maxH = previewFrame.clientHeight - 16;
-            const scale = Math.min(maxW / previewW, maxH / previewH, 1);
-            frame.style.transform = `scale(${scale})`;
-            frame.style.transformOrigin = 'top center';
-        });
     } catch (e) {
         console.error('Preview render error:', e);
     }
@@ -773,7 +771,7 @@ function qvBuildModal() {
                         <span class="qv-range-label">حجم الخط</span>
                         <span class="qv-range-value" id="qvFontSizeVal">2.8</span>
                     </div>
-                    <input type="range" class="qv-range-slider" id="qvFontSize" min="1.2" max="5" step="0.1" value="2.8">
+                    <input type="range" class="qv-range-slider" id="qvFontSize" min="0.1" max="5" step="0.1" value="2.8">
                 </div>
                 <div class="qv-toggle-row">
                     <span class="qv-toggle-label">رقم الآية</span>

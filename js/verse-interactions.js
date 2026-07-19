@@ -31,9 +31,12 @@ function _positionToolbarNearCursor(verseContainer, x, y) {
     let top, left;
 
     if (isMobile) {
-        const verseRect = verseContainer.getBoundingClientRect();
-        left = verseRect.left + verseRect.width / 2;
-        top = y + gap;
+        left = x;
+        top = y - toolbarH - gap;
+
+        if (top < 4) {
+            top = y + gap;
+        }
 
         if (top + toolbarH > window.innerHeight - 8) {
             top = y - toolbarH - gap;

@@ -39,7 +39,7 @@ const PRECACHE_ASSETS = [
     './css/components.css',
     './css/tafsir.css',
     './css/animations.css',
-    './css/image-export.css',
+    './css/export-modal.css',
     './css/night-mode.css',
     './css/responsive.css',
     './css/search.css',

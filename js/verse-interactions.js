@@ -204,6 +204,7 @@ function setupVerseInteractions() {
             clearTimeout(longPressTimer);
 
             if (longPressFired) {
+                e.preventDefault();
                 longPressFired = false;
                 touchMoved = false;
                 isPotentialScroll = false;

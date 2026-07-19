@@ -16,12 +16,36 @@ function setupVerseInteractions() {
             actionsDiv.setAttribute('role', 'toolbar');
             actionsDiv.setAttribute('aria-label', 'إجراءات الآية');
             actionsDiv.innerHTML = `
+                <button class="verse-action-btn verse-tafsir-btn" onclick="event.stopPropagation(); showTafsir(this.closest('.verse-container'), ${surahNumber}, ${verseNumber})" title="تفسير الآية" aria-label="تفسير الآية">📖</button>
                 <button class="verse-action-btn verse-bookmark-btn" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)" title="إضافة للمفضلة" aria-label="إضافة للمفضلة">☆</button>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ" aria-label="نسخ الآية">📋</button>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة" aria-label="مشاركة الآية">⤴</button>
                 <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة" aria-label="تصدير الآية كصورة">🖼</button>
             `;
             verseContainer.appendChild(actionsDiv);
+        }
+
+        function positionToolbar() {
+            const actionsDiv = verseContainer.querySelector('.verse-actions');
+            if (!actionsDiv) return;
+
+            const verseRect = verseContainer.getBoundingClientRect();
+            const gap = 8;
+            const toolbarW = actionsDiv.offsetWidth || 200;
+            const toolbarH = actionsDiv.offsetHeight || 40;
+
+            let top = verseRect.top - toolbarH - gap;
+            let left = verseRect.left + verseRect.width / 2;
+
+            if (top < 0) {
+                top = verseRect.bottom + gap;
+            }
+
+            left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
+
+            actionsDiv.style.top = top + 'px';
+            actionsDiv.style.left = left + 'px';
+            actionsDiv.style.transform = 'translateX(-50%)';
         }
 
         let tafsirTimer = null;
@@ -124,6 +148,7 @@ function setupVerseInteractions() {
                     verseContainer.classList.remove('active-verse');
                 } else {
                     verseContainer.classList.add('active-verse');
+                    positionToolbar();
 
                     const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                         currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
@@ -151,7 +176,7 @@ function setupVerseInteractions() {
         }
 
         function handleDesktopClick(e) {
-            if (!e.target.closest('.verse-tafsir') && !e.target.closest('.verse-actions')) {
+            if (!e.target.closest('.tafsir-modal') && !e.target.closest('.verse-actions')) {
                 const isCurrentVersePlaying = currentPlayingSurah === surahNumber &&
                     currentVerseSequence[currentVerseIndex]?.numberInSurah === verseNumber;
 
@@ -159,6 +184,7 @@ function setupVerseInteractions() {
                     toggleAudioPlayback();
                 } else {
                     highlightVerse();
+                    positionToolbar();
                     playEntireSurah(surahNumber, { verseNumber: verseNumber });
                     clearSelection();
                 }
@@ -166,18 +192,11 @@ function setupVerseInteractions() {
         }
 
         async function handleMouseEnter() {
-            tafsirTimer = setTimeout(async () => {
-                await showTafsir(verseContainer, surahNumber, verseNumber);
-                tafsirTimer = null;
-            }, 1500);
+            positionToolbar();
         }
 
         function handleMouseLeave() {
-            if (tafsirTimer) {
-                clearTimeout(tafsirTimer);
-                tafsirTimer = null;
-            }
-            hideTafsir(verseContainer);
+            // No hover-to-hide tafsir — modal handles its own close
         }
     });
 

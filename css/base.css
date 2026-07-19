@@ -1,22 +1,34 @@
 *, *::before, *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
-    font-family: 'Amiri', serif;
+    font-family: var(--quran-font);
     background-color: var(--cream-bg);
-    color: #333;
-    margin: 0;
-    padding: 0;
-    line-height: 1.8;
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
+    background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(197, 153, 42, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(27, 107, 58, 0.03) 0%, transparent 50%);
+    color: #2C2416;
+    line-height: 1.7;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
 }
 
 .app-container {
     display: flex;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* Prevent horizontal scroll on mobile */
@@ -29,5 +41,15 @@ img, video, select, input {
 @supports (-webkit-overflow-scrolling: touch) {
     .sidebar, .bookmarks-list, .search-results {
         -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

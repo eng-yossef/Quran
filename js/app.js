@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 let resizeTimer;
 window.addEventListener('resize', function () {
     matchSidebarHeight();
+    recalcLayout();
 });
 
 window._isAudioNavigation = false;
@@ -55,6 +56,9 @@ nightModeToggle.addEventListener('click', () => {
 
 async function initApp() {
     try {
+        // Set user font size for layout engine before first render
+        userFontSize = parseFloat(localStorage.getItem('quran-font-size') || '1.75');
+
         const surahs = await fetchQuranData();
         if (!surahs) {
             quranPageEl.innerHTML = '<p style="text-align:center; padding:2rem;">تعذر تحميل القرآن الكريم. يرجى المحاولة لاحقاً.</p>';
@@ -116,16 +120,10 @@ async function initApp() {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' && currentPage < totalPages) {
                 e.preventDefault();
-                currentPage++;
-                renderPage(currentPage);
-                saveCurrentPage(currentPage);
-                highlightSurahForCurrentPage();
+                navigateToPage(currentPage + 1);
             } else if (e.key === 'ArrowRight' && currentPage > 1) {
                 e.preventDefault();
-                currentPage--;
-                renderPage(currentPage);
-                saveCurrentPage(currentPage);
-                highlightSurahForCurrentPage();
+                navigateToPage(currentPage - 1);
             } else if (e.code === 'Space' || e.key === ' ') {
                 e.preventDefault();
                 toggleAudioPlayback();

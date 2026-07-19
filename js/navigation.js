@@ -43,14 +43,43 @@ function handleSwipe() {
 }
 
 function navigateToPage(newPage) {
-    const direction = newPage > currentPage ? 5 : -5;
-    currentPage = newPage;
-    renderPage(currentPage);
-    saveCurrentPage(currentPage);
-    highlightSurahForCurrentPage();
+    if (newPage === currentPage) return;
 
-    document.getElementById('quranPage').style.transform = `translateX(${direction}px)`;
+    const quranPage = document.getElementById('quranPage');
+    const direction = newPage > currentPage ? 1 : -1;
+
+    // Smooth transition: fade out, update, fade in
+    quranPage.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+    quranPage.style.opacity = '0.4';
+    quranPage.style.transform = `translateY(${direction * 4}px)`;
+
     setTimeout(() => {
-        document.getElementById('quranPage').style.transform = 'translateX(0)';
-    }, 300);
+        currentPage = newPage;
+        renderPage(currentPage);
+        saveCurrentPage(currentPage);
+        highlightSurahForCurrentPage();
+
+        // Fade in
+        requestAnimationFrame(() => {
+            quranPage.style.opacity = '1';
+            quranPage.style.transform = 'translateY(0)';
+        });
+
+        // Clean up transition after animation
+        setTimeout(() => {
+            quranPage.style.transition = '';
+        }, 200);
+    }, 150);
+}
+
+/* ─── Layout recalculation on resize ──────────────────────────── */
+let _layoutResizeTimer;
+function recalcLayout() {
+    clearTimeout(_layoutResizeTimer);
+    _layoutResizeTimer = setTimeout(() => {
+        LayoutEngine.invalidate();
+        if (currentPage && pagesData[currentPage]) {
+            renderPage(currentPage);
+        }
+    }, 250);
 }

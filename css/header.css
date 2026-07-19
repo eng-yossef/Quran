@@ -1,20 +1,29 @@
-/* Header Styles */
+/* ================================================================
+   HEADER — Premium Minimal Header
+   
+   Clean, elegant header that provides essential controls
+   without distracting from the reading experience.
+   Uses warm tones consistent with the Mushaf design.
+   ================================================================ */
 .header {
     z-index: 5;
-    top: 0px;
+    top: 0;
     position: sticky;
-    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+    background: linear-gradient(135deg, #1B5E20 0%, var(--primary-green) 50%, #1B6B3A 100%);
     color: white;
-    padding: 0.1rem 0.2rem;
+    padding: 0.35rem 0.8rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    gap: 0;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.08);
+    gap: 0.5rem;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    border-bottom: 1.5px solid rgba(197, 153, 42, 0.2);
 }
 
 .header::-webkit-scrollbar {
@@ -24,42 +33,38 @@
 .header-left {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
+/* ─── Menu Button ────────────────────────────────────────────── */
 .menu-button {
     background: none;
     border: none;
-    color: white;
-    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.3rem;
     cursor: pointer;
-    padding: 0.4rem;
+    padding: 0.35rem;
     min-width: 36px;
     min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.header-title {
-    margin: 0;
-    font-size: 0.9rem;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-    flex-shrink: 1;
-    min-width: 0;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.menu-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
-/* Night Mode Toggle */
+/* ─── Night Mode Toggle ──────────────────────────────────────── */
 .night-mode-toggle {
     background: none;
     border: none;
-    font-size: 1.3em;
+    font-size: 1.2em;
     cursor: pointer;
     padding: 0.3rem;
     min-width: 36px;
@@ -68,173 +73,201 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast), transform var(--transition-fast);
+    color: rgba(255, 255, 255, 0.85);
 }
 
-/* Reciter Select Styling */
-.reciter-select {
-    background: rgba(255, 255, 255, 0.12);
-    color: black;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    padding: 5px 8px;
-    border-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease-in-out;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+.night-mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+/* ─── Header Title ───────────────────────────────────────────── */
+.header-title {
+    margin: 0;
+    font-size: 0.9rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    flex-shrink: 1;
+    min-width: 0;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.02em;
+}
+
+/* ─── Header Controls Group ──────────────────────────────────── */
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-.reciter-select:hover {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.45);
+.header-controls::-webkit-scrollbar {
+    display: none;
+}
+
+/* ─── Header Buttons ─────────────────────────────────────────── */
+.header-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 4px 6px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
 
+.header-btn:active {
+    transform: scale(0.95);
+}
+
+/* ─── Progress Bar Container ─────────────────────────────────── */
+.progress-bar-container {
+    width: 50px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background var(--transition-fast);
+}
+
+.progress-bar-container:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-accent), var(--gold-bright));
+    transition: width 0.5s ease;
+    border-radius: 12px;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.55rem;
+    font-weight: var(--font-weight-bold);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+/* ─── Font Controls ──────────────────────────────────────────── */
+.font-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.font-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    padding: 3px 5px;
+    min-width: 26px;
+    min-height: 26px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast), color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.font-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* ─── Reciter Select ─────────────────────────────────────────── */
+.reciter-select {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 5px 8px;
+    border-radius: var(--radius-md);
+    font-size: 0.72rem;
+    cursor: pointer;
+    outline: none;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.reciter-select:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
 .reciter-select:focus {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: white;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.35),
-                0 4px 10px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .reciter-select option {
     background-color: var(--primary-green);
+    color: white;
     font-size: 14px;
 }
 
-/* ========== RESPONSIVE ========== */
-
-/* Tablet */
-@media (max-width: 992px) {
-    .header {
-        padding: 0.05rem 0.15rem;
-    }
+/* ─── Audio Speed Select ─────────────────────────────────────── */
+.audio-speed-select {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 5px 6px;
+    border-radius: var(--radius-md);
+    font-size: 0.7rem;
+    cursor: pointer;
+    outline: none;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Mobile - ONE ROW */
-@media (max-width: 768px) {
-    .header {
-        padding: 0.05rem 0.1rem;
-        flex-wrap: nowrap;
-    }
-
-    .header-left {
-        gap: 0;
-    }
-
-    .header-title {
-        font-size: 0.78rem;
-        padding: 0 0.3rem;
-    }
-
-    .menu-button, .night-mode-toggle {
-        font-size: 1.1rem;
-        padding: 0.2rem;
-        min-width: 30px;
-        min-height: 30px;
-    }
-
-    .night-mode-toggle {
-        margin-left: 2px;
-    }
-
-    .header-controls {
-        gap: 3px;
-        flex-shrink: 0;
-    }
-
-    .header-btn {
-        min-width: 28px;
-        min-height: 28px;
-        padding: 2px 5px;
-        font-size: 0.8rem;
-    }
-
-    .progress-bar-container {
-        width: 45px;
-    }
-
-    .progress-text {
-        font-size: 0.55rem;
-    }
-
-    .font-controls {
-        gap: 1px;
-        padding: 1px 2px;
-    }
-
-    .font-btn {
-        font-size: 0.65rem;
-        padding: 2px 4px;
-        min-width: 26px;
-        min-height: 26px;
-    }
-
-    .reciter-select {
-        font-size: 0.65rem;
-        padding: 3px 4px;
-        max-width: 100px;
-    }
-
-    .audio-speed-select {
-        font-size: 0.65rem;
-        padding: 3px 4px;
-    }
+.audio-speed-select:hover {
+    background: rgba(255, 255, 255, 0.14);
 }
 
-/* Small Mobile */
-@media (max-width: 480px) {
-    .header-title {
-        font-size: 0.7rem;
-    }
-
-    .menu-button, .night-mode-toggle {
-        font-size: 1rem;
-        min-width: 28px;
-        min-height: 28px;
-        padding: 0.15rem;
-    }
-
-    .header-btn {
-        min-width: 26px;
-        min-height: 26px;
-        padding: 2px 4px;
-        font-size: 0.75rem;
-    }
-
-    .progress-bar-container {
-        width: 35px;
-    }
-
-    .font-btn {
-        font-size: 0.6rem;
-        padding: 1px 3px;
-        min-width: 24px;
-        min-height: 24px;
-    }
-
-    .reciter-select {
-        font-size: 0.58rem;
-        padding: 2px 3px;
-        max-width: 85px;
-    }
-
-    .audio-speed-select {
-        font-size: 0.58rem;
-        padding: 2px 3px;
-    }
-}
-
-/* Very small */
-@media (max-width: 360px) {
-    .header-title {
-        font-size: 0.62rem;
-    }
-
-    .reciter-select {
-        max-width: 70px;
-        font-size: 0.52rem;
-    }
+.audio-speed-select option {
+    background-color: var(--primary-green);
+    color: white;
 }

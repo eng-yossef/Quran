@@ -1,140 +1,135 @@
-/* Navigation Bar */
+/* ================================================================
+   NAVIGATION — Premium Bottom Navigation Bar
+   
+   Elegant, functional navigation with premium gold accents.
+   Feels like the footer of a beautifully bound book.
+   ================================================================ */
 .navigation {
     z-index: 984;
-    bottom: 0px;
+    bottom: 0;
     position: sticky;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.3rem 1.5rem;
-    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, #0F4B24 0%, #1B6B3A 50%, #0F4B24 100%);
     color: white;
-    border-top: 3px solid var(--gold-accent);
+    border-top: 1.5px solid rgba(197, 153, 42, 0.25);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* ─── Navigation Buttons ─────────────────────────────────────── */
 .nav-button {
-    background-color: var(--gold-accent);
-    color: var(--dark-green);
+    background: var(--gold-gradient);
+    color: #2C2416;
     border: none;
-    padding: 10px;
-    border-radius: 4px;
-    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
-    font-size: 0.95rem;
-    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-family: var(--quran-font);
+    transition: all var(--transition-fast);
     min-width: 44px;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(160, 120, 24, 0.2);
 }
 
 .nav-button:hover {
-    background-color: #e6c260;
     transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(160, 120, 24, 0.3);
 }
 
+.nav-button:active {
+    transform: scale(0.97);
+}
+
+.nav-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ─── Page Indicator ─────────────────────────────────────────── */
 .page-indicator {
-    font-size: 1.1rem;
-    font-weight: bold;
-    background-color: rgba(255,255,255,0.2);
+    font-size: 0.95rem;
+    font-weight: var(--font-weight-bold);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Page Controls */
+/* ─── Page Controls (inside indicator) ───────────────────────── */
 .page-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5px;
-    border-radius: 8px;
+    gap: 10px;
+    padding: 2px;
 }
 
 .juz-info-display {
-    background: var(--gold-accent);
-    padding: 0px 2px;
-    border-radius: 25px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background: var(--gold-gradient);
+    padding: 3px 10px;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px rgba(160, 120, 24, 0.2);
 }
 
 .juz-label {
-    color: var(--dark-green);
-    font-size: .8rem;
-    font-weight: bold;
-    font-family: 'Amiri', 'Traditional Arabic', serif;
-    letter-spacing: 0.5px;
+    color: #2C2416;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-bold);
+    font-family: var(--quran-font);
+    letter-spacing: 0.02em;
 }
 
 .page-navigation {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .page-navigation input {
     text-align: center;
-    font-size: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
     font-family: inherit;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 4px 6px;
+    outline: none;
+    transition: border-color var(--transition-fast);
 }
 
-.page-navigation {
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s;
+.page-navigation input:focus {
+    border-color: var(--gold-accent);
+}
+
+.page-navigation input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .go-btn {
-    background-color: var(--gold-accent);
-    color: var(--dark-green);
+    background: var(--gold-gradient);
+    color: #2C2416;
     border: none;
-    border-radius: 4px;
-    font-weight: bold;
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
-    transition: all 0.2s ease;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    font-family: var(--quran-font);
+    transition: all var(--transition-fast);
+    box-shadow: 0 1px 4px rgba(160, 120, 24, 0.2);
 }
 
-.page-navigation .go-btn:hover {
-    background: #a05e2a;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .navigation {
-        padding: 0.2rem 0.8rem;
-    }
-
-    .nav-button {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-    }
-
-    .page-indicator {
-        font-size: 0.9rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .navigation {
-        padding: 0.15rem 0.5rem;
-        gap: 4px;
-    }
-
-    .nav-button {
-        padding: 6px 10px;
-        font-size: 0.78rem;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .page-indicator {
-        font-size: 0.78rem;
-        padding: 2px 8px;
-        white-space: nowrap;
-    }
+.go-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(160, 120, 24, 0.3);
 }

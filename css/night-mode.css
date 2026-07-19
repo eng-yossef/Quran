@@ -1,165 +1,346 @@
-/* ===== Night Mode Styles ===== */
+/* ================================================================
+   NIGHT MODE — Premium Dark Reading Experience
+   
+   A carefully designed dark mode that maintains excellent
+   readability while reducing eye strain for late-night reading.
+   Uses deep charcoal instead of pure black, with warm accents.
+   ================================================================ */
 
-/* Base Night Mode */
+/* ─── Base Night Mode ────────────────────────────────────────── */
 .night-mode {
-    background-color: #121212 !important;
-    color: #e0e0e0 !important;
+    background-color: #1A1714 !important;
+    color: #D4C8B0 !important;
 }
 
 .night-mode .main-content,
 .night-mode main.main-content {
-    background-color: #1e1e1e !important;
+    background-color: #1A1714 !important;
 }
 
-/* Sidebar Night Mode */
+/* ─── Header Night Mode ──────────────────────────────────────── */
+.night-mode .header {
+    background: linear-gradient(135deg, #0D1B0F 0%, #142218 50%, #0D1B0F 100%) !important;
+    border-bottom-color: rgba(197, 153, 42, 0.12);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Sidebar Night Mode ─────────────────────────────────────── */
 .night-mode .sidebar {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
+    background-color: #1E1B16 !important;
+    color: #D4C8B0 !important;
+    border-left: 1px solid rgba(197, 153, 42, 0.08);
 }
 
 .night-mode .surah-list li {
-    color: #e0e0e0 !important;
-    border-bottom: 1px solid #333 !important;
+    color: #C4B89A !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
 }
 
 .night-mode .surah-list li:hover {
-    background-color: #333 !important;
+    background-color: rgba(197, 153, 42, 0.06) !important;
 }
 
 .night-mode .surah-item:hover {
-    background-color: rgba(50, 205, 50, 0.1);
+    background-color: rgba(197, 153, 42, 0.08);
 }
 
 .night-mode .active-surah {
-    background-color: rgba(70, 130, 180, 0.15);
-    border-right-color: #3CB371;
-}
-
-.night-mode .active-surah::after {
+    background-color: rgba(197, 153, 42, 0.1) !important;
+    border-right-color: var(--gold-accent) !important;
 }
 
 .night-mode .active-surah .surah-name {
-    color: #20B2AA;
+    color: var(--gold-accent) !important;
 }
 
-.night-mode[dir="rtl"] .active-surah {
-    border-left-color: #3CB371;
+.night-mode .sidebar-header {
+    background-color: #1A1714 !important;
+    border-bottom: 1px solid rgba(197, 153, 42, 0.08);
 }
 
-/* Quran Page Night Mode */
-.night-mode .quran-page,
-.night-mode .quran-page * {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
+/* ─── Quran Page Night Mode ──────────────────────────────────── */
+.night-mode .quran-page {
+    background-color: #22201A !important;
+    border-color: rgba(197, 153, 42, 0.12) !important;
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(197, 153, 42, 0.06) !important;
 }
 
-.night-mode .verse {
-    background-color: #1e1e1e !important;
-    color: #e0e0e0 !important;
+.night-mode .quran-page::before {
+    border-color: rgba(197, 153, 42, 0.08);
+}
+
+.night-mode .quran-page::after {
+    opacity: 0.2;
+}
+
+/* ─── Verse Text Night Mode ──────────────────────────────────── */
+.night-mode .verse-text {
+    color: #D4C8B0 !important;
     transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.night-mode ,
-.night-mode ,
-.night-mode  {
-    background-color: #333 !important;
-    color: #e0e0e0 !important;
-    border: 1px solid #444 !important;
+.night-mode .verse-text:hover {
+    background-color: rgba(197, 153, 42, 0.08) !important;
+    text-shadow: 0 0 8px rgba(197, 153, 42, 0.15);
 }
 
-.night-mode .header-title {
-    color: #e0e0e0 !important;
-}
-
-/* Quran Page Night Mode */
-.night-mode .quran-page::before {
-    border-color: rgba(100, 90, 60, 0.2);
-}
-
-/* Verse Number Night Mode */
+/* ─── Verse Number Night Mode — Gold on Dark ─────────────────── */
 .night-mode .verse-number {
-    background: linear-gradient(145deg, #0277BD 0%, #01579b 40%, #0288D1 100%) !important;
-    color: #b3e5fc !important;
-    box-shadow: 0 2px 6px rgba(2, 136, 209, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.15);
+    background: linear-gradient(145deg, #B8960E 0%, #8B6914 35%, #C5992A 65%, #D4AF37 100%) !important;
+    color: #FFF8E1 !important;
+    border-color: rgba(197, 153, 42, 0.4) !important;
+    box-shadow:
+        0 2px 6px rgba(197, 153, 42, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15) !important;
 }
 
-/* Surah Info Night Mode */
+/* ─── Surah Info Night Mode ──────────────────────────────────── */
 .night-mode .surah-info {
-    background-color: #263238;
-    border-right-color: #81C784;
-    color: #E8F5E9;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #1E1B16 0%, #252320 50%, #1E1B16 100%) !important;
+    border-color: rgba(197, 153, 42, 0.15) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.night-mode .surah-info::before {
+    background: linear-gradient(90deg, transparent, rgba(197, 153, 42, 0.4), transparent);
+}
+
+.night-mode .surah-info::after {
+    background: linear-gradient(90deg, transparent, rgba(197, 153, 42, 0.2), transparent);
 }
 
 .night-mode .surah-info h2 {
-    color: #81C784;
+    color: var(--gold-accent) !important;
 }
 
 .night-mode .surah-info h2::after {
-    background: linear-gradient(to right, #FFD54F, #81C784, #FFD54F);
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
 }
 
 .night-mode .surah-info p {
-    color: #A5D6A7;
+    color: #A09880 !important;
 }
 
-.night-mode .surah-info::before,
-.night-mode .surah-info::after {
-    background-color: rgba(129, 199, 132, 0.1);
+.night-mode .surah-corner::before,
+.night-mode .surah-corner::after {
+    background: rgba(197, 153, 42, 0.3);
 }
 
-/* Bismillah Night Mode */
+/* ─── Bismillah Night Mode ───────────────────────────────────── */
 .night-mode .bismillah-text {
-    color: #81C784;
-    background: linear-gradient(to right, #263238, #37474F, #263238);
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-    border-color: rgba(129, 199, 132, 0.3);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    color: var(--gold-accent) !important;
+    background: linear-gradient(to right, transparent 0%, rgba(34, 32, 26, 0.8) 20%, rgba(34, 32, 26, 0.9) 50%, rgba(34, 32, 26, 0.8) 80%, transparent 100%) !important;
+    border-color: rgba(197, 153, 42, 0.1) !important;
 }
 
 .night-mode .bismillah-decoration {
-    background: linear-gradient(90deg, #FFD54F, #81C784, #FFD54F);
+    background: linear-gradient(90deg, transparent, rgba(197, 153, 42, 0.4), transparent);
 }
 
 .night-mode .bismillah-decoration::before {
-    background-color: #FFD54F;
+    background: var(--gold-accent);
 }
 
-.night-mode .bismillah-decoration.left::after,
-.night-mode .bismillah-decoration.right::after {
-    background-color: #81C784;
-}
-
-/* Current Playing Verse Night Mode */
+/* ─── Current Playing Verse Night Mode ───────────────────────── */
 .night-mode .current-playing-verse {
-    background-color: rgba(66, 165, 245, 0.10) !important;
-    box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.25);
-    border-radius: 6px;
+    background-color: rgba(197, 153, 42, 0.06) !important;
+    box-shadow: 0 0 0 2px rgba(197, 153, 42, 0.15);
+    border-radius: var(--radius-sm);
 }
 
 .night-mode .current-playing-verse .verse-number {
-    background: linear-gradient(145deg, #0288D1 0%, #01579b 40%, #0288D1 60%, #4FC3F7 100%) !important;
-    color: #E1F5FE !important;
-    box-shadow: 0 2px 8px rgba(2, 136, 209, 0.5), 0 0 0 3px rgba(79, 195, 247, 0.25);
+    background: linear-gradient(145deg, #E8C84A 0%, #C5992A 35%, #D4AF37 65%, #F0D060 100%) !important;
+    color: #2C2416 !important;
+    box-shadow: 0 2px 8px rgba(197, 153, 42, 0.4), 0 0 0 3px rgba(197, 153, 42, 0.15) !important;
+    transform: scale(1.1);
 }
 
 .night-mode .current-playing-verse {
-    animation: night-pulse 3s ease infinite;
+    animation: nightVersePulse 3s ease infinite;
 }
 
-@keyframes night-pulse {
-    0% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
-    50% { box-shadow: inset 0 0 15px rgba(66, 165, 245, 0.15); }
-    100% { box-shadow: inset 0 0 0 rgba(66, 165, 245, 0); }
+@keyframes nightVersePulse {
+    0% { box-shadow: inset 0 0 0 rgba(197, 153, 42, 0); }
+    50% { box-shadow: inset 0 0 12px rgba(197, 153, 42, 0.06); }
+    100% { box-shadow: inset 0 0 0 rgba(197, 153, 42, 0); }
 }
 
-/* Close Tafsir Button Night Mode */
+/* ─── Verse Hover Night Mode ─────────────────────────────────── */
+.night-mode .verse-text:hover {
+    color: #E8DCC0 !important;
+    text-shadow: 0 0 8px rgba(197, 153, 42, 0.2);
+}
+
+.night-mode .verse-container:hover .verse-number {
+    transform: scale(1.08);
+    box-shadow:
+        0 2px 8px rgba(197, 153, 42, 0.4),
+        0 6px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+/* ─── Navigation Night Mode ──────────────────────────────────── */
+.night-mode .navigation {
+    background: linear-gradient(135deg, #0D0B08 0%, #1A1714 50%, #0D0B08 100%) !important;
+    border-top-color: rgba(197, 153, 42, 0.12) !important;
+}
+
+/* ─── Page Controls Night Mode ───────────────────────────────── */
+.night-mode .juz-info-display {
+    background: var(--gold-gradient);
+}
+
+.night-mode .juz-label {
+    color: #2C2416;
+}
+
+.night-mode .page-navigation input {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #D4C8B0;
+}
+
+/* ─── Verse Actions Night Mode ───────────────────────────────── */
+.night-mode .verse-actions {
+    background: rgba(34, 32, 26, 0.95);
+    border-color: rgba(197, 153, 42, 0.12);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.night-mode .verse-action-btn {
+    color: #C4B89A;
+}
+
+.night-mode .verse-action-btn:hover {
+    background: rgba(197, 153, 42, 0.1);
+}
+
+/* ─── Header Buttons Night Mode ──────────────────────────────── */
+.night-mode .header-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.night-mode .header-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.night-mode .progress-bar-container {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+.night-mode .font-controls {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.night-mode .reciter-select,
+.night-mode .audio-speed-select {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── Page Ornament Night Mode ───────────────────────────────── */
+.night-mode .page-ornament::before,
+.night-mode .page-ornament::after {
+    background: linear-gradient(90deg, transparent, rgba(197, 153, 42, 0.2), transparent);
+}
+
+.night-mode .page-ornament-ornament {
+    color: rgba(197, 153, 42, 0.3);
+}
+
+/* ─── Close Tafsir Button Night Mode ─────────────────────────── */
 .night-mode .close-tafsir-btn {
-    color: #aaa;
+    color: #8A7E6A;
 }
 
 .night-mode .close-tafsir-btn:hover {
-    color: #fff;
+    color: #C4B89A;
 }
 
-/* Image Export Night Mode — handled by template-specific .qv-card.t-* styles */
+/* ─── Toast Night Mode ───────────────────────────────────────── */
+.night-mode .toast-notification {
+    background: #2C2A24;
+    color: #D4C8B0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Stats Modal Night Mode ─────────────────────────────────── */
+.night-mode .stats-modal {
+    background: #22201A;
+    border-color: rgba(197, 153, 42, 0.12);
+}
+
+.night-mode .stat-card {
+    background: #2C2A24;
+    border-color: rgba(197, 153, 42, 0.08);
+}
+
+.night-mode .stat-value {
+    color: var(--gold-accent);
+}
+
+/* ─── Search Modal Night Mode ────────────────────────────────── */
+.night-mode .search-modal {
+    background: #22201A;
+    border-color: rgba(197, 153, 42, 0.12);
+}
+
+.night-mode .search-input {
+    background: #2C2A24;
+    color: #D4C8B0;
+    border-color: rgba(197, 153, 42, 0.12);
+}
+
+.night-mode .search-result-item {
+    border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+.night-mode .search-result-item:hover {
+    background: rgba(197, 153, 42, 0.06);
+}
+
+/* ─── Bookmarks Panel Night Mode ─────────────────────────────── */
+.night-mode .bookmarks-panel {
+    background: #22201A;
+    border-left-color: rgba(197, 153, 42, 0.08);
+}
+
+.night-mode .bookmark-item {
+    border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+.night-mode .bookmark-item:hover {
+    background: rgba(197, 153, 42, 0.06);
+}
+
+/* ─── Reading Progress Night Mode ────────────────────────────── */
+.night-mode .reading-progress-bar {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.night-mode .reading-progress-fill {
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-accent), var(--gold-bright));
+}
+
+/* ─── Repeat Controls Night Mode ─────────────────────────────── */
+.night-mode .repeat-controls {
+    background: #22201A;
+    border-color: rgba(197, 153, 42, 0.12);
+    color: #D4C8B0;
+}
+
+/* ─── Fullscreen Button Night Mode ───────────────────────────── */
+.night-mode .fullscreen-exit-btn {
+    background: #22201A;
+    color: #D4C8B0;
+    border-color: rgba(197, 153, 42, 0.12);
+}

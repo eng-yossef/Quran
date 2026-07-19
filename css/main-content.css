@@ -5,20 +5,37 @@
     flex-direction: column;
     align-items: stretch;
     min-width: 0;
+    min-height: 0;
+    background: transparent;
 }
 
 /* ================================================================
-   QURAN PAGE — Premium Mushaf Reading Surface
+   QURAN PAGE — Premium Digital Mushaf Reading Surface
+   
+   This is the heart of the design. The page should look and feel
+   like a beautifully typeset, premium printed Mushaf page floating
+   above a warm application background.
    ================================================================ */
 .quran-page {
     flex: 1;
     width: 100%;
     max-width: var(--quran-max-width);
-    padding: var(--quran-page-padding) calc(var(--quran-page-padding) * 1.15);
+    padding: var(--quran-page-padding) calc(var(--quran-page-padding) * 1.2);
     background-color: var(--quran-page-bg);
-    margin: 0.6rem auto;
+    margin: var(--page-margin-top) auto;
+    position: relative;
+    min-height: 0;
+
+    /* Fixed-height container — no scrolling, content fits exactly */
+    overflow: visible;
+
+    /* Premium page shadow — layered for depth */
     box-shadow: var(--quran-page-shadow);
-    border-radius: 6px;
+
+    /* Soft rounded corners like a real page */
+    border-radius: var(--radius-lg);
+
+    /* Subtle gold border accent */
     border: 1px solid var(--quran-page-border);
 
     /* Mushaf typography */
@@ -37,30 +54,114 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-feature-settings: 'liga' 1, 'calt' 1;
+    font-feature-settings: 'liga' 1, 'calt' 1, 'mark' 1;
 
-    /* Vertical rhythm */
-    overflow-x: hidden;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-
-    /* Subtle inner texture */
-    position: relative;
+    /* Subtle paper texture via inner gradient */
+    transition: background-color var(--transition-smooth), box-shadow var(--transition-smooth);
 }
 
-/* Decorative page border accent */
+/* ─── Hidden measurement container (used by LayoutEngine) ─────── */
+.quran-page--measure {
+    position: fixed !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* ─── Content wrapper — scrollable when content exceeds container ── */
+.quran-page-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(197, 153, 42, 0.3) transparent;
+}
+
+.quran-page-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.quran-page-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.quran-page-content::-webkit-scrollbar-thumb {
+    background: rgba(197, 153, 42, 0.3);
+    border-radius: 3px;
+}
+
+/* ─── Inner decorative border (Mushaf-style page frame) ──────── */
 .quran-page::before {
     content: "";
     position: absolute;
-    inset: 6px;
-    border: 1px solid rgba(212, 175, 55, 0.15);
-    border-radius: 4px;
+    inset: 8px;
+    border: 1px solid var(--quran-page-inner-border);
+    border-radius: calc(var(--radius-lg) - 4px);
     pointer-events: none;
     z-index: 0;
 }
 
+/* ─── Subtle paper texture overlay ───────────────────────────── */
+.quran-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(197, 153, 42, 0.008) 2px,
+            rgba(197, 153, 42, 0.008) 3px
+        );
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+}
+
 /* ================================================================
-   VERSE CONTAINER — Inline flow with proper separation
+   PAGE ORNAMENTS — Top and Bottom Mushaf-style Decorative Frames
+   ================================================================ */
+.page-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+.page-ornament::before,
+.page-ornament::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
+    opacity: 0.3;
+}
+
+.page-ornament-ornament {
+    padding: 0 0.8rem;
+    color: var(--gold-accent);
+    font-size: 0.6rem;
+    opacity: 0.4;
+    line-height: 1;
+}
+
+/* ================================================================
+   VERSE CONTAINER — Inline flow with natural wrapping
+   Each verse flows naturally like printed text, with subtle
+   separation between consecutive verses.
    ================================================================ */
 .verse-container {
     display: inline;
@@ -68,31 +169,40 @@
     cursor: default;
     word-break: keep-all;
     overflow-wrap: anywhere;
+    z-index: 1;
 }
 
 /* Spacing between consecutive verses */
 .verse-container + .verse-container {
-    margin-left: 0.7em;
+    margin-left: 0.65em;
 }
 
 /* ================================================================
-   VERSE TEXT — Refined Arabic typography
+   VERSE TEXT — Refined Arabic Typography
+   The verse text is the most important element. It must be
+   perfectly rendered with beautiful Arabic shaping.
    ================================================================ */
 .verse-text {
-    transition: background-color 0.25s ease, text-shadow 0.25s ease;
+    font-size: 1em;
+    transition: background-color var(--transition-normal), text-shadow var(--transition-normal);
     border-radius: 3px;
-    padding: 1px 0;
+    padding: 2px 1px;
     position: relative;
 }
 
-/* Light Mode Hover */
+/* Light Mode Hover — subtle, elegant */
 .verse-text:hover {
-    background-color: rgba(46, 139, 87, 0.08);
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
+    background-color: rgba(197, 153, 42, 0.06);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 /* ================================================================
    VERSE NUMBER — Ornamental Mushaf End-of-Ayah Marker
+   
+   A beautiful gold ornamental circle that serves as the verse
+   separator, inspired by the Madinah Mushaf design. The marker
+   should feel integrated with the typography, not like an
+   afterthought.
    ================================================================ */
 .verse-number {
     display: inline-flex;
@@ -100,173 +210,379 @@
     justify-content: center;
     width: var(--verse-marker-size);
     height: var(--verse-marker-size);
-    min-width: 34px;
-    min-height: 34px;
-    padding: 2px 5px;
-    margin: 0 3px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 2px 6px;
+    margin: 0 2px;
     vertical-align: middle;
 
-    /* Ornamental gold marker */
+    /* Ornamental gold marker with inner glow */
     background: var(--verse-marker-bg);
-    color: white;
+    color: var(--verse-marker-text);
     border: var(--verse-marker-border);
     border-radius: 50%;
-    font-size: 0.52em;
-    font-weight: 700;
+
+    /* Typography */
+    font-size: 0.5em;
+    font-weight: var(--font-weight-bold);
+    font-family: 'Amiri', serif;
     line-height: 1;
     text-align: center;
 
-    /* Layered shadow for depth */
+    /* Layered shadow for 3D depth */
     box-shadow: var(--verse-marker-shadow);
 
     /* Prevent line break */
     flex-shrink: 0;
     white-space: nowrap;
 
-    /* Smooth transitions for state changes */
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    /* Smooth transitions */
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-/* Inner number text — no pseudo-element override needed */
+/* Hover effect on verse number */
+.verse-container:hover .verse-number {
+    transform: scale(1.05);
+    box-shadow:
+        0 2px 8px rgba(160, 120, 24, 0.40),
+        0 6px 16px rgba(160, 120, 24, 0.15),
+        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
 
 /* ================================================================
    SURAH INFO HEADER — Premium Mushaf Header
+   
+   A beautifully designed surah header that looks like the ornate
+   headers found in the Madinah Mushaf. Features decorative elements,
+   elegant typography, and subtle Islamic design motifs.
    ================================================================ */
 .surah-info {
+    position: relative;
     background: var(--surah-bg);
     border: var(--surah-border);
-    border-radius: 12px;
-    margin: 1.2rem auto 0.8rem;
-    padding: 1.2rem 2rem 1rem;
+    border-radius: var(--radius-xl);
+    margin: 1.5rem auto 1.2rem;
+    padding: 1.8rem 2rem 1.4rem;
     text-align: center;
-    color: #1B5E20;
-    box-shadow:
-        0 2px 8px rgba(46, 139, 87, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    max-width: 500px;
+    color: var(--surah-text);
+    box-shadow: var(--surah-shadow);
+    max-width: 520px;
     width: fit-content;
     z-index: 1;
+    overflow: hidden;
 }
 
+/* ─── Top decorative border ──────────────────────────────────── */
+.surah-info::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), var(--primary-green), var(--gold-accent), transparent);
+    opacity: 0.6;
+}
+
+/* ─── Bottom decorative accent ───────────────────────────────── */
+.surah-info::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
+    opacity: 0.3;
+}
+
+/* ─── Surah Name ─────────────────────────────────────────────── */
 .surah-info h2 {
-    margin: 0 0 0.4rem 0;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--primary-green);
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--surah-text);
     position: relative;
     display: inline-block;
     font-family: var(--quran-font);
+    line-height: 1.4;
 }
 
+/* ─── Gold underline accent ──────────────────────────────────── */
 .surah-info h2::after {
     content: "";
     position: absolute;
-    bottom: -5px;
+    bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--gold-accent), var(--primary-green), var(--gold-accent), transparent);
+    width: 80px;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
 }
 
+/* ─── Surah Subtitle (English name, Meccan/Medinan) ─────────── */
 .surah-info p {
-    margin: 0.5rem 0 0 0;
-    font-size: 1rem;
-    color: #388E3C;
+    margin: 0.7rem 0 0 0;
+    font-size: 0.95rem;
+    color: var(--surah-subtitle);
     font-style: italic;
     font-family: var(--quran-font);
+    letter-spacing: 0.02em;
 }
 
-/* Decorative corners */
-.surah-info::before,
-.surah-info::after {
+/* ─── Surah Number Badge ─────────────────────────────────────── */
+.surah-number-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--gold-gradient);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 6px rgba(197, 153, 42, 0.25);
+}
+
+/* ─── Decorative corner accents ──────────────────────────────── */
+.surah-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    opacity: 0.15;
+}
+
+.surah-corner::before,
+.surah-corner::after {
     content: "";
     position: absolute;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(46, 139, 87, 0.08);
-    border-radius: 50%;
+    background: var(--gold-accent);
 }
 
-.surah-info::before {
-    top: -15px;
-    left: -15px;
+.surah-corner--tl {
+    top: 10px;
+    left: 10px;
+}
+.surah-corner--tl::before {
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 1px;
+}
+.surah-corner--tl::after {
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 12px;
 }
 
-.surah-info::after {
-    bottom: -15px;
-    right: -15px;
+.surah-corner--tr {
+    top: 10px;
+    right: 10px;
+}
+.surah-corner--tr::before {
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 1px;
+}
+.surah-corner--tr::after {
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 12px;
+}
+
+.surah-corner--bl {
+    bottom: 10px;
+    left: 10px;
+}
+.surah-corner--bl::before {
+    bottom: 0;
+    left: 0;
+    width: 12px;
+    height: 1px;
+}
+.surah-corner--bl::after {
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    height: 12px;
+}
+
+.surah-corner--br {
+    bottom: 10px;
+    right: 10px;
+}
+.surah-corner--br::before {
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 1px;
+}
+.surah-corner--br::after {
+    bottom: 0;
+    right: 0;
+    width: 1px;
+    height: 12px;
 }
 
 /* ================================================================
-   BISMILLAH — Centered Mushaf Style
+   BISMILLAH — Centered Mushaf Style with Ornamental Flanks
    ================================================================ */
 .bismillah-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0.5rem 0 1rem 0;
+    margin: 0.8rem 0 1.5rem;
+    padding: 0.5rem 0;
+    position: relative;
+    z-index: 1;
 }
 
 .bismillah-text {
     font-family: var(--quran-font);
     font-size: 1.5rem;
-    color: var(--primary-green);
+    color: var(--surah-text);
     text-align: center;
-    padding: 0.8rem 2rem;
+    padding: 0.8rem 2.5rem;
     position: relative;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.08);
-    background: linear-gradient(to right, rgba(245, 245, 240, 0), rgba(232, 245, 233, 0.6), rgba(245, 245, 240, 0));
-    border-radius: 8px;
-    border: 1px solid rgba(46, 139, 87, 0.15);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    background: linear-gradient(to right, transparent 0%, rgba(245, 240, 228, 0.5) 20%, rgba(245, 240, 228, 0.7) 50%, rgba(245, 240, 228, 0.5) 80%, transparent 100%);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(197, 153, 42, 0.12);
 }
 
+/* ─── Ornamental flank lines ─────────────────────────────────── */
 .bismillah-decoration {
     flex: 1;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, var(--gold-accent), var(--primary-green), var(--gold-accent), transparent);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-accent), transparent);
     position: relative;
-    opacity: 0.6;
-    max-width: 80px;
+    opacity: 0.4;
+    max-width: 90px;
 }
 
 .bismillah-decoration.left {
-    margin-right: 0.8rem;
+    margin-right: 1rem;
 }
 
 .bismillah-decoration.right {
-    margin-left: 0.8rem;
+    margin-left: 1rem;
 }
 
-.bismillah-decoration::before,
-.bismillah-decoration::after {
+/* ─── Small diamond accent at ends ───────────────────────────── */
+.bismillah-decoration::before {
     content: "";
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: var(--gold-accent);
+    width: 6px;
+    height: 6px;
+    background: var(--gold-accent);
     border-radius: 50%;
     top: 50%;
     transform: translateY(-50%);
+    opacity: 0.6;
 }
 
 .bismillah-decoration.left::before {
-    left: 0;
-}
-
-.bismillah-decoration.left::after {
-    left: 15px;
-    background-color: var(--primary-green);
-}
-
-.bismillah-decoration.right::before {
     right: 0;
 }
 
-.bismillah-decoration.right::after {
-    right: 15px;
-    background-color: var(--primary-green);
+.bismillah-decoration.right::before {
+    left: 0;
+}
+
+/* ================================================================
+   VERSE ACTIONS — Floating Contextual Toolbar
+   
+   Actions are hidden by default, appearing on hover (desktop)
+   or tap/long-press (mobile). They float above the verse text
+   without disrupting the reading flow.
+   Uses position: fixed so the scroll container never clips them.
+   ================================================================ */
+.verse-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    position: fixed;
+    z-index: 100;
+    background: rgba(253, 248, 238, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 5px 8px;
+    border-radius: 28px;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(197, 153, 42, 0.1);
+    border: 1px solid rgba(197, 153, 42, 0.12);
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+    pointer-events: none;
+}
+
+.verse-container:hover .verse-actions,
+.verse-container.active-verse .verse-actions {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Individual action buttons */
+.verse-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+    color: #5A4A2A;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.verse-action-btn:hover {
+    background: rgba(197, 153, 42, 0.1);
+    transform: scale(1.1);
+}
+
+.verse-action-btn:active {
+    transform: scale(0.95);
+}
+
+.verse-action-btn.copied {
+    color: var(--primary-green);
+}
+
+.verse-action-btn.verse-bookmark-btn.bookmarked {
+    color: var(--gold-accent);
+}
+
+/* ================================================================
+   READING PAGE TRANSITIONS — Smooth Page Changes
+   ================================================================ */
+.quran-page.transitioning {
+    animation: pageTransition 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes pageTransition {
+    0% {
+        opacity: 0.6;
+        transform: translateY(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

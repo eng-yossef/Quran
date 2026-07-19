@@ -1,4 +1,10 @@
-/* ===== Responsive Styles — Mobile-First ===== */
+/* ================================================================
+   RESPONSIVE DESIGN — Adaptive Typography & Layout
+   
+   Mobile-first approach with progressive enhancement.
+   Typography, spacing, and layout adapt dynamically to screen
+   size for optimal reading comfort at every breakpoint.
+   ================================================================ */
 
 /* ============================================================
    BASE (mobile-first, ≤640px)
@@ -15,7 +21,7 @@
         max-width: 300px;
         z-index: 984600;
         transform: translateX(100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .sidebar.open {
@@ -54,7 +60,7 @@
 
     /* --- Header: compact --- */
     .header {
-        padding: 0.05rem 0.1rem;
+        padding: 0.15rem 0.3rem;
         flex-wrap: nowrap;
     }
 
@@ -90,98 +96,114 @@
         min-width: 26px;
         min-height: 26px;
         padding: 2px 4px;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
     }
 
     .progress-bar-container {
         width: 35px;
+        height: 20px;
     }
 
     .progress-text {
-        font-size: 0.5rem;
+        font-size: 0.48rem;
     }
 
     .font-controls {
         gap: 1px;
-        padding: 1px 2px;
+        padding: 1px 3px;
     }
 
     .font-btn {
-        font-size: 0.6rem;
+        font-size: 0.58rem;
         padding: 1px 3px;
-        min-width: 24px;
-        min-height: 24px;
+        min-width: 22px;
+        min-height: 22px;
     }
 
     .font-size-display {
-        font-size: 0.6rem;
-        min-width: 20px;
+        font-size: 0.58rem;
+        min-width: 18px;
     }
 
     .reciter-select {
-        font-size: 0.55rem;
+        font-size: 0.52rem;
         padding: 2px 3px;
         max-width: 80px;
     }
 
     .audio-speed-select {
-        font-size: 0.55rem;
+        font-size: 0.52rem;
         padding: 2px 3px;
     }
 
-    /* --- Quran page: smaller text --- */
+    /* --- Quran page: optimized mobile reading --- */
     .quran-page {
-        --quran-font-size: 1.2rem;
-        --quran-line-height: 1.9;
-        --quran-page-padding: 0.75rem;
-        margin: 0.15rem;
-        border-radius: 3px;
+        --quran-font-size: 1.25rem;
+        --quran-line-height: 2.1;
+        --quran-page-padding: 0.85rem;
+        --quran-word-spacing: 0.1em;
+        --quran-letter-spacing: 0.01em;
+        margin: 0.3rem 0.25rem;
+        border-radius: var(--radius-md);
+    }
+
+    .quran-page::before {
+        inset: 5px;
     }
 
     .verse-number {
-        min-width: 26px;
-        min-height: 26px;
-        font-size: 0.45em;
+        min-width: 28px;
+        min-height: 28px;
+        font-size: 0.44em;
     }
 
     .verse-container + .verse-container {
-        margin-left: 0.5em;
+        margin-left: 0.45em;
     }
 
     /* --- Surah info --- */
     .surah-info {
-        padding: 0.5rem 0.8rem;
-        margin: 0.3rem auto;
-        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        margin: 0.6rem auto 0.8rem;
+        border-radius: var(--radius-lg);
+        max-width: 360px;
     }
 
     .surah-info h2 {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
     }
 
     .surah-info p {
-        font-size: 0.8rem;
+        font-size: 0.82rem;
     }
 
     /* --- Bismillah --- */
     .bismillah-text {
-        font-size: 1.1rem;
-        padding: 0.4rem 0.8rem;
+        font-size: 1.15rem;
+        padding: 0.5rem 1rem;
     }
 
     .bismillah-decoration {
-        display: none;
+        max-width: 40px;
+    }
+
+    .bismillah-decoration.left {
+        margin-right: 0.5rem;
+    }
+
+    .bismillah-decoration.right {
+        margin-left: 0.5rem;
     }
 
     /* --- Navigation --- */
     .navigation {
-        padding: 0.15rem 0.5rem;
+        padding: 0.3rem 0.5rem;
         gap: 4px;
     }
 
     .nav-button {
-        padding: 6px 10px;
-        font-size: 0.78rem;
+        padding: 7px 12px;
+        font-size: 0.8rem;
         flex: 1;
         min-width: 0;
     }
@@ -241,7 +263,7 @@
     .search-modal {
         width: 98%;
         max-height: 90vh;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
     }
 
     .search-header {
@@ -308,7 +330,7 @@
     .stats-modal {
         width: 98%;
         padding: 15px;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         max-height: 85vh;
         overflow-y: auto;
     }
@@ -347,17 +369,15 @@
 
     /* --- Verse actions --- */
     .verse-actions {
-        padding: 3px 5px;
+        padding: 3px 6px;
         gap: 1px;
     }
 
     .verse-action-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 0.95rem;
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
     }
-
-    /* --- Image export (handled in export-modal.css) --- */
 
     /* --- Verse text touch --- */
     .verse-container {
@@ -369,21 +389,21 @@
     }
 
     .verse-text {
-        padding: 1px 2px;
+        padding: 2px 3px;
     }
 }
 
-/* Very small screens */
+/* Very small screens (≤360px) */
 @media (max-width: 360px) {
     .quran-page {
-        --quran-font-size: 1.1rem;
-        --quran-line-height: 1.8;
-        --quran-page-padding: 0.65rem;
+        --quran-font-size: 1.15rem;
+        --quran-line-height: 2.0;
+        --quran-page-padding: 0.7rem;
     }
 
     .verse-number {
-        min-width: 22px;
-        min-height: 22px;
+        min-width: 24px;
+        min-height: 24px;
     }
 
     .header-title {
@@ -396,6 +416,10 @@
     }
 
     .surah-info h2 {
+        font-size: 1.15rem;
+    }
+
+    .bismillah-text {
         font-size: 1rem;
     }
 }
@@ -412,7 +436,7 @@
         width: 280px;
         z-index: 984600;
         transform: translateX(100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .sidebar.open {
@@ -420,53 +444,45 @@
     }
 
     .quran-page {
-        --quran-font-size: 1.35rem;
-        --quran-line-height: 2.0;
-        --quran-page-padding: 1.1rem;
-        margin: 0.3rem 0.5rem;
-        border-radius: 4px;
+        --quran-font-size: 1.4rem;
+        --quran-line-height: 2.2;
+        --quran-page-padding: 1.2rem;
+        margin: 0.5rem 0.6rem;
+        border-radius: var(--radius-lg);
     }
 
     .verse-number {
-        min-width: 28px;
-        min-height: 28px;
-        font-size: 0.48em;
+        min-width: 30px;
+        min-height: 30px;
+        font-size: 0.47em;
     }
 
     .surah-info {
-        padding: 0.8rem 1.2rem;
-        margin: 0.5rem auto;
-        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        margin: 0.8rem auto;
+        border-radius: var(--radius-xl);
     }
 
     .surah-info h2 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
     }
 
     .surah-info p {
-        font-size: 0.9rem;
+        font-size: 0.92rem;
     }
 
     .bismillah-text {
         font-size: 1.3rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .bismillah-decoration.left {
-        margin-right: 0.3rem;
-    }
-
-    .bismillah-decoration.right {
-        margin-left: 0.3rem;
+        padding: 0.6rem 1.2rem;
     }
 
     .navigation {
-        padding: 0.2rem 0.8rem;
+        padding: 0.35rem 1rem;
     }
 
     .nav-button {
         padding: 8px 14px;
-        font-size: 0.85rem;
+        font-size: 0.88rem;
     }
 
     .page-indicator {
@@ -474,14 +490,14 @@
     }
 
     .verse-actions {
-        padding: 3px 5px;
-        gap: 1px;
+        padding: 4px 7px;
+        gap: 2px;
     }
 
     .verse-action-btn {
         width: 34px;
         height: 34px;
-        font-size: 0.85rem;
+        font-size: 0.88rem;
     }
 
     .stop-btn-container {
@@ -549,7 +565,7 @@
         width: 280px;
         z-index: 984600;
         transform: translateX(100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .sidebar.open {
@@ -557,9 +573,9 @@
     }
 
     .quran-page {
-        --quran-font-size: 1.5rem;
-        --quran-line-height: 2.15;
-        --quran-page-padding: 1.8rem;
+        --quran-font-size: 1.6rem;
+        --quran-line-height: 2.3;
+        --quran-page-padding: 2rem;
     }
 
     .verse-container {
@@ -572,7 +588,7 @@
 }
 
 /* ============================================================
-   SMALL DESKTOPS (≥1025px) — sidebar is always visible
+   SMALL DESKTOPS (≥1025px) — sidebar always visible
    ============================================================ */
 @media (min-width: 1025px) {
     .sidebar {
@@ -590,6 +606,82 @@
    ============================================================ */
 @media (min-width: 1280px) {
     .quran-page {
-        --quran-max-width: 860px;
+        --quran-max-width: 850px;
+    }
+}
+
+/* ============================================================
+   EXTRA LARGE DESKTOPS (≥1536px) — maximum comfort
+   ============================================================ */
+@media (min-width: 1536px) {
+    .quran-page {
+        --quran-max-width: 900px;
+        --quran-font-size: 1.85rem;
+        --quran-line-height: 2.5;
+        --quran-page-padding: 3rem;
+    }
+
+    .surah-info h2 {
+        font-size: 2rem;
+    }
+}
+
+/* ============================================================
+   LANDSCAPE MOBILE (height-constrained)
+   ============================================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+    .quran-page {
+        --quran-font-size: 1.1rem;
+        --quran-line-height: 1.9;
+        --quran-page-padding: 0.5rem;
+    }
+
+    .header {
+        padding: 0.1rem 0.3rem;
+    }
+
+    .navigation {
+        padding: 0.2rem 0.5rem;
+    }
+
+    .surah-info {
+        padding: 0.4rem 0.8rem;
+        margin: 0.3rem auto;
+    }
+
+    .surah-info h2 {
+        font-size: 1.1rem;
+    }
+}
+
+/* ============================================================
+   FOLDABLE DEVICES
+   ============================================================ */
+@media (min-width: 500px) and (max-width: 700px) and (min-height: 600px) {
+    .quran-page {
+        --quran-font-size: 1.35rem;
+        --quran-line-height: 2.15;
+        --quran-page-padding: 1rem;
+    }
+}
+
+/* ============================================================
+   ACCESSIBILITY — High Contrast & Forced Colors
+   ============================================================ */
+@media (forced-colors: active) {
+    .verse-number {
+        border: 2px solid ButtonText;
+    }
+
+    .surah-info {
+        border: 2px solid ButtonText;
+    }
+
+    .nav-button {
+        border: 1px solid ButtonText;
+    }
+
+    .verse-actions {
+        border: 1px solid ButtonText;
     }
 }

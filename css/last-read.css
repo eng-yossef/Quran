@@ -1,5 +1,8 @@
 /* ================================================================
-   LAST READ — Continue Reading Card + Verse Marker (Premium)
+   LAST READ — Continue Reading Card + Verse Marker
+   
+   Premium continue-reading card with elegant styling,
+   and a subtle verse marker for the last read position.
    ================================================================ */
 
 /* ─── Card Container ─────────────────────────────────────────── */
@@ -15,25 +18,35 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    background: #fff;
+    background: linear-gradient(135deg, #FDF8EE 0%, #F5F0E4 100%);
     border-inline-start: 4px solid var(--last-read-color);
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     padding: 16px 20px;
-    margin: 0.6rem auto 0;
+    margin: 0.8rem auto 0;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.04),
-        0 4px 20px rgba(0, 0, 0, 0.03);
+        0 4px 16px rgba(0, 0, 0, 0.03),
+        0 0 0 1px rgba(197, 153, 42, 0.08);
     animation: lastReadSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     position: relative;
     overflow: hidden;
     isolation: isolate;
+    transition: box-shadow var(--transition-smooth);
+}
+
+.last-read-card:hover {
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 4px 16px rgba(0, 0, 0, 0.03),
+        0 8px 24px rgba(197, 153, 42, 0.06),
+        0 0 0 1px rgba(197, 153, 42, 0.12);
 }
 
 .last-read-card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(46, 139, 87, 0.025), transparent 60%);
+    background: linear-gradient(135deg, rgba(197, 153, 42, 0.02), transparent 60%);
     pointer-events: none;
     z-index: 0;
 }
@@ -52,8 +65,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--light-green), #f1f8e9);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(27, 107, 58, 0.08), rgba(27, 107, 58, 0.04));
+    border-radius: var(--radius-lg);
 }
 
 /* ─── Card Body ──────────────────────────────────────────────── */
@@ -64,7 +77,7 @@
 
 .last-read-card-label {
     font-size: 0.72rem;
-    color: #999;
+    color: #8A7E6A;
     margin: 0 0 2px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -75,7 +88,7 @@
 .last-read-card-title {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #2C2416;
     margin: 0 0 2px 0;
     font-family: var(--quran-font);
     line-height: 1.3;
@@ -83,7 +96,7 @@
 
 .last-read-card-meta {
     font-size: 0.78rem;
-    color: #888;
+    color: #8A7E6A;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
@@ -100,21 +113,21 @@
     background: var(--last-read-color);
     color: #fff;
     border: none;
-    border-radius: 10px;
-    padding: 10px 18px;
+    border-radius: var(--radius-lg);
+    padding: 10px 20px;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    transition: all var(--transition-fast);
     white-space: nowrap;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    box-shadow: 0 2px 8px rgba(46, 139, 87, 0.2);
+    box-shadow: 0 2px 8px rgba(27, 107, 58, 0.2);
 }
 
 .last-read-continue-btn:hover {
-    background: #247a49;
+    background: #165A30;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+    box-shadow: 0 4px 12px rgba(27, 107, 58, 0.3);
 }
 
 .last-read-continue-btn:active {
@@ -129,13 +142,13 @@
 .last-read-dismiss-btn {
     background: none;
     border: none;
-    color: #ccc;
+    color: #C4B89A;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
     line-height: 1;
-    transition: color 0.2s, transform 0.15s;
-    border-radius: 6px;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    border-radius: var(--radius-sm);
     min-width: 32px;
     min-height: 32px;
     display: flex;
@@ -144,12 +157,12 @@
 }
 
 .last-read-dismiss-btn:hover {
-    color: #666;
+    color: #8A7E6A;
     transform: scale(1.1);
 }
 
 .last-read-dismiss-btn:focus-visible {
-    outline: 2px solid #999;
+    outline: 2px solid #8A7E6A;
     outline-offset: 2px;
 }
 
@@ -185,10 +198,9 @@
     }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ================================================================
    VERSE MARKER — CSS-only via ::before on .last-read-verse
-   No DOM injection needed. Purely visual.
-   ═══════════════════════════════════════════════════════════════════ */
+   ================================================================ */
 
 .last-read-verse {
     position: relative;
@@ -212,7 +224,6 @@
     opacity: 1;
 }
 
-/* Pulse: only box-shadow, no width/layout shift */
 .last-read-verse.pulse::before {
     animation: lastReadPulseOnce 2s ease;
 }
@@ -232,20 +243,21 @@
     }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ================================================================
    NIGHT MODE
-   ═══════════════════════════════════════════════════════════════════ */
+   ================================================================ */
 
 .night-mode .last-read-card {
-    background: #2a2a2a;
-    border-inline-start-color: #3d8b5e;
+    background: linear-gradient(135deg, #252320 0%, #1E1B16 100%) !important;
+    border-inline-start-color: #3d8b5e !important;
     box-shadow:
         0 2px 8px rgba(0, 0, 0, 0.2),
-        0 4px 20px rgba(0, 0, 0, 0.15);
+        0 4px 20px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(197, 153, 42, 0.06);
 }
 
 .night-mode .last-read-card::before {
-    background: linear-gradient(135deg, rgba(61, 139, 94, 0.04), transparent 60%);
+    background: linear-gradient(135deg, rgba(197, 153, 42, 0.03), transparent 60%);
 }
 
 .night-mode .last-read-card-icon {
@@ -253,42 +265,42 @@
 }
 
 .night-mode .last-read-card-label {
-    color: #777;
+    color: #6A6050;
 }
 
 .night-mode .last-read-card-title {
-    color: #e0e0e0;
+    color: #D4C8B0;
 }
 
 .night-mode .last-read-card-meta {
-    color: #666;
+    color: #6A6050;
 }
 
 .night-mode .last-read-continue-btn {
-    background: #3d8b5e;
-    box-shadow: 0 2px 8px rgba(61, 139, 94, 0.25);
+    background: #2A7B4A;
+    box-shadow: 0 2px 8px rgba(42, 123, 74, 0.25);
 }
 
 .night-mode .last-read-continue-btn:hover {
-    background: #4a9e6e;
-    box-shadow: 0 4px 12px rgba(61, 139, 94, 0.35);
+    background: #33925A;
+    box-shadow: 0 4px 12px rgba(42, 123, 74, 0.35);
 }
 
 .night-mode .last-read-dismiss-btn {
-    color: #555;
+    color: #5A5040;
 }
 
 .night-mode .last-read-dismiss-btn:hover {
-    color: #aaa;
+    color: #8A7E6A;
 }
 
 .night-mode .last-read-verse::before {
-    background: #5B9BD5;
+    background: var(--gold-accent);
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ================================================================
    RESPONSIVE
-   ═══════════════════════════════════════════════════════════════════ */
+   ================================================================ */
 
 @media (max-width: 600px) {
     .last-read-card {
@@ -319,9 +331,9 @@
     }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
+/* ================================================================
    ACCESSIBILITY
-   ═══════════════════════════════════════════════════════════════════ */
+   ================================================================ */
 
 @media (prefers-reduced-motion: reduce) {
     .last-read-card,

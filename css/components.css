@@ -1,4 +1,10 @@
-/* Stop Audio Button */
+/* ================================================================
+   COMPONENTS — Stop Button, PWA Banners, Accessibility
+   
+   Shared component styles with premium warm theme.
+   ================================================================ */
+
+/* ─── Stop Audio Button ──────────────────────────────────────── */
 .stop-btn-container {
     position: fixed;
     bottom: 70px;
@@ -7,8 +13,10 @@
 }
 
 .stop-audio-btn {
-    background: white;
-    border: 1px solid #ddd;
+    background: rgba(253, 248, 238, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(197, 153, 42, 0.15);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -16,22 +24,30 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(80, 60, 30, 0.1), 0 0 0 1px rgba(197, 153, 42, 0.08);
+    transition: all var(--transition-fast);
+    color: #C0392B;
+    font-size: 1rem;
 }
 
-/* ===== PWA Banners ===== */
+.stop-audio-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(80, 60, 30, 0.15);
+}
+
+/* ─── PWA Banners ────────────────────────────────────────────── */
 .pwa-banner {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 10001;
-    background: white;
-    box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
-    border-top: 1px solid #e0e0e0;
+    background: var(--quran-page-bg);
+    box-shadow: 0 -2px 16px rgba(80, 60, 30, 0.1);
+    border-top: 1.5px solid rgba(197, 153, 42, 0.12);
     transform: translateY(100%);
-    transition: transform 0.3s ease;
-    font-family: 'Amiri', serif;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: var(--quran-font);
 }
 
 .pwa-banner.visible {
@@ -63,12 +79,12 @@
 
 .pwa-banner-text strong {
     font-size: 0.95rem;
-    color: #333;
+    color: #2C2416;
 }
 
 .pwa-banner-text span {
     font-size: 0.8rem;
-    color: #666;
+    color: #8A7E6A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -82,12 +98,12 @@
 
 .pwa-banner-btn {
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     padding: 8px 16px;
     font-size: 0.85rem;
-    font-family: 'Amiri', serif;
+    font-family: var(--quran-font);
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    transition: all var(--transition-fast);
     font-weight: 600;
 }
 
@@ -103,68 +119,73 @@
 
 .pwa-install-btn:hover,
 .pwa-update-btn:hover {
-    background: #1B6B3A;
+    background: var(--dark-green);
 }
 
 .pwa-dismiss-btn {
     background: transparent;
-    color: #666;
+    color: #8A7E6A;
     font-size: 1.2rem;
     padding: 8px;
     min-width: 36px;
 }
 
 .pwa-dismiss-btn:hover {
-    color: #333;
-    background: rgba(0, 0, 0, 0.05);
+    color: #2C2416;
+    background: rgba(197, 153, 42, 0.06);
 }
 
 .pwa-offline {
-    background: #FFF3E0;
-    border-top-color: #FFB74D;
+    background: #FDF3E0;
+    border-top-color: #E8C84A;
 }
 
 .pwa-offline .pwa-banner-icon {
-    color: #E65100;
+    color: #C5992A;
 }
 
 .pwa-offline .pwa-banner-text strong {
-    color: #E65100;
+    color: #8B6914;
 }
 
 .pwa-offline .pwa-banner-text span {
-    color: #BF360C;
+    color: #A07818;
 }
 
-/* ===== Night Mode PWA Banners ===== */
+/* Night Mode PWA Banners */
 .night-mode .pwa-banner {
-    background: #2a2a2a;
-    border-top-color: #444;
+    background: #22201A;
+    border-top-color: rgba(197, 153, 42, 0.1);
 }
 
 .night-mode .pwa-banner-text strong {
-    color: #e0e0e0;
+    color: #D4C8B0;
 }
 
 .night-mode .pwa-banner-text span {
-    color: #aaa;
+    color: #8A7E6A;
 }
 
 .night-mode .pwa-dismiss-btn {
-    color: #aaa;
+    color: #8A7E6A;
 }
 
 .night-mode .pwa-dismiss-btn:hover {
-    color: #e0e0e0;
-    background: rgba(255, 255, 255, 0.05);
+    color: #D4C8B0;
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .night-mode .pwa-offline {
-    background: #332200;
-    border-top-color: #5D4037;
+    background: rgba(139, 105, 20, 0.1);
+    border-top-color: rgba(197, 153, 42, 0.2);
 }
 
-/* ===== Skip Link (Accessibility) ===== */
+.night-mode .stop-audio-btn {
+    background: rgba(34, 32, 26, 0.95);
+    border-color: rgba(197, 153, 42, 0.1);
+}
+
+/* ─── Skip Link (Accessibility) ──────────────────────────────── */
 .skip-link {
     position: absolute;
     top: -100px;
@@ -175,7 +196,7 @@
     z-index: 100000;
     font-size: 0.9rem;
     text-decoration: none;
-    border-radius: 0 0 4px 0;
+    border-radius: 0 0 var(--radius-sm) 0;
     transition: top 0.2s ease;
 }
 
@@ -183,7 +204,7 @@
     top: 0;
 }
 
-/* ===== Screen Reader Only ===== */
+/* ─── Screen Reader Only ─────────────────────────────────────── */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -196,46 +217,29 @@
     border-width: 0;
 }
 
-/* ===== Reduced Motion ===== */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
-
-    .pwa-banner {
-        transition: none;
-    }
-}
-
-/* ===== Focus Visible Styles ===== */
+/* ─── Focus Visible Styles ───────────────────────────────────── */
 :focus-visible {
-    outline: 2px solid var(--primary-green);
+    outline: 2px solid var(--gold-accent);
     outline-offset: 2px;
 }
 
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {
-    outline: 2px solid var(--primary-green);
+    outline: 2px solid var(--gold-accent);
     outline-offset: 2px;
 }
 
-/* ===== High Contrast Mode ===== */
+/* ─── Reduced Motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .pwa-banner {
+        transition: none;
+    }
+}
+
+/* ─── High Contrast Mode ─────────────────────────────────────── */
 @media (forced-colors: active) {
     .pwa-banner {
-        border: 2px solid CanvasText;
-    }
-
-    .verse-number {
-        border: 2px solid CanvasText;
-    }
-
-    .surah-info {
         border: 2px solid CanvasText;
     }
 }

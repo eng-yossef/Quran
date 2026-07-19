@@ -1,84 +1,94 @@
-/* Sidebar Styles */
+/* ================================================================
+   SIDEBAR — Premium Surah Navigation Drawer
+   
+   Warm, elegant sidebar with smooth animations and
+   consistent premium styling.
+   ================================================================ */
 .sidebar {
     width: 280px;
-    background-color: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+    background-color: var(--parchment);
+    box-shadow: -2px 0 12px rgba(80, 60, 30, 0.08);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow-y: auto;
     z-index: 10;
+    border-left: 1px solid rgba(197, 153, 42, 0.08);
 }
 
 .sidebar-header {
-    background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+    background: linear-gradient(135deg, #0F4B24 0%, var(--primary-green) 50%, #1B6B3A 100%);
     color: white;
     padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
-    top: 0px;
-    opacity: .5;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1.5px solid rgba(197, 153, 42, 0.2);
 }
 
 .sidebar-title {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    font-weight: var(--font-weight-bold);
+    font-family: var(--quran-font);
 }
 
 .close-sidebar {
     background: none;
     border: none;
-    color: white;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 1.5rem;
     cursor: pointer;
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.close-sidebar:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .surah-list {
     list-style: none;
-    padding: 0;
+    padding: 4px;
     margin: 0;
 }
 
 .surah-item {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #eee;
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid rgba(197, 153, 42, 0.04);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all var(--transition-fast);
+    margin: 1px 0;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
 }
 
 .surah-item:hover {
-    background-color: var(--light-green);
+    background-color: rgba(197, 153, 42, 0.06);
 }
 
 .surah-number {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 25px;
     height: 25px;
-    background-color: var(--primary-green);
-    color: white;
+    background: var(--gold-gradient);
+    color: #2C2416;
     border-radius: 50%;
-    text-align: center;
-    line-height: 25px;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
     margin-left: 10px;
-    font-size: 0.8rem;
-}
-
-/* Surah Item - Light Mode */
-.surah-item {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin: 2px 0;
-    border-radius: 4px;
-}
-
-.surah-item:hover {
-    background-color: rgba(34, 139, 34, 0.08);
+    flex-shrink: 0;
 }
 
 .active-surah {
-    background-color: rgba(65, 105, 225, 0.1);
-    border-right: 3px solid #2E8B57;
+    background-color: rgba(197, 153, 42, 0.08) !important;
+    border-right: 3px solid var(--gold-accent);
     font-weight: 600;
     position: relative;
 }
@@ -93,13 +103,13 @@
 }
 
 .active-surah .surah-name {
-    color: #2E8B57;
+    color: var(--primary-green);
 }
 
 /* RTL Support for Active Surah */
 [dir="rtl"] .active-surah {
     border-right: none;
-    border-left: 3px solid #2E8B57;
+    border-left: 3px solid var(--gold-accent);
 }
 
 [dir="rtl"] .active-surah::after {
@@ -115,7 +125,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(44, 36, 22, 0.4);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     z-index: 984599;
     animation: overlayFadeIn 0.2s ease;
 }

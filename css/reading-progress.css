@@ -1,24 +1,30 @@
-/* Reading Progress */
+/* ================================================================
+   READING PROGRESS — Premium Top Progress Indicator
+   
+   A thin, elegant progress bar at the very top of the viewport.
+   Uses gold gradient to match the Mushaf aesthetic.
+   ================================================================ */
 .reading-progress-bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: 3px;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(197, 153, 42, 0.08);
     z-index: 9999;
 }
 
 .reading-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-green), var(--gold-accent));
-    transition: width 0.5s ease;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-accent), var(--gold-bright));
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 0 2px 2px 0;
 }
 
 .night-mode .reading-progress-bar {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(197, 153, 42, 0.06);
 }
 
 .night-mode .reading-progress-fill {
-    background: linear-gradient(90deg, #81C784, #FFD54F);
+    background: linear-gradient(90deg, #8B6914, #C5992A, #E8C84A);
 }

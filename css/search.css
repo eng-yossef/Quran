@@ -1,4 +1,8 @@
-/* Search Modal */
+/* ================================================================
+   SEARCH — Premium Search Modal
+   
+   Clean, elegant search with warm tones and smooth animations.
+   ================================================================ */
 .search-overlay {
     display: none;
     position: fixed;
@@ -6,12 +10,13 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(44, 36, 22, 0.5);
     z-index: 9000;
     justify-content: center;
     align-items: flex-start;
     padding-top: 80px;
     backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .search-overlay.active {
@@ -19,19 +24,22 @@
 }
 
 .search-modal {
-    background: white;
-    border-radius: 12px;
+    background: var(--quran-page-bg);
+    border-radius: var(--radius-xl);
     width: 90%;
     max-width: 600px;
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: searchSlideIn 0.3s ease;
+    box-shadow:
+        0 20px 60px rgba(44, 36, 22, 0.2),
+        0 0 0 1px rgba(197, 153, 42, 0.1);
+    animation: searchSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
 }
 
 @keyframes searchSlideIn {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(-16px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -39,23 +47,26 @@
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    border-bottom: 2px solid var(--primary-green);
+    border-bottom: 1.5px solid rgba(197, 153, 42, 0.15);
     gap: 10px;
 }
 
 .search-input {
     flex: 1;
     padding: 10px 15px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+    border: 1.5px solid rgba(197, 153, 42, 0.15);
+    border-radius: var(--radius-md);
     font-size: 1.1rem;
-    font-family: 'Amiri', serif;
+    font-family: var(--quran-font);
     outline: none;
-    transition: border-color 0.2s;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    background: rgba(255, 255, 255, 0.6);
+    color: #2C2416;
 }
 
 .search-input:focus {
-    border-color: var(--primary-green);
+    border-color: var(--gold-accent);
+    box-shadow: 0 0 0 3px rgba(197, 153, 42, 0.1);
 }
 
 .search-close-btn {
@@ -63,12 +74,15 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: #8A7E6A;
     padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .search-close-btn:hover {
-    color: #333;
+    color: #2C2416;
+    background: rgba(197, 153, 42, 0.06);
 }
 
 .search-results {
@@ -80,18 +94,18 @@
 
 .search-result-item {
     padding: 12px 15px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid rgba(197, 153, 42, 0.06);
     cursor: pointer;
-    border-radius: 8px;
-    transition: background 0.2s;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
 }
 
 .search-result-item:hover {
-    background-color: var(--light-green);
+    background-color: rgba(197, 153, 42, 0.06);
 }
 
 .search-result-surah {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     color: var(--primary-green);
     font-size: 0.9rem;
     margin-bottom: 4px;
@@ -100,49 +114,50 @@
 .search-result-text {
     font-size: 1.1rem;
     line-height: 1.6;
+    font-family: var(--quran-font);
 }
 
 .search-result-text mark {
-    background-color: #fff176;
-    color: #333;
-    padding: 0 2px;
+    background-color: rgba(232, 200, 74, 0.3);
+    color: #2C2416;
+    padding: 0 3px;
     border-radius: 2px;
 }
 
 .search-result-verse-num {
     font-size: 0.8rem;
-    color: #888;
+    color: #8A7E6A;
     margin-top: 4px;
 }
 
 .search-no-results {
     text-align: center;
     padding: 40px 20px;
-    color: #888;
+    color: #8A7E6A;
     font-size: 1.1rem;
 }
 
 .search-recent {
     padding: 10px 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid rgba(197, 153, 42, 0.06);
 }
 
 .search-recent-title {
     font-size: 0.85rem;
-    color: #888;
+    color: #8A7E6A;
     margin-bottom: 8px;
 }
 
 .search-recent-item {
     padding: 6px 10px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-size: 0.95rem;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .search-recent-item:hover {
-    background-color: var(--light-green);
+    background-color: rgba(197, 153, 42, 0.06);
 }
 
 /* Search Highlight Animation */
@@ -151,9 +166,9 @@
 }
 
 @keyframes searchHighlightPulse {
-    0% { background-color: rgba(255, 235, 59, 0.3); }
-    50% { background-color: rgba(255, 235, 59, 0.6); }
-    100% { background-color: rgba(255, 235, 59, 0.3); }
+    0% { background-color: rgba(232, 200, 74, 0.2); }
+    50% { background-color: rgba(232, 200, 74, 0.4); }
+    100% { background-color: rgba(232, 200, 74, 0.2); }
 }
 
 .night-mode .verse-container.search-highlight {
@@ -161,41 +176,41 @@
 }
 
 @keyframes searchHighlightPulseDark {
-    0% { background-color: rgba(255, 235, 59, 0.1); }
-    50% { background-color: rgba(255, 235, 59, 0.25); }
-    100% { background-color: rgba(255, 235, 59, 0.1); }
+    0% { background-color: rgba(197, 153, 42, 0.1); }
+    50% { background-color: rgba(197, 153, 42, 0.2); }
+    100% { background-color: rgba(197, 153, 42, 0.1); }
 }
 
 /* Night Mode */
 .night-mode .search-modal {
-    background: #1e1e1e;
-    color: #e0e0e0;
+    background: #22201A;
 }
 
 .night-mode .search-input {
-    background: #333;
-    border-color: #555;
-    color: #e0e0e0;
+    background: #2C2A24;
+    border-color: rgba(197, 153, 42, 0.12);
+    color: #D4C8B0;
 }
 
 .night-mode .search-input:focus {
-    border-color: #81C784;
+    border-color: var(--gold-accent);
+    box-shadow: 0 0 0 3px rgba(197, 153, 42, 0.08);
 }
 
 .night-mode .search-header {
-    border-bottom-color: #81C784;
+    border-bottom-color: rgba(197, 153, 42, 0.12);
 }
 
 .night-mode .search-result-item:hover {
-    background-color: rgba(50, 205, 50, 0.1);
+    background-color: rgba(197, 153, 42, 0.06);
 }
 
 .night-mode .search-close-btn {
-    color: #aaa;
+    color: #8A7E6A;
 }
 
 .night-mode .search-result-item {
-    border-bottom-color: #333;
+    border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
 /* Responsive */
@@ -227,7 +242,7 @@
     .search-modal {
         width: 98%;
         max-height: 90vh;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
     }
 
     .search-header {

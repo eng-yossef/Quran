@@ -1,110 +1,34 @@
-/* ===== Verse Action Toolbar ===== */
-.verse-actions {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    position: absolute;
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%) translateY(4px) scale(0.95);
-    z-index: 10;
-    background: white;
-    padding: 4px 6px;
-    border-radius: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
-    border: 1px solid #eee;
-    white-space: nowrap;
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
-    pointer-events: none;
-}
-
-.verse-container:hover .verse-actions,
-.verse-container.active-verse .verse-actions {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-    pointer-events: auto;
-}
-
-/* Individual buttons */
-.verse-action-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border-radius: 50%;
-    transition: background 0.15s ease, transform 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    line-height: 1;
-    color: #333;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.verse-action-btn:hover {
-    background: var(--light-green);
-    transform: scale(1.1);
-}
-
-.verse-action-btn:active {
-    transform: scale(0.95);
-}
-
-.verse-action-btn.copied {
-    color: var(--primary-green);
-}
-
-.verse-action-btn.verse-bookmark-btn.bookmarked {
-    color: var(--gold-accent);
-}
-
-/* Toast Notification */
+/* ================================================================
+   VERSE ACTION TOOLBAR — Premium Floating Context Actions
+   
+   Clean, modern action bar that appears on verse hover/tap.
+   Uses glassmorphism effect with warm tones.
+   ================================================================ */
 .toast-notification {
     position: fixed;
     bottom: 130px;
     left: 50%;
     transform: translateX(-50%);
-    background: #333;
-    color: white;
+    background: #2C2416;
+    color: #F0EBE0;
     padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.88rem;
     z-index: 10000;
-    animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: toastIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), toastOut 0.3s ease 2s forwards;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(197, 153, 42, 0.1);
     pointer-events: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @keyframes toastIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    from { opacity: 0; transform: translateX(-50%) translateY(16px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 @keyframes toastOut {
     from { opacity: 1; }
     to { opacity: 0; }
-}
-
-/* Night Mode */
-.night-mode .verse-actions {
-    background: #333;
-    border-color: #555;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-}
-
-.night-mode .verse-action-btn {
-    color: #e0e0e0;
-}
-
-.night-mode .verse-action-btn:hover {
-    background: rgba(50, 205, 50, 0.15);
 }
 
 /* Mobile: toast smaller */

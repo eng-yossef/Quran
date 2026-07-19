@@ -1,132 +1,122 @@
-/* Current Playing Verse Styles */
+/* ================================================================
+   ANIMATIONS — Premium, Subtle Micro-interactions
+   
+   All animations are designed to be:
+   - Smooth and natural (60fps)
+   - Subtle (never distracting)
+   - Respectful of user preferences (prefers-reduced-motion)
+   - Performance-optimized (CSS transforms only)
+   ================================================================ */
+
+/* ─── Current Playing Verse ──────────────────────────────────── */
 .current-playing-verse {
     position: relative;
-    transition: all 0.3s ease;
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 1;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 /* Light Mode */
 .current-playing-verse {
-    background-color: rgba(46, 139, 87, 0.10) !important;
-    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.20);
-    padding: 2px 6px;
-    border-radius: 6px;
+    background-color: rgba(27, 107, 58, 0.06) !important;
+    box-shadow: 0 0 0 2px rgba(27, 107, 58, 0.12);
+    padding: 3px 8px;
+    border-radius: var(--radius-md);
 }
 
 .current-playing-verse .verse-number {
-    background: linear-gradient(145deg, #2E8B57 0%, #1B6B3A 40%, #2E8B57 60%, #3CB371 100%) !important;
+    background: linear-gradient(145deg, #1B6B3A 0%, #0F4B24 35%, #2E8B57 65%, #3CB371 100%) !important;
     color: white !important;
     transform: scale(1.15);
-    box-shadow: 0 2px 8px rgba(46, 139, 87, 0.45), 0 0 0 3px rgba(46, 139, 87, 0.20);
-    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(27, 107, 58, 0.4), 0 0 0 3px rgba(27, 107, 58, 0.12);
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Surah Info Hover */
-@keyframes surah-info-glow {
-    0% { box-shadow: 0 0 0 rgba(46, 139, 87, 0); }
-    100% { box-shadow: 0 0 10px rgba(46, 139, 87, 0.3); }
-}
-
-.surah-info:hover {
-    animation: surah-info-glow 0.5s forwards;
-}
-
-/* Bismillah Hover */
-@keyframes bismillah-glow {
-    0% { box-shadow: 0 0 5px rgba(46, 139, 87, 0.3); }
-    50% { box-shadow: 0 0 15px rgba(46, 139, 87, 0.5); }
-    100% { box-shadow: 0 0 5px rgba(46, 139, 87, 0.3); }
-}
-
-.bismillah-text:hover {
-    animation: bismillah-glow 2s infinite;
-}
-
-/* Tafsir Fade In */
+/* ─── Tafsir Fade In ─────────────────────────────────────────── */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Verse Pulse Animation */
-@keyframes verse-pulse {
-    0% { box-shadow: inset 0 0 0 rgba(46, 139, 87, 0); }
-    50% { box-shadow: inset 0 0 10px rgba(46, 139, 87, 0.1); }
-    100% { box-shadow: inset 0 0 0 rgba(46, 139, 87, 0); }
+.tafsir-tooltip {
+    animation: fadeIn 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Night Mode Verse Hover - Glow Effect */
+/* ─── Verse Pulse (when playing) ─────────────────────────────── */
+@keyframes versePulse {
+    0% { box-shadow: inset 0 0 0 rgba(27, 107, 58, 0); }
+    50% { box-shadow: inset 0 0 10px rgba(27, 107, 58, 0.06); }
+    100% { box-shadow: inset 0 0 0 rgba(27, 107, 58, 0); }
+}
+
+.current-playing-verse {
+    animation: versePulse 3s ease infinite;
+}
+
+/* ─── Surah Info Hover ───────────────────────────────────────── */
+@keyframes surahInfoGlow {
+    0% { box-shadow: 0 2px 12px rgba(120, 100, 60, 0.08); }
+    100% { box-shadow: 0 2px 16px rgba(197, 153, 42, 0.12); }
+}
+
+.surah-info:hover {
+    animation: surahInfoGlow 0.4s forwards;
+}
+
+/* ─── Bismillah Subtle Hover ─────────────────────────────────── */
+.bismillah-text {
+    transition: all 0.4s ease;
+}
+
+.bismillah-text:hover {
+    text-shadow: 0 0 12px rgba(27, 107, 58, 0.08);
+}
+
+/* ─── Verse Hover Glow (Light Mode) ──────────────────────────── */
+.verse-text:hover {
+    background-color: rgba(197, 153, 42, 0.05);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+/* ─── Page Transition ────────────────────────────────────────── */
+@keyframes pageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quran-page {
+    animation: pageSlideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ─── Night Mode Verse Hover — Gentle Gold Glow ──────────────── */
 .night-mode .verse-text:hover {
     position: relative;
-    color: #ffffff;
-    text-shadow: 0 0 8px rgba(179, 229, 252, 0.7);
+    color: #E8DCC0;
+    text-shadow: 0 0 8px rgba(197, 153, 42, 0.2);
     transition: all 0.3s ease;
 }
 
-.night-mode .verse-text:hover::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 4px;
-    background: rgba(179, 229, 252, 0.1);
-    box-shadow: 0 0 12px rgba(179, 229, 252, 0.3);
-    z-index: -1;
-    animation: gentle-pulse 2s infinite alternate;
-}
-
-@keyframes gentle-pulse {
-    0% {
-        opacity: 0.3;
-        box-shadow: 0 0 8px rgba(179, 229, 252, 0.2);
-    }
-    100% {
-        opacity: 0.5;
-        box-shadow: 0 0 15px rgba(179, 229, 252, 0.4);
-    }
-}
-
-/* Night Mode Verse Container Hover */
-.night-mode .verse:hover {
-    background-color: rgba(30, 30, 30, 0.7);
-    border-left: 2px solid #4FC3F7;
-    transform: translateX(3px);
-}
-
-.night-mode .verse:hover .verse-text {
-    color: #E1F5FE;
-    text-shadow: 0 0 10px rgba(187, 222, 251, 0.6);
-}
-
-.night-mode .verse:hover .verse-number {
-    background-color: #0288D1 !important;
-    box-shadow: 0 0 0 2px #4FC3F7;
-    transform: scale(1.1);
+.night-mode .verse-container:hover .verse-number {
+    transform: scale(1.08);
     transition: all 0.3s ease;
 }
 
-.night-mode .verse:hover::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -5px;
-    right: -5px;
-    bottom: -2px;
-    background: linear-gradient(
-        90deg,
-        rgba(2, 136, 209, 0.1) 0%,
-        rgba(66, 165, 245, 0.05) 50%,
-        rgba(2, 136, 209, 0.1) 100%
-    );
-    border-radius: 6px;
-    z-index: -1;
-    animation: gentle-glow 2s ease infinite alternate;
-}
-
-@keyframes gentle-glow {
-    from { opacity: 0.4; }
-    to { opacity: 0.7; }
+/* ─── Reduced Motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .current-playing-verse,
+    .surah-info,
+    .bismillah-text,
+    .verse-text,
+    .quran-page,
+    .tafsir-tooltip {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+    }
 }

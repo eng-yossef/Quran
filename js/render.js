@@ -7,8 +7,64 @@ function renderPage(pageNumber) {
 
     const lastRead = (typeof getLastRead === 'function') ? getLastRead() : null;
 
-    let html = '';
+    // Build page elements array
+    const elements = [];
     let currentSurah = null;
+
+    pageVerses.forEach(verse => {
+        if (verse.surahNumber !== currentSurah) {
+            if (verse.numberInSurah === 1) {
+                elements.push({
+                    type: 'surah-header',
+                    surahNumber: verse.surahNumber,
+                    surahName: verse.surahName,
+                    englishName: verse.englishName,
+                    revelationType: verse.revelationType
+                });
+                if (pageNumber != 1 && pageNumber != 187) {
+                    elements.push({ type: 'bismillah' });
+                }
+            }
+            currentSurah = verse.surahNumber;
+        }
+
+        const displayText = (verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187)
+            ? verse.text.substring(39)
+            : verse.text;
+
+        elements.push({
+            type: 'verse',
+            surahNumber: verse.surahNumber,
+            numberInSurah: verse.numberInSurah,
+            surahName: verse.surahName,
+            displayText: displayText,
+            verseData: verse
+        });
+    });
+
+    // Use a single consistent font size — no per-page scaling
+    const targetFontSize = userFontSize || parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--quran-font-size')) || 1.75;
+
+    // Apply fixed font size to the page
+    quranPageEl.style.fontSize = targetFontSize + 'rem';
+
+    // Build HTML
+    const html = LayoutEngine._buildPageHTML(elements);
+
+    // Wrap content in layout container and inject
+    quranPageEl.innerHTML = `<div class="quran-page-content">${html}</div>`;
+
+    // Add last-read highlight after render
+    if (lastRead) {
+        quranPageEl.querySelectorAll('.verse-container').forEach(verseEl => {
+            const surah = parseInt(verseEl.dataset.surah);
+            const ayah = parseInt(verseEl.dataset.ayah);
+            if (surah === lastRead.surahNumber && ayah === lastRead.ayahNumber) {
+                verseEl.classList.add('last-read-verse');
+            }
+        });
+    }
 
     const pageJuz = pageVerses[0]?.juz;
     const pageJuzEnd = pageVerses[pageVerses.length - 1]?.juz;
@@ -17,44 +73,6 @@ function renderPage(pageNumber) {
     if (pageJuz !== pageJuzEnd) {
         juzDisplayText = `الجزء ${toArabicNumber(pageJuz)} - ${toArabicNumber(pageJuzEnd)}`;
     }
-
-    pageVerses.forEach(verse => {
-        if (verse.surahNumber !== currentSurah) {
-            if (verse.numberInSurah === 1) {
-                html += `
-                    <div class="surah-info">
-                        <h2 class="surah-name" data-surah="${verse.surahNumber}">
-                            ${verse.surahName}
-                        </h2>
-                        <p>${verse.englishName} - ${verse.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</p>
-                    </div>
-                `;
-                if (pageNumber != 1 && pageNumber != 187) {
-                    html += `
-                        <div class="bismillah-container">
-                            <div class="bismillah-decoration left"></div>
-                            <h1 class="bismillah-text">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</h1>
-                            <div class="bismillah-decoration right"></div>
-                        </div>
-                    `;
-                }
-            }
-            currentSurah = verse.surahNumber;
-        }
-
-        const isLastRead = lastRead &&
-            lastRead.surahNumber === verse.surahNumber &&
-            lastRead.ayahNumber === verse.numberInSurah;
-
-        html += `
-        <div class="verse-container${isLastRead ? ' last-read-verse' : ''}" data-surah="${verse.surahNumber}" data-ayah="${verse.numberInSurah}" data-surah-name="${verse.surahName}">
-            <span class="verse-text">${verse.numberInSurah === 1 && pageNumber != 1 && pageNumber != 187 ? verse.text.substring(39) : verse.text}</span>
-            <span class="verse-number">${toArabicNumber(verse.numberInSurah)}</span>
-        </div>
-    `;
-    });
-
-    quranPageEl.innerHTML = html;
 
     pageIndicatorEl.innerHTML = `
         <div class="page-controls">

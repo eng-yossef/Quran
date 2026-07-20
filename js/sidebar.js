@@ -40,7 +40,6 @@ function goToSurah(surahNumber) {
         window.scrollTo(0, 0);
         history.replaceState({ page: currentPage }, '', `?page=${currentPage}`);
     }
-    matchSidebarHeight();
     closeSidebar();
 }
 
@@ -92,7 +91,6 @@ function toggleSidebar() {
             sidebarEl.classList.add('collapsed');
             menuButtonEl.setAttribute('aria-expanded', 'false');
         }
-        matchSidebarHeight();
     }
 }
 

@@ -735,7 +735,6 @@ function goToSurahWithLastRead(surahNumber) {
                 scrollToVerse(data.surahNumber, data.ayahNumber, true);
             }, 200);
         }
-        matchSidebarHeight();
         closeSidebar();
         return true;
     }

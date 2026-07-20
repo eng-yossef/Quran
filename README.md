@@ -20,7 +20,7 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 - **Verse-by-Verse Sync**: Audio highlights the currently playing verse with green marker
 - **Continuous Surah Mode**: Click any Surah header to play the entire Surah
 - **Playback Speed**: 0.5x, 0.75x, 1x, 1.25x, 1.5x, 2x
-- **Verse Repeat**: Repeat individual verses 1x, 3x, 5x, 10x, or infinite
+- **Verse Repeat**: Repeat individual verses 1x, 3x, 5x, 10x, or infinite — replays the same audio directly without consuming from the queue, with accurate progress display
 - **Stop Audio**: Floating stop button for quick audio termination
 - **Smart Pre-fetch**: Pre-loads upcoming verses for gapless playback
 
@@ -70,6 +70,7 @@ A modern, feature-rich web application for reading and listening to the Holy Qur
 ### Responsive Design
 - **Mobile-first**: Optimized for phones (≤640px), small tablets (641–768px), large tablets (769–1024px), and desktops (≥1025px)
 - **Overlay Sidebar**: Slide-out drawer on mobile with backdrop, ESC key, and outside-click close
+- **Desktop Sidebar Toggle**: Collapsible sidebar on desktop (≥1025px) with smooth width/opacity animation — main content expands to fill the space when closed
 - **Touch-friendly**: 40px minimum touch targets, tap-to-toggle verse actions
 - **Compact Header**: Scrollable header controls on small screens
 - **Body Scroll Lock**: Prevents background scrolling when sidebar is open on mobile
@@ -167,13 +168,13 @@ Quran/
 │   ├── utils.js            # cleanVerseText(), normalizeArabic(), toArabicNumber(), findPageForVerse()
 │   ├── storage.js          # IndexedDB (QuranCacheDB), localStorage helpers, organizeVersesByPage()
 │   ├── share.js            # copyVerseText(), shareVerse(), fallbackCopy(), showToast()
-│   ├── audio.js            # Audio playback engine, pre-fetch queue, verse sync, audio navigation flag
-│   ├── audio-controls.js   # Play/pause, stop, speed control, repeat/loop logic
+│   ├── audio.js            # Audio playback engine, pre-fetch queue, verse sync, replayCurrentAudio() for correct repeat
+│   ├── audio-controls.js   # Speed control, repeat/loop logic with accurate iteration tracking
 │   ├── render.js           # renderPage() — verse HTML generation, surah headers, bismillah, last-read marker
 │   ├── tafsir.js           # Tafsir Al-Muyassar fetch and tooltip display
 │   ├── verse-interactions.js # Verse hover/tap, action toolbar, copy/share/bookmark/tafsir
 │   ├── navigation.js       # Page navigation, keyboard shortcuts, page input
-│   ├── sidebar.js          # Sidebar toggle, surah list, overlay, ESC/outside-click close
+│   ├── sidebar.js          # Sidebar toggle (mobile overlay + desktop collapse), surah list, ESC/outside-click close
 │   ├── night-mode.js       # Theme toggle, localStorage persistence
 │   ├── image-export.js     # html2canvas verse image generation
 │   ├── search.js           # Full-text search engine, recent searches, result highlighting
@@ -253,6 +254,7 @@ reading-progress → last-read → fullscreen → pwa → app
 - **Gold gradient verse markers** with layered box-shadow for depth
 - **Parchment page background** (`#FFFDF7`) with decorative inner border
 - **Mobile overlay sidebar** with backdrop blur, ESC key close, and body scroll lock
+- **Desktop collapsible sidebar** with smooth width/opacity animation, independent scroll panels
 - **Touch-first verse actions** — tap toggles toolbar on mobile, hover shows on desktop
 - **IntersectionObserver** for last-read tracking — no scroll event listeners, no performance overhead
 - **CSS-only verse marker** via `::before` pseudo-element — no DOM injection during scroll

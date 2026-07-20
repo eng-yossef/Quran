@@ -103,7 +103,6 @@ function renderPage(pageNumber) {
     setupVerseInteractions();
     if (typeof updateBookmarkIcons === 'function') updateBookmarkIcons();
     highlightSurahForCurrentPage();
-    matchSidebarHeight();
     if (typeof trackReadingPosition === 'function') trackReadingPosition();
     if (typeof updateLastReadMarker === 'function') updateLastReadMarker();
 }

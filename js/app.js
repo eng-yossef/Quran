@@ -19,13 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    matchSidebarHeight();
-    window.addEventListener('load', matchSidebarHeight);
 });
 
 let resizeTimer;
 window.addEventListener('resize', function () {
-    matchSidebarHeight();
     recalcLayout();
 });
 

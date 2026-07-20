@@ -1,17 +1,3 @@
-function matchSidebarHeight() {
-    const sidebar = document.querySelector('.surah-list');
-    if (!sidebar) return;
-
-    if (isMobile()) {
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            sidebar.style.height = `${mainContent.offsetHeight - 200}px`;
-        }
-    } else {
-        sidebar.style.height = '';
-    }
-}
-
 function setupSwipeNavigation() {
     const quranPage = document.getElementById('quranPage');
     const SWIPE_IGNORE_RADIUS = 40;

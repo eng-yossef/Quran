@@ -1,10 +1,14 @@
 function matchSidebarHeight() {
-    const quranPage = document.querySelector('.main-content');
     const sidebar = document.querySelector('.surah-list');
+    if (!sidebar) return;
 
-    if (quranPage && sidebar) {
-        const quranPageHeight = quranPage.offsetHeight;
-        sidebar.style.height = `${quranPageHeight - 200}px`;
+    if (isMobile()) {
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            sidebar.style.height = `${mainContent.offsetHeight - 200}px`;
+        }
+    } else {
+        sidebar.style.height = '';
     }
 }
 

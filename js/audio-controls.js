@@ -37,7 +37,10 @@ function applyAudioSpeed(audio) {
 
 function showRepeatControls() {
     const controls = document.getElementById('repeatControls');
-    if (controls) controls.classList.add('active');
+    if (controls) {
+        controls.classList.add('active');
+        updateRepeatDisplay();
+    }
 }
 
 function hideRepeatControls() {

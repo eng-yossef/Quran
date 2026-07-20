@@ -609,12 +609,34 @@
 }
 
 /* ============================================================
-   SMALL DESKTOPS (≥1025px) — sidebar always visible
+   SMALL DESKTOPS (≥1025px) — sidebar toggleable
    ============================================================ */
 @media (min-width: 1025px) {
+    .app-container {
+        height: 100vh;
+        height: 100dvh;
+    }
+
     .sidebar {
         transform: none;
         position: relative;
+        transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    min-width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    opacity 0.25s ease;
+        height: 100%;
+    }
+
+    .sidebar.collapsed {
+        width: 0;
+        min-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        border: none;
+    }
+
+    .main-content {
+        height: 100%;
+        overflow-y: auto;
     }
 
     .sidebar-overlay {

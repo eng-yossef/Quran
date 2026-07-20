@@ -84,34 +84,34 @@ async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumbe
     clearVerseHighlights();
 
     const verses = [];
-    let currentPage = startFrom.page;
+    let page = startFrom.page;
 
-    if (!currentPage && startFrom.verseNumber) {
-        for (let page = 1; page <= totalPages; page++) {
-            const verseInPage = pagesData[page].find(v =>
+    if (!page && startFrom.verseNumber) {
+        for (let p = 1; p <= totalPages; p++) {
+            const verseInPage = pagesData[p].find(v =>
                 v.surahNumber == surahNumber && v.numberInSurah == startFrom.verseNumber
             );
             if (verseInPage) {
-                currentPage = page;
+                page = p;
                 break;
             }
         }
-        if (!currentPage) return;
+        if (!page) return;
     }
 
-    if (!currentPage) {
-        for (let page = 1; page <= totalPages; page++) {
-            if (pagesData[page].some(v => v.surahNumber == surahNumber)) {
-                currentPage = page;
+    if (!page) {
+        for (let p = 1; p <= totalPages; p++) {
+            if (pagesData[p].some(v => v.surahNumber == surahNumber)) {
+                page = p;
                 break;
             }
         }
-        if (!currentPage) return;
+        if (!page) return;
     }
 
     let foundStartingVerse = !startFrom.verseNumber;
-    for (let page = currentPage; page <= totalPages; page++) {
-        const pageVerses = pagesData[page].filter(v => v.surahNumber == surahNumber);
+    for (let p = page; p <= totalPages; p++) {
+        const pageVerses = pagesData[p].filter(v => v.surahNumber == surahNumber);
         if (pageVerses.length === 0) break;
 
         for (const verse of pageVerses) {
@@ -125,7 +125,7 @@ async function playEntireSurah(surahNumber, startFrom = { page: null, verseNumbe
             }
         }
 
-        if (page < totalPages && pagesData[page + 1][0]?.surahNumber !== surahNumber) {
+        if (p < totalPages && pagesData[p + 1][0]?.surahNumber !== surahNumber) {
             break;
         }
     }
@@ -203,7 +203,7 @@ async function playNextVerseInSequence() {
         trackVerseListened(verse.surahNumber, verse.numberInSurah);
 
         if (shouldRepeat()) {
-            playNextVerseInSequence();
+            replayCurrentAudio(verse);
             return;
         }
         resetRepeatCount();
@@ -220,6 +220,45 @@ async function playNextVerseInSequence() {
             stopAudio();
         }
     });
+}
+
+function replayCurrentAudio(verse) {
+    if (!currentAudio) return;
+
+    if (currentAudio._endedHandler) {
+        currentAudio.removeEventListener('ended', currentAudio._endedHandler);
+        delete currentAudio._endedHandler;
+    }
+
+    currentAudio._endedHandler = async () => {
+        currentAudio.removeEventListener('ended', currentAudio._endedHandler);
+        delete currentAudio._endedHandler;
+
+        trackVerseListened(verse.surahNumber, verse.numberInSurah);
+
+        if (shouldRepeat()) {
+            replayCurrentAudio(verse);
+            return;
+        }
+        resetRepeatCount();
+
+        currentVerseIndex++;
+
+        if (audioQueue.length < MAX_PREFETCH_COUNT - 1 && currentVerseIndex < currentVerseSequence.length) {
+            await prefetchVerses(currentVerseIndex + audioQueue.length, 1);
+        }
+
+        if (isPlayingEntireSurah && currentVerseIndex < currentVerseSequence.length) {
+            playNextVerseInSequence();
+        } else {
+            stopAudio();
+        }
+    };
+
+    currentAudio.addEventListener('ended', currentAudio._endedHandler);
+    currentAudio.currentTime = 0;
+    applyAudioSpeed(currentAudio);
+    currentAudio.play().catch(err => console.error('Replay failed:', err));
 }
 
 function highlightCurrentVerse(verseElement) {

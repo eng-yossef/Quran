@@ -147,9 +147,13 @@ async function initApp() {
                     tooltip.remove();
                 });
 
-                document.querySelectorAll('.verse-container').forEach(v => {
-                    v.classList.remove('active-verse');
-                });
+                if (typeof _hideAllToolbars === 'function') {
+                    _hideAllToolbars();
+                } else {
+                    document.querySelectorAll('.verse-container').forEach(v => {
+                        v.classList.remove('active-verse');
+                    });
+                }
             }
         });
 

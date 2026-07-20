@@ -1,5 +1,7 @@
 let _toolbarHideTimer = null;
 const TOOLBAR_HIDE_DELAY = 300;
+let _activeToolbarVerse = null;
+let _scrollDismissHandler = null;
 
 function _showToolbar(verseContainer) {
     clearTimeout(_toolbarHideTimer);
@@ -7,11 +9,13 @@ function _showToolbar(verseContainer) {
         if (v !== verseContainer) v.classList.remove('active-verse');
     });
     verseContainer.classList.add('active-verse');
+    _activeToolbarVerse = verseContainer;
 }
 
 function _hideToolbar(verseContainer) {
     _toolbarHideTimer = setTimeout(() => {
-        verseContainer.classList.remove('active-verse');
+        if (verseContainer) verseContainer.classList.remove('active-verse');
+        if (_activeToolbarVerse === verseContainer) _activeToolbarVerse = null;
     }, TOOLBAR_HIDE_DELAY);
 }
 
@@ -19,31 +23,53 @@ function _cancelHide() {
     clearTimeout(_toolbarHideTimer);
 }
 
+function _hideAllToolbars() {
+    clearTimeout(_toolbarHideTimer);
+    document.querySelectorAll('.verse-container.active-verse').forEach(v => {
+        v.classList.remove('active-verse');
+    });
+    _activeToolbarVerse = null;
+}
+
+function _setupScrollDismiss() {
+    if (_scrollDismissHandler) return;
+    _scrollDismissHandler = function () {
+        if (_activeToolbarVerse) {
+            _hideAllToolbars();
+        }
+    };
+    window.addEventListener('scroll', _scrollDismissHandler, { passive: true });
+}
+
 function _positionToolbarNearCursor(verseContainer, x, y) {
     const actionsDiv = verseContainer.querySelector('.verse-actions');
     if (!actionsDiv) return;
 
     const isMobile = window.innerWidth <= 768;
-    const gap = 10;
+    const gap = isMobile ? 12 : 10;
     const toolbarW = actionsDiv.offsetWidth || 200;
-    const toolbarH = actionsDiv.offsetHeight || 40;
+    const toolbarH = actionsDiv.offsetHeight || 44;
 
     let top, left;
 
     if (isMobile) {
-        left = x;
         top = y - toolbarH - gap;
+        left = x;
 
-        if (top < 4) {
+        if (top < 8) {
             top = y + gap;
         }
 
-        if (top + toolbarH > window.innerHeight - 8) {
+        if (top + toolbarH > window.innerHeight - 16) {
             top = y - toolbarH - gap;
         }
 
-        left = Math.max(toolbarW / 2 + 4, Math.min(window.innerWidth - toolbarW / 2 - 4, left));
-        top = Math.max(4, Math.min(window.innerHeight - toolbarH - 4, top));
+        if (top < 8) {
+            top = Math.max(8, (window.innerHeight - toolbarH) / 2);
+        }
+
+        left = Math.max(toolbarW / 2 + 8, Math.min(window.innerWidth - toolbarW / 2 - 8, left));
+        top = Math.max(8, Math.min(window.innerHeight - toolbarH - 8, top));
     } else {
         top = y - toolbarH - gap;
         left = x;
@@ -65,6 +91,8 @@ function setupVerseInteractions() {
     const isTouchDevice = ('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0);
+
+    _setupScrollDismiss();
 
     document.querySelectorAll('.verse-container').forEach(verseContainer => {
         verseContainer.classList.add('no-text-select');
@@ -105,7 +133,9 @@ function setupVerseInteractions() {
         let isPotentialScroll = false;
         let longPressTimer = null;
         let longPressFired = false;
+        let toolbarInteracting = false;
         const LONG_PRESS_DELAY = 400;
+        const MOVE_THRESHOLD = 12;
 
         const highlightVerse = () => {
             document.querySelectorAll('.verse-container').forEach(v => {
@@ -135,6 +165,7 @@ function setupVerseInteractions() {
                 document.querySelectorAll('.verse-container').forEach(v => {
                     v.classList.remove('active-verse');
                 });
+                _activeToolbarVerse = null;
                 verseContainer.style.opacity = '0.7';
                 setTimeout(() => { verseContainer.style.opacity = ''; }, 300);
                 playEntireSurah(surahNumber, { verseNumber: verseNumber });
@@ -151,17 +182,31 @@ function setupVerseInteractions() {
 
             if (isAlreadyActive) {
                 verseContainer.classList.remove('active-verse');
+                _activeToolbarVerse = null;
             } else {
                 _showToolbar(verseContainer);
+
+                const actionsDiv = verseContainer.querySelector('.verse-actions');
+                if (actionsDiv) {
+                    void actionsDiv.offsetWidth;
+                }
+
                 _positionToolbarNearCursor(verseContainer, x, y);
                 clearSelection();
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
             }
         }
 
         function handleTouchStart(e) {
             if (e.target.closest('.verse-actions')) {
+                toolbarInteracting = true;
                 return;
             }
+
+            toolbarInteracting = false;
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
             touchEndX = touchStartX;
@@ -181,6 +226,8 @@ function setupVerseInteractions() {
         }
 
         function handleTouchMove(e) {
+            if (toolbarInteracting) return;
+
             const currentX = e.touches[0].clientX;
             const currentY = e.touches[0].clientY;
 
@@ -190,7 +237,7 @@ function setupVerseInteractions() {
             const xDiff = Math.abs(currentX - touchStartX);
             const yDiff = Math.abs(currentY - touchStartY);
 
-            if (xDiff > 8 || yDiff > 8) {
+            if (xDiff > MOVE_THRESHOLD || yDiff > MOVE_THRESHOLD) {
                 touchMoved = true;
                 clearTimeout(longPressTimer);
 
@@ -201,6 +248,11 @@ function setupVerseInteractions() {
         }
 
         function handleTouchEnd(e) {
+            if (toolbarInteracting) {
+                toolbarInteracting = false;
+                return;
+            }
+
             clearTimeout(longPressTimer);
 
             if (longPressFired) {
@@ -238,6 +290,7 @@ function setupVerseInteractions() {
             touchMoved = false;
             isPotentialScroll = false;
             longPressFired = false;
+            toolbarInteracting = false;
         }
 
         function handleDesktopClick(e) {
@@ -280,9 +333,7 @@ function setupVerseInteractions() {
         window._verseDismissListenerAdded = true;
         document.addEventListener('touchend', function (e) {
             if (!e.target.closest('.verse-container')) {
-                document.querySelectorAll('.verse-container').forEach(v => {
-                    v.classList.remove('active-verse');
-                });
+                _hideAllToolbars();
             }
         }, { passive: true });
     }

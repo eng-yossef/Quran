@@ -508,22 +508,25 @@
     gap: 2px;
     position: fixed;
     z-index: 9999;
-    background: rgba(253, 248, 238, 0.95);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 5px 8px;
+    background: rgba(253, 248, 238, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 6px 10px;
     border-radius: 28px;
     box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.08),
-        0 4px 16px rgba(0, 0, 0, 0.06),
-        0 0 0 1px rgba(197, 153, 42, 0.1);
-    border: 1px solid rgba(197, 153, 42, 0.12);
+        0 4px 20px rgba(0, 0, 0, 0.12),
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(197, 153, 42, 0.15);
+    border: 1px solid rgba(197, 153, 42, 0.15);
     white-space: nowrap;
     visibility: hidden;
     opacity: 0;
-    transform: translateY(4px) scale(0.95);
-    transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+    transform: translateY(6px) scale(0.92);
+    transition: opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                visibility 0.2s;
     pointer-events: none;
+    will-change: transform, opacity;
 }
 
 .verse-container.active-verse .verse-actions {

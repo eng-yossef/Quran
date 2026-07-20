@@ -42,6 +42,8 @@ let _lastSaveTime = 0;
 let _lastSavedKey = null;
 let _surahInfoCache = null;
 let _audioTrackingActive = false;
+let _initGracePeriod = false;
+let _hasUserScrolled = false;
 
 /* ═══════════════════════════════════════════════════════════════════
    SURAH INFO CACHE (O(1) lookup instead of O(114) find)
@@ -595,6 +597,7 @@ function trackReadingPosition() {
 }
 
 function _onIntersection(entries) {
+    if (_initGracePeriod) return;
     if (_audioTrackingActive || window._isAudioNavigation) return;
 
     if (isManualLastRead() || !isAutoTrackingEnabled()) return;
@@ -740,13 +743,90 @@ function goToSurahWithLastRead(surahNumber) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   SAVE ON CLOSE — beforeunload handler
+   Writes directly to localStorage (synchronous) so the position is
+   persisted even if async IndexedDB write doesn't complete.
+   ═══════════════════════════════════════════════════════════════════ */
+
+function _savePositionOnUnload() {
+    if (isManualLastRead()) return;
+
+    const verseEls = document.querySelectorAll('.verse-container');
+    if (!verseEls.length) return;
+
+    const viewportCenter = window.innerHeight / 2;
+    let closestVerse = null;
+    let closestDist = Infinity;
+
+    for (const el of verseEls) {
+        const rect = el.getBoundingClientRect();
+        const verseCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(verseCenter - viewportCenter);
+        if (dist < closestDist) {
+            closestDist = dist;
+            closestVerse = el;
+        }
+    }
+
+    if (!closestVerse) return;
+
+    const surah = parseInt(closestVerse.getAttribute('data-surah'));
+    const ayah = parseInt(closestVerse.getAttribute('data-ayah'));
+    if (isNaN(surah) || isNaN(ayah)) return;
+
+    const surahInfo = getLastReadSurahInfo(surah);
+    const data = {
+        surahNumber: surah,
+        surahName: surahInfo ? surahInfo.arabicName : '',
+        englishSurahName: surahInfo ? surahInfo.englishName : '',
+        pageNumber: currentPageNumber,
+        ayahNumber: ayah,
+        verseKey: `${surah}:${ayah}`,
+        mode: 'auto',
+        timestamp: Date.now()
+    };
+
+    try {
+        localStorage.setItem(LAST_READ_LS_KEY, JSON.stringify(data));
+    } catch (e) { /* */ }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GRACE PERIOD — Prevent observer from overwriting position on load
+   After init, the observer is suspended for GRACE_PERIOD_MS or until
+   the user scrolls manually — whichever comes first.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const GRACE_PERIOD_MS = 3000;
+
+function _startGracePeriod() {
+    _initGracePeriod = true;
+    _hasUserScrolled = false;
+
+    setTimeout(() => {
+        _initGracePeriod = false;
+    }, GRACE_PERIOD_MS);
+
+    const scrollHandler = function () {
+        if (_hasUserScrolled) return;
+        _hasUserScrolled = true;
+        _initGracePeriod = false;
+        window.removeEventListener('scroll', scrollHandler, { passive: true });
+    };
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════════════ */
 
 function initLastRead() {
     _buildSurahCache();
     renderContinueReadingCard();
-    trackReadingPosition();
     updateLastReadMarker();
     updateSurahListLastReadIndicator();
+    _startGracePeriod();
+    trackReadingPosition();
+
+    window.addEventListener('beforeunload', _savePositionOnUnload);
 }

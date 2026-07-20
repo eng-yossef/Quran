@@ -28,6 +28,10 @@ function populateSurahList(surahs) {
 }
 
 function goToSurah(surahNumber) {
+    if (typeof goToSurahWithLastRead === 'function' && goToSurahWithLastRead(surahNumber)) {
+        return;
+    }
+
     const surah = surahData.find(s => s.number === surahNumber);
     if (surah && surah.ayahs.length > 0) {
         currentPage = surah.ayahs[0].page;

@@ -106,6 +106,30 @@
     color: var(--primary-green);
 }
 
+/* ─── Last Read Indicator in Surah List ───────────────────────── */
+.surah-lastread-indicator {
+    margin-right: auto;
+    margin-left: 6px;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+    opacity: 0.85;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+[dir="rtl"] .surah-lastread-indicator {
+    margin-right: auto;
+    margin-left: 6px;
+}
+
+.surah-item:hover .surah-lastread-indicator {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.surah-item.has-last-read .surah-name {
+    font-weight: 600;
+}
+
 /* RTL Support for Active Surah */
 [dir="rtl"] .active-surah {
     border-right: none;

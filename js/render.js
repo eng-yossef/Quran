@@ -5,8 +5,6 @@ function renderPage(pageNumber) {
     const pageVerses = pagesData[pageNumber];
     if (!pageVerses) return;
 
-    const lastRead = (typeof getLastRead === 'function') ? getLastRead() : null;
-
     // Build page elements array
     const elements = [];
     let currentSurah = null;
@@ -54,17 +52,6 @@ function renderPage(pageNumber) {
 
     // Wrap content in layout container and inject
     quranPageEl.innerHTML = `<div class="quran-page-content">${html}</div>`;
-
-    // Add last-read highlight after render
-    if (lastRead) {
-        quranPageEl.querySelectorAll('.verse-container').forEach(verseEl => {
-            const surah = parseInt(verseEl.dataset.surah);
-            const ayah = parseInt(verseEl.dataset.ayah);
-            if (surah === lastRead.surahNumber && ayah === lastRead.ayahNumber) {
-                verseEl.classList.add('last-read-verse');
-            }
-        });
-    }
 
     const pageJuz = pageVerses[0]?.juz;
     const pageJuzEnd = pageVerses[pageVerses.length - 1]?.juz;

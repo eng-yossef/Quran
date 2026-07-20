@@ -106,14 +106,27 @@ function setupVerseInteractions() {
             actionsDiv.className = 'verse-actions';
             actionsDiv.setAttribute('role', 'toolbar');
             actionsDiv.setAttribute('aria-label', 'إجراءات الآية');
+
+            const lastReadData = (typeof getLastRead === 'function') ? getLastRead() : null;
+            const isThisVerseLastRead = lastReadData && lastReadData.surahNumber === surahNumber && lastReadData.ayahNumber === verseNumber;
+            const lastReadIcon = isThisVerseLastRead ? '❌' : '📍';
+            const lastReadTitle = isThisVerseLastRead ? 'إزالة علامة آخر قراءة' : 'تعيين كآخر موضع قراءة';
+            const lastReadAriaLabel = lastReadTitle;
+
             actionsDiv.innerHTML = `
                 <button class="verse-action-btn verse-tafsir-btn" onclick="event.stopPropagation(); showTafsir(this.closest('.verse-container'), ${surahNumber}, ${verseNumber})" title="تفسير الآية" aria-label="تفسير الآية">📖</button>
                 <button class="verse-action-btn verse-bookmark-btn" onclick="event.stopPropagation(); toggleBookmark(${surahNumber}, ${verseNumber}, '${surahName.replace(/'/g, "\\'")}', this.closest('.verse-container').querySelector('.verse-text').textContent)" title="إضافة للمفضلة" aria-label="إضافة للمفضلة">☆</button>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); copyVerseText(${surahNumber}, ${verseNumber})" title="نسخ" aria-label="نسخ الآية">📋</button>
                 <button class="verse-action-btn" onclick="event.stopPropagation(); shareVerse(${surahNumber}, ${verseNumber})" title="مشاركة" aria-label="مشاركة الآية">⤴</button>
                 <button class="verse-action-btn verse-export-btn" onclick="event.stopPropagation(); exportVerseFromButton(this.closest('.verse-container'))" title="تصدير صورة" aria-label="تصدير الآية كصورة">🖼</button>
+                <button class="verse-action-btn verse-lastread-btn${isThisVerseLastRead ? ' is-lastread' : ''}" title="${lastReadTitle}" aria-label="${lastReadAriaLabel}">${lastReadIcon}</button>
             `;
             verseContainer.appendChild(actionsDiv);
+
+            const lastReadBtn = actionsDiv.querySelector('.verse-lastread-btn');
+            if (lastReadBtn && typeof _setupLastReadButtonAction === 'function') {
+                _setupLastReadButtonAction(lastReadBtn, surahNumber, verseNumber);
+            }
 
             actionsDiv.addEventListener('mouseenter', () => {
                 _cancelHide();

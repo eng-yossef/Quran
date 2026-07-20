@@ -1,11 +1,16 @@
 /*
  * Last Read — Continue Reading (Last Read Position)
- * Complete rewrite with:
+ * Enhanced with:
+ *   - Manual Set/Remove Last Read controls
+ *   - Automatic vs Manual priority
+ *   - Once-per-session Continue Reading card
+ *   - Verse number ornament highlighting
+ *   - Surah list indicator
  *   - IntersectionObserver with 40% center band + 50% threshold
  *   - 1000ms dwell time before saving
- *   - IndexedDB primary + localStorage fallback
+ *   - IndexedDB + localStorage dual storage
  *   - MutationObserver-based cross-page navigation
- *   - Audio integration (updates position when audio plays)
+ *   - Audio integration
  *   - Input validation + error recovery
  *   - DOM-based card rendering (no innerHTML XSS)
  *   - Arabic + English relative timestamps
@@ -20,6 +25,8 @@ const LAST_READ_STORE = 'position';
 const LAST_READ_LS_KEY = 'quran-last-read';
 const LAST_READ_DISMISS_KEY = 'last-read-dismissed';
 const LAST_READ_DISMISS_VKEY = 'last-read-dismissed-verse';
+const LAST_READ_SESSION_KEY = 'last-read-session-shown';
+const LAST_READ_AUTO_KEY = 'last-read-auto-tracking';
 const DWELL_TIME_MS = 1000;
 const SAVE_THROTTLE_MS = 3000;
 const NAVIGATION_TIMEOUT_MS = 3000;
@@ -161,6 +168,132 @@ function clearLastRead() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   MANUAL vs AUTOMATIC TRACKING
+   ═══════════════════════════════════════════════════════════════════ */
+
+function isAutoTrackingEnabled() {
+    const val = localStorage.getItem(LAST_READ_AUTO_KEY);
+    return val !== 'false';
+}
+
+function setAutoTrackingEnabled(enabled) {
+    localStorage.setItem(LAST_READ_AUTO_KEY, enabled ? 'true' : 'false');
+}
+
+function isManualLastRead() {
+    const data = getLastRead();
+    return data && data.mode === 'manual';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MANUAL SET / REMOVE LAST READ
+   ═══════════════════════════════════════════════════════════════════ */
+
+function setManualLastRead(surahNumber, ayahNumber) {
+    const surahInfo = getLastReadSurahInfo(surahNumber);
+    const verseEl = document.querySelector(
+        `.verse-container[data-surah="${surahNumber}"][data-ayah="${ayahNumber}"]`
+    );
+    let pageNumber = currentPageNumber;
+    if (verseEl) {
+        const pageContent = document.querySelector('.quran-page-content');
+        if (pageContent) pageNumber = currentPageNumber;
+    }
+
+    const data = {
+        surahNumber: surahNumber,
+        surahName: surahInfo ? surahInfo.arabicName : '',
+        englishSurahName: surahInfo ? surahInfo.englishName : '',
+        pageNumber: pageNumber,
+        ayahNumber: ayahNumber,
+        verseKey: `${surahNumber}:${ayahNumber}`,
+        mode: 'manual',
+        timestamp: Date.now()
+    };
+
+    saveLastRead(data);
+
+    _lastSavedKey = `${surahNumber}:${ayahNumber}`;
+    _lastSaveTime = Date.now();
+
+    _applyLastReadHighlight();
+    updateLastReadMarker();
+    updateCard();
+    updateSurahListLastReadIndicator();
+    updateVerseLastReadButton(surahNumber, ayahNumber);
+
+    showToast('تم تعيين كآخر موضع قراءة');
+}
+
+function removeManualLastRead() {
+    const data = getLastRead();
+    if (!data) return;
+
+    setAutoTrackingEnabled(true);
+    clearLastRead();
+
+    document.querySelectorAll('.verse-container.last-read-verse').forEach(el => {
+        el.classList.remove('last-read-verse');
+        el.removeAttribute('aria-current');
+    });
+
+    const verseEl = document.querySelector(
+        `.verse-container[data-surah="${data.surahNumber}"][data-ayah="${data.ayahNumber}"]`
+    );
+    if (verseEl) {
+        updateVerseLastReadButton(data.surahNumber, data.ayahNumber);
+    }
+
+    updateCard();
+    updateSurahListLastReadIndicator();
+
+    showToast('تمت إزالة علامة آخر قراءة');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VERSE TOOLBAR — Last Read Button Update
+   ═══════════════════════════════════════════════════════════════════ */
+
+function updateVerseLastReadButton(surahNumber, ayahNumber) {
+    const verseEl = document.querySelector(
+        `.verse-container[data-surah="${surahNumber}"][data-ayah="${ayahNumber}"]`
+    );
+    if (!verseEl) return;
+
+    const btn = verseEl.querySelector('.verse-lastread-btn');
+    if (!btn) return;
+
+    const data = getLastRead();
+    const isLastRead = data && data.surahNumber === surahNumber && data.ayahNumber === ayahNumber;
+
+    if (isLastRead) {
+        btn.textContent = '❌';
+        btn.title = 'إزالة علامة آخر قراءة';
+        btn.setAttribute('aria-label', 'إزالة علامة آخر قراءة');
+        btn.classList.add('is-lastread');
+    } else {
+        btn.textContent = '📍';
+        btn.title = 'تعيين كآخر موضع قراءة';
+        btn.setAttribute('aria-label', 'تعيين كآخر موضع قراءة');
+        btn.classList.remove('is-lastread');
+    }
+}
+
+function _setupLastReadButtonAction(btn, surahNumber, ayahNumber) {
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const data = getLastRead();
+        const isLastRead = data && data.surahNumber === surahNumber && data.ayahNumber === ayahNumber;
+
+        if (isLastRead) {
+            removeManualLastRead();
+        } else {
+            setManualLastRead(surahNumber, ayahNumber);
+        }
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    RELATIVE TIME FORMATTING (Arabic + English)
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -223,7 +356,7 @@ function formatRelativeTime(timestamp) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   CONTINUE READING CARD
+   CONTINUE READING CARD — Once Per Session
    ═══════════════════════════════════════════════════════════════════ */
 
 function renderContinueReadingCard() {
@@ -234,6 +367,8 @@ function renderContinueReadingCard() {
     const data = getLastRead();
     if (!data || !data.surahNumber) return;
 
+    if (sessionStorage.getItem(LAST_READ_SESSION_KEY)) return;
+
     const dismissed = localStorage.getItem(LAST_READ_DISMISS_KEY);
     const dismissedVerse = localStorage.getItem(LAST_READ_DISMISS_VKEY);
     const currentKey = `${data.surahNumber}:${data.ayahNumber}`;
@@ -242,7 +377,6 @@ function renderContinueReadingCard() {
 
     const surahInfo = getLastReadSurahInfo(data.surahNumber);
     const surahName = surahInfo ? surahInfo.arabicName : (data.surahName || '');
-    const englishName = surahInfo ? surahInfo.englishName : (data.englishSurahName || '');
     const relTime = formatRelativeTime(data.timestamp);
 
     const card = document.createElement('div');
@@ -268,6 +402,7 @@ function renderContinueReadingCard() {
 
     const meta = document.createElement('p');
     meta.className = 'last-read-card-meta';
+    const modeLabel = data.mode === 'manual' ? 'آخر قراءة' : 'آخر قراءة';
     meta.textContent = `الآية ${toArabicNumber(data.ayahNumber)} \u2022 ${relTime}`;
 
     body.appendChild(label);
@@ -296,6 +431,8 @@ function renderContinueReadingCard() {
     card.appendChild(body);
     card.appendChild(actions);
     container.appendChild(card);
+
+    sessionStorage.setItem(LAST_READ_SESSION_KEY, '1');
 }
 
 function dismissLastReadCard() {
@@ -307,6 +444,7 @@ function dismissLastReadCard() {
         localStorage.setItem(LAST_READ_DISMISS_VKEY, `${data.surahNumber}:${data.ayahNumber}`);
     }
     localStorage.setItem(LAST_READ_DISMISS_KEY, Date.now().toString());
+    sessionStorage.setItem(LAST_READ_SESSION_KEY, '1');
 
     card.classList.add('dismissing');
     setTimeout(() => {
@@ -339,7 +477,7 @@ function continueReading() {
     dismissLastReadCard();
 
     if (data.pageNumber === currentPageNumber) {
-        scrollToVerse(data.surahNumber, data.ayahNumber);
+        scrollToVerse(data.surahNumber, data.ayahNumber, true);
     } else {
         navigateToPage(data.pageNumber);
         _waitForRenderAndScroll(data.surahNumber, data.ayahNumber);
@@ -353,7 +491,7 @@ function _waitForRenderAndScroll(surahNumber, ayahNumber) {
         `.verse-container[data-surah="${surahNumber}"][data-ayah="${ayahNumber}"]`
     );
     if (verseEl) {
-        scrollToVerse(surahNumber, ayahNumber);
+        scrollToVerse(surahNumber, ayahNumber, true);
         return;
     }
 
@@ -365,7 +503,7 @@ function _waitForRenderAndScroll(surahNumber, ayahNumber) {
         if (el) {
             resolved = true;
             observer.disconnect();
-            requestAnimationFrame(() => scrollToVerse(surahNumber, ayahNumber));
+            requestAnimationFrame(() => scrollToVerse(surahNumber, ayahNumber, true));
         }
     });
 
@@ -380,7 +518,7 @@ function _waitForRenderAndScroll(surahNumber, ayahNumber) {
     }, NAVIGATION_TIMEOUT_MS);
 }
 
-function scrollToVerse(surahNumber, ayahNumber) {
+function scrollToVerse(surahNumber, ayahNumber, animate) {
     const verseEl = document.querySelector(
         `.verse-container[data-surah="${surahNumber}"][data-ayah="${ayahNumber}"]`
     );
@@ -389,12 +527,48 @@ function scrollToVerse(surahNumber, ayahNumber) {
         return;
     }
 
-    verseEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    verseEl.scrollIntoView({ behavior: animate ? 'smooth' : 'auto', block: 'center' });
 
-    verseEl.classList.remove('pulse');
-    void verseEl.offsetWidth;
-    verseEl.classList.add('pulse');
-    setTimeout(() => verseEl.classList.remove('pulse'), 2200);
+    if (animate) {
+        const verseNumEl = verseEl.querySelector('.verse-number');
+        if (verseNumEl) {
+            verseNumEl.classList.remove('last-read-ornament-pulse');
+            void verseNumEl.offsetWidth;
+            verseNumEl.classList.add('last-read-ornament-pulse');
+            setTimeout(() => verseNumEl.classList.remove('last-read-ornament-pulse'), 2200);
+        }
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VERSE NUMBER ORNAMENT HIGHLIGHTING
+   ═══════════════════════════════════════════════════════════════════ */
+
+function _applyLastReadHighlight() {
+    document.querySelectorAll('.verse-container.last-read-verse').forEach(el => {
+        el.classList.remove('last-read-verse');
+        el.removeAttribute('aria-current');
+    });
+
+    document.querySelectorAll('.verse-number.last-read-ornament').forEach(el => {
+        el.classList.remove('last-read-ornament');
+    });
+
+    const data = getLastRead();
+    if (!data || !data.surahNumber) return;
+
+    const verseEl = document.querySelector(
+        `.verse-container[data-surah="${data.surahNumber}"][data-ayah="${data.ayahNumber}"]`
+    );
+    if (!verseEl) return;
+
+    verseEl.classList.add('last-read-verse');
+    verseEl.setAttribute('aria-current', 'true');
+
+    const verseNumEl = verseEl.querySelector('.verse-number');
+    if (verseNumEl) {
+        verseNumEl.classList.add('last-read-ornament');
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -422,6 +596,8 @@ function trackReadingPosition() {
 
 function _onIntersection(entries) {
     if (_audioTrackingActive || window._isAudioNavigation) return;
+
+    if (isManualLastRead() || !isAutoTrackingEnabled()) return;
 
     let bestEntry = null;
     let bestRatio = 0;
@@ -465,9 +641,6 @@ function _cancelDwell() {
 }
 
 function _savePosition(surahNumber, ayahNumber) {
-    const verseText = document.querySelector(
-        `.verse-container[data-surah="${surahNumber}"][data-ayah="${ayahNumber}"] .verse-text`
-    );
     const surahInfo = getLastReadSurahInfo(surahNumber);
 
     saveLastRead({
@@ -477,6 +650,7 @@ function _savePosition(surahNumber, ayahNumber) {
         pageNumber: currentPageNumber,
         ayahNumber: ayahNumber,
         verseKey: `${surahNumber}:${ayahNumber}`,
+        mode: 'auto',
         timestamp: Date.now()
     });
 
@@ -489,6 +663,12 @@ function _savePosition(surahNumber, ayahNumber) {
 
 function onAudioVerseChange(surahNumber, verseNumber) {
     _audioTrackingActive = true;
+
+    if (isManualLastRead() || !isAutoTrackingEnabled()) {
+        setTimeout(() => { _audioTrackingActive = false; }, 2000);
+        return;
+    }
+
     _savePosition(surahNumber, verseNumber);
 
     setTimeout(() => { _audioTrackingActive = false; }, 2000);
@@ -499,22 +679,64 @@ function onAudioVerseChange(surahNumber, verseNumber) {
    ═══════════════════════════════════════════════════════════════════ */
 
 function updateLastReadMarker() {
-    document.querySelectorAll('.verse-container.last-read-verse').forEach(el => {
-        el.classList.remove('last-read-verse');
-        el.removeAttribute('aria-current');
-    });
+    _applyLastReadHighlight();
 
     const data = getLastRead();
     if (!data || !data.surahNumber) return;
     if (data.pageNumber !== currentPageNumber) return;
+}
 
-    const verseEl = document.querySelector(
-        `.verse-container[data-surah="${data.surahNumber}"][data-ayah="${data.ayahNumber}"]`
-    );
-    if (!verseEl) return;
+/* ═══════════════════════════════════════════════════════════════════
+   SURAH LIST LAST READ INDICATOR
+   ═══════════════════════════════════════════════════════════════════ */
 
-    verseEl.classList.add('last-read-verse');
-    verseEl.setAttribute('aria-current', 'true');
+function updateSurahListLastReadIndicator() {
+    document.querySelectorAll('.surah-item').forEach(item => {
+        item.classList.remove('has-last-read');
+        const indicator = item.querySelector('.surah-lastread-indicator');
+        if (indicator) indicator.remove();
+    });
+
+    const data = getLastRead();
+    if (!data || !data.surahNumber) return;
+
+    const surahItem = document.querySelector(`.surah-item[data-surah="${data.surahNumber}"]`);
+    if (!surahItem) return;
+
+    surahItem.classList.add('has-last-read');
+
+    const indicator = document.createElement('span');
+    indicator.className = 'surah-lastread-indicator';
+    indicator.textContent = '📖';
+    indicator.setAttribute('aria-label', 'آخر قراءة');
+    surahItem.appendChild(indicator);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   GO TO SURAH — With Auto-Scroll to Last Read
+   ═══════════════════════════════════════════════════════════════════ */
+
+function goToSurahWithLastRead(surahNumber) {
+    const data = getLastRead();
+    if (data && data.surahNumber === surahNumber) {
+        const targetSurah = surahData.find(s => s.number === surahNumber);
+        if (targetSurah && targetSurah.ayahs.length > 0) {
+            currentPage = data.pageNumber;
+            renderPage(currentPage);
+            highlightActiveSurah(surahNumber);
+            window.scrollTo(0, 0);
+            history.replaceState({ page: currentPage }, '', `?page=${currentPage}`);
+
+            setTimeout(() => {
+                _applyLastReadHighlight();
+                scrollToVerse(data.surahNumber, data.ayahNumber, true);
+            }, 200);
+        }
+        matchSidebarHeight();
+        closeSidebar();
+        return true;
+    }
+    return false;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -526,4 +748,5 @@ function initLastRead() {
     renderContinueReadingCard();
     trackReadingPosition();
     updateLastReadMarker();
+    updateSurahListLastReadIndicator();
 }

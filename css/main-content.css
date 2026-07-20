@@ -573,6 +573,19 @@
     color: var(--gold-accent);
 }
 
+.verse-action-btn.verse-lastread-btn {
+    transition: background var(--transition-fast), transform var(--transition-fast), color var(--transition-fast);
+}
+
+.verse-action-btn.verse-lastread-btn.is-lastread {
+    color: var(--primary-green);
+    background: rgba(27, 107, 58, 0.08);
+}
+
+.verse-action-btn.verse-lastread-btn.is-lastread:hover {
+    background: rgba(27, 107, 58, 0.15);
+}
+
 /* ================================================================
    READING PAGE TRANSITIONS — Smooth Page Changes
    ================================================================ */

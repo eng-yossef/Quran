@@ -53,6 +53,10 @@
     color: var(--gold-accent) !important;
 }
 
+.night-mode .surah-item.has-last-read .surah-name {
+    color: #D4C8B0 !important;
+}
+
 .night-mode .sidebar-header {
     background-color: #1A1714 !important;
     border-bottom: 1px solid rgba(197, 153, 42, 0.08);
@@ -218,6 +222,11 @@
 
 .night-mode .verse-action-btn:hover {
     background: rgba(197, 153, 42, 0.1);
+}
+
+.night-mode .verse-action-btn.verse-lastread-btn.is-lastread {
+    color: #3CB371;
+    background: rgba(60, 179, 113, 0.1);
 }
 
 /* ─── Header Buttons Night Mode ──────────────────────────────── */
